@@ -1,3 +1,2 @@
 thoth-storages
-thoth-python
 pandas
