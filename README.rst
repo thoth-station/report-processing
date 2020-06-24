@@ -18,10 +18,3 @@ The library can be installed via pip or Pipenv from `PyPI
 
 The library does not provide any CLI, it is rather a low level library
 supporting other parts of Thoth.
-
-You can run prepared test-suite via the following command:
-
-.. code-block:: console
-
-  pipenv install --dev
-  pipenv run python3 setup.py test
