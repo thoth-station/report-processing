@@ -17,8 +17,6 @@
 
 """Securit Indicator bandit test suite."""
 
-import pytest
-
 from .base_test import ReportProcessingTestCase
 from thoth.report_processing.components.security import SecurityIndicatorsBandit
 

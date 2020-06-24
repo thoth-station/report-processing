@@ -19,7 +19,6 @@
 
 
 import logging
-import json
 
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict
@@ -217,8 +216,6 @@ class SecurityIndicatorsBandit:
         self, si_bandit_report: dict, filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """Create final si-bandit dataframe."""
-        _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
-
         # Create metadata dataframe
         metadata_df = self.create_si_bandit_metadata_dataframe(si_bandit_report=si_bandit_report)
 
@@ -268,8 +265,6 @@ class SecurityIndicatorsBandit:
         HIGH_CONFIDENCE_WEIGHT = 1
         MEDIUM_CONFIDENCE_WEIGHT = 0.5
         LOW_CONFIDENCE_WEIGHT = 0.1
-
-        q_min_max_scaler = {}
 
         for security in ["LOW", "MEDIUM", "HIGH"]:
             for confidence in ["LOW", "MEDIUM", "HIGH"]:
@@ -387,8 +382,6 @@ class SecurityIndicatorsCloc:
 
     def create_si_cloc_final_dataframe(self, si_cloc_report: dict) -> pd.DataFrame:
         """Create final si-cloc final dataframe."""
-        _LOGGER.info(f"Analyzing SI-cloc report: {counter}/{total_reports}")
-
         # Create metadata dataframe
         metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report)
         _LOGGER.info(f"Analyzing package_name: {metadata_df['package_name'][0]}")

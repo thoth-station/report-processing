@@ -19,13 +19,11 @@
 
 import logging
 import json
-import os
 
-from typing import Optional, Union, Tuple
+from typing import Optional, Union, Tuple, Dict, List, Any
 from pathlib import Path
 from zipfile import ZipFile
 
-from thoth.storages.result_base import ResultStorageBase
 from thoth.storages.advisers import AdvisersResultsStore
 from thoth.storages.inspections import InspectionResultsStore
 from thoth.storages.si_bandit import SIBanditResultsStore
@@ -34,6 +32,14 @@ from thoth.storages import SolverResultsStore
 
 
 _LOGGER = logging.getLogger(__name__)
+
+STORE = {
+    "adviser": AdvisersResultsStore,
+    "inspection": InspectionResultsStore,
+    "si-bandit": SIBanditResultsStore,
+    "si-cloc": SIClocResultsStore,
+    "solver": SolverResultsStore,
+}
 
 
 def extract_zip_file(file_path: Path):
@@ -122,16 +128,9 @@ def aggregate_thoth_results_from_local(
 
 def aggregate_thoth_results_from_ceph(
     store_name: str, files: Union[dict, list], limit_results: bool = False, max_ids: int = 5
-) -> Tuple[Union[dict, list], int]:
+) -> Tuple[Union[Dict[Any, Any], List[Any]], int]:
     """Aggregate Thoth results from Ceph."""
-    _STORE = {
-        "adviser": AdvisersResultsStore,
-        "inspection": InspectionResultsStore,
-        "si-bandit": SIBanditResultsStore,
-        "si-cloc": SIClocResultsStore,
-        "solver": SolverResultsStore,
-    }
-    store_type = _STORE[store_name]
+    store_type = STORE[store_name]
     store = store_type()
     store.connect()
 
