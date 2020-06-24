@@ -33,10 +33,8 @@ _LOGGER = logging.getLogger("thoth.lab.security")
 logging.basicConfig(level=logging.INFO)
 
 
-class SecurityIndicators:
-    """Class of methods used to process reports from Security Indicators (SI) analyzers."""
-
-    # SI-bandit
+class SecurityIndicatorsBandit:
+    """Class of methods used to process reports from Security Indicators (SI) bandit analyzer."""
 
     @staticmethod
     def aggregate_security_indicator_bandit_results(
@@ -103,7 +101,7 @@ class SecurityIndicators:
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
 
         :output extracted_info: list of dictionary for each SEVERITY/CONFIDENCE combination
-        :output extracted_info: list of dictionary for each SEVERITY/CONFIDENCE combination
+        :output summary_files: dictionary with statistics about analyzed, filtered total files
         """
         extracted_info = []
 
@@ -321,7 +319,8 @@ class SecurityIndicators:
 
         return si_bandit_df
 
-    # SI-cloc
+class SecurityIndicatorsCloc:
+    """Class of methods used to process reports from Security Indicators (SI) cloc analyzer."""
 
     @staticmethod
     def aggregate_security_indicator_cloc_results(

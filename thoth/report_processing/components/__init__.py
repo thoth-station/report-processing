@@ -17,6 +17,7 @@
 
 """Thoth components classes to process outputs."""
 
-from .security import SecurityIndicators
+from .security import SecurityIndicatorsBandit
+from .security import SecurityIndicatorsCloc
 
-__all__ = ["SecurityIndicators"]
+__all__ = ["SecurityIndicatorsBandit", "SecurityIndicatorsCloc"]
