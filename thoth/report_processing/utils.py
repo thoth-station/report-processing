@@ -76,60 +76,48 @@ def aggregate_thoth_results(
         )
 
     elif is_local:
-        counter = 0
 
-        _LOGGER.debug(f"Retrieving dataset at path... {repo_path}")
-
-        if not repo_path.exists():
-            raise Exception("There is no dataset at this path")
-
-        for file_path in repo_path.iterdir():
-            _LOGGER.debug(file_path)
-
-            if os.path.isdir(file_path) and is_inspection:
-                main_repo = file_path
-                files[str(main_repo)] = []
-
-                for file_path in main_repo.iterdir():
-                    if "specification" in str(file_path):
-                        with open(file_path, "r") as json_file_type:
-                            specification = json.load(json_file_type)
-                        break
-
-                if specification:
-                    for file_path in main_repo.iterdir():
-                        if "specification" not in str(file_path):
-                            with open(file_path, "r") as json_file_type:
-                                json_file = json.load(json_file_type)
-                                json_file["requirements"] = specification["python"]["requirements"]
-                                json_file["requirements_locked"] = specification["python"]["requirements_locked"]
-                                json_file["build_log"] = None
-
-                            json_file["identifier"] = main_repo.stem
-                            files[str(main_repo)].append(json_file)
-
-                            if limit_results:
-                                if counter == max_ids:
-                                    return files
-
-                            counter += 1
-
-            else:
-
-                with open(file_path, "r") as json_file_type:
-                    json_file = json.load(json_file_type)
-
-                files.append(json_file)
-
-                if limit_results:
-                    if counter == max_ids:
-                        return files
-
-                counter += 1
+        files, counter = aggregate_thoth_results_from_local(
+            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids, is_inspection=is_inspection
+        )
 
     _LOGGER.info("Number of file retrieved is: %r" % counter)
 
     return files
+
+
+def aggregate_thoth_results_from_local(
+    repo_path: Path,
+    files: Union[dict, list],
+    limit_results: bool = False,
+    max_ids: int = 5,
+    is_inspection: bool = False,
+):
+    """Aggregate Thoth results from local repo."""
+    _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
+    if not repo_path.exists():
+        raise Exception("There is no dataset at this path")
+
+    if is_inspection:
+        raise Exception("To be implemented")
+
+    counter = 0
+
+    for file_path in repo_path.iterdir():
+        _LOGGER.debug(file_path)
+
+        with open(file_path, "r") as json_file_type:
+            json_file = json.load(json_file_type)
+
+        files.append(json_file)
+
+        if limit_results:
+            if counter == max_ids:
+                return files
+
+        counter += 1
+
+    return files, counter
 
 
 def aggregate_thoth_results_from_ceph(
@@ -137,7 +125,7 @@ def aggregate_thoth_results_from_ceph(
 ) -> Tuple[Union[dict, list], int]:
     """Aggregate Thoth results from Ceph."""
     _STORE = {
-        "adviser": InspectionResultsStore,
+        "adviser": AdvisersResultsStore,
         "inspection": InspectionResultsStore,
         "si-bandit": SIBanditResultsStore,
         "si-cloc": SIClocResultsStore,
