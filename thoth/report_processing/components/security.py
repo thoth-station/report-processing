@@ -26,7 +26,7 @@ from typing import List, Optional, Tuple, Dict
 
 import pandas as pd
 
-from utils import aggregate_thoth_results
+from thoth.report_processing.utils import aggregate_thoth_results
 
 _LOGGER = logging.getLogger("thoth.lab.security")
 
@@ -238,9 +238,7 @@ class SecurityIndicatorsBandit:
         return si_bandit_report_summary_df
 
     def aggregate_si_bandit_final_dataframe(
-        self,
-        si_bandit_reports: List[dict],
-        filters_files: Optional[List[str]] = None,
+        self, si_bandit_reports: List[dict], filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """Aggregate si-bandit final dataframes."""
         counter = 1
@@ -252,8 +250,7 @@ class SecurityIndicatorsBandit:
             _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
 
             si_bandit_report_summary_df = self.create_si_bandit_final_dataframe(
-                si_bandit_report=si_bandit_report,
-                filters_files=filters_files
+                si_bandit_report=si_bandit_report, filters_files=filters_files
             )
 
             final_df = pd.concat([final_df, si_bandit_report_summary_df], axis=0)
@@ -319,6 +316,7 @@ class SecurityIndicatorsBandit:
 
         return si_bandit_df
 
+
 class SecurityIndicatorsCloc:
     """Class of methods used to process reports from Security Indicators (SI) cloc analyzer."""
 
@@ -349,7 +347,7 @@ class SecurityIndicatorsCloc:
     @staticmethod
     def extract_data_from_si_cloc_metadata(si_cloc_report: dict) -> dict:
         """Extract data from si-cloc report metadata."""
-        report_metadata=si_cloc_report["metadata"]
+        report_metadata = si_cloc_report["metadata"]
 
         extracted_metadata = {
             "datetime": report_metadata["datetime"],
@@ -416,9 +414,7 @@ class SecurityIndicatorsCloc:
         for si_cloc_report in si_cloc_reports:
 
             _LOGGER.info(f"Analyzing SI-cloc report: {counter}/{total_reports}")
-            si_cloc_report_summary_df = self.create_si_cloc_final_dataframe(
-                si_cloc_report=si_cloc_report
-            )
+            si_cloc_report_summary_df = self.create_si_cloc_final_dataframe(si_cloc_report=si_cloc_report)
 
             final_df = pd.concat([final_df, si_cloc_report_summary_df], axis=0)
 

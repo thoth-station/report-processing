@@ -26,7 +26,7 @@ from pathlib import Path
 from zipfile import ZipFile
 
 from thoth.storages.result_base import ResultStorageBase
-from thoth.storages.adviser import Advi
+from thoth.storages.advisers import AdvisersResultsStore
 from thoth.storages.inspections import InspectionResultsStore
 from thoth.storages.si_bandit import SIBanditResultsStore
 from thoth.storages.si_cloc import SIClocResultsStore
