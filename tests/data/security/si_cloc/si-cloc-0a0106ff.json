@@ -7,9 +7,9 @@
         "from_directory": null,
         "no_pretty": false,
         "output": "/mnt/workdir/si-cloc-0a0106ff",
-        "package_index": "https://pypi.org/simple",
-        "package_name": "aiohttp",
-        "package_version": "3.4.0b1"
+        "package_index": "https://thoth-station.ninja/",
+        "package_name": "thoth-test",
+        "package_version": "0.0.1"
       }
     },
     "datetime": "2020-06-15T18:44:16.375352",

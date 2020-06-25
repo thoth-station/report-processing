@@ -19,6 +19,7 @@
 
 
 import logging
+import json
 
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict, Any
@@ -516,9 +517,28 @@ class SecurityIndicatorsAggregator:
 
         package_df = si_bandit_df[package_info]
 
-        si_bandit_df.drop(columns=package_info)
-        si_cloc_df.drop(columns=package_info)
+        si_bandit_df.drop(columns=package_info, inplace=True)
+        si_cloc_df.drop(columns=package_info, inplace=True)
 
         aggregated_df = pd.concat([package_df, si_bandit_df, si_cloc_df], axis=1)
 
         return aggregated_df
+
+    def create_si_aggregated_json(
+        self, si_bandit_report: Dict[str, Any], si_cloc_report: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Create json with aggregated data from SI analyzers.
+
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+
+        :output: json file with aggregated SI analyzers reports provided.
+        """
+        aggregated_df = self.create_si_aggregated_dataframe(
+            si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
+        )
+        aggregated_si = aggregated_df.to_json(orient="records")  # string
+
+        aggregated_json: Dict[str, Any] = json.loads(aggregated_si)[0]
+
+        return aggregated_json

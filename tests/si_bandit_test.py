@@ -24,19 +24,19 @@ from thoth.report_processing.components.security import SecurityIndicatorsBandit
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_BANDIT_FILE = ReportProcessingTestCase.DATA / "security" / "si_bandit"
+    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security" / "si_bandit"
 
     def test_get_security_indicator_bandit_report(self) -> None:
         """Test retrieving report from local path."""
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FILE
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )[0]
         assert si_bandit_report
 
     def test_get_metadata_df_from_bandit_report(self) -> None:
         """Test obtaining metadata from si bandit report."""
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FILE
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )[0]
         si_bandit = SecurityIndicatorsBandit()
         metadata_retrieved = si_bandit.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
@@ -55,7 +55,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
     def test_get_severity_confidence_info_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info from si bandit report."""
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FILE
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info, summary = si_bandit.extract_severity_confidence_info(
@@ -77,7 +77,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
     def test_get_severity_confidence_info_df_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info DataFrame from si bandit report."""
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FILE
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info_df, summary = si_bandit.create_security_confidence_dataframe(
