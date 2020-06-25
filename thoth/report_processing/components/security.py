@@ -491,7 +491,10 @@ class SecurityIndicatorsAggregator:
     si_cloc = SecurityIndicatorsCloc()
 
     def create_si_aggregated_dataframe(
-        self, si_bandit_report: Dict[str, Any], si_cloc_report: Dict[str, Any]
+        self,
+        si_bandit_report: Dict[str, Any],
+        si_cloc_report: Dict[str, Any],
+        filters_files: Optional[List[str]] = None,
     ) -> pd.DataFrame:
         """Create dataframe with aggregated data from SI analyzers.
 
@@ -501,7 +504,9 @@ class SecurityIndicatorsAggregator:
         :output aggregated_df: pandas.DataFrame aggregating all SI analyzers reports provided.
         """
         aggregated_df = pd.DataFrame()
-        si_bandit_df = self.si_bandit.create_si_bandit_final_dataframe(si_bandit_report=si_bandit_report)
+        si_bandit_df = self.si_bandit.create_si_bandit_final_dataframe(
+            si_bandit_report=si_bandit_report, filters_files=filters_files
+        )
         si_cloc_df = self.si_cloc.create_si_cloc_final_dataframe(si_cloc_report=si_cloc_report)
 
         package_info = ["package_name", "package_version", "package_index"]
@@ -525,7 +530,10 @@ class SecurityIndicatorsAggregator:
         return aggregated_df
 
     def create_si_aggregated_json(
-        self, si_bandit_report: Dict[str, Any], si_cloc_report: Dict[str, Any]
+        self,
+        si_bandit_report: Dict[str, Any],
+        si_cloc_report: Dict[str, Any],
+        filters_files: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Create json with aggregated data from SI analyzers.
 
@@ -535,7 +543,7 @@ class SecurityIndicatorsAggregator:
         :output: json file with aggregated SI analyzers reports provided.
         """
         aggregated_df = self.create_si_aggregated_dataframe(
-            si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
+            si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report, filters_files=filters_files
         )
         aggregated_si = aggregated_df.to_json(orient="records")  # string
 
