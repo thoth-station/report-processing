@@ -26,6 +26,7 @@ from typing import List, Optional, Tuple, Dict, Any
 import pandas as pd
 
 from thoth.report_processing.utils import aggregate_thoth_results
+from thoth.report_processing.exceptions import ThothSIPackageNotMatchingException
 
 _LOGGER = logging.getLogger("thoth.lab.security")
 
@@ -52,12 +53,12 @@ class SecurityIndicatorsBandit:
         is_local: bool = True,
         security_indicator_bandit_repo_path: Path = Path("security/si-bandit"),
     ) -> List[Any]:
-        """Aggregate si_bandit results from jsons stored in Ceph or locally from `si_bandit` repo.
+        """Aggregate si_bandit results from Ceph or locally using the provided path.
 
-        :param limit_results: reduce the number of si_bandit reports ids considered to `max_ids` to test analysis
-        :param max_ids: maximum number of si_bandit reports ids considered
-        :param is_local: flag to retreive the dataset locally or from S3 (credentials are required)
-        :param si_bandit_repo_path: path to retrieve the si_bandit dataset locally and `is_local` is set to True
+        :param limit_results: reduce the number of si_bandit reports ids considered to `max_ids` to test analysis.
+        :param max_ids: maximum number of si_bandit reports ids considered.
+        :param is_local: flag to retreive the dataset locally or from S3 (credentials are required).
+        :param si_bandit_repo_path: path to retrieve the si_bandit dataset locally and `is_local` is set to True.
         """
         security_indicator_bandit_reports: List[Any] = aggregate_thoth_results(
             limit_results=limit_results,
@@ -73,15 +74,17 @@ class SecurityIndicatorsBandit:
     def extract_data_from_si_bandit_metadata(si_bandit_report: Dict[str, Any]) -> Dict[str, Any]:
         """Extract data from si-bandit report metadata.
 
-        :param si_bandit_report: SI bandit report retrieved from Ceph
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+
+        :output extracted_metadata: dictinary with metadata retrieved from SI bandit report.
         """
         report_metadata = si_bandit_report["metadata"]
 
         extracted_metadata = {
-            "datetime": report_metadata["datetime"],
-            "analyzer": report_metadata["analyzer"],
-            "analyzer_version": report_metadata["analyzer_version"],
-            "document_id": report_metadata["document_id"],
+            "datetime_si_bandit": report_metadata["datetime"],
+            "analyzer_si_bandit": report_metadata["analyzer"],
+            "analyzer_version_si_bandit": report_metadata["analyzer_version"],
+            "document_id_si_bandit": report_metadata["document_id"],
             "package_name": report_metadata["arguments"]["si-bandit"]["package_name"],
             "package_version": report_metadata["arguments"]["si-bandit"]["package_version"],
             "package_index": report_metadata["arguments"]["si-bandit"]["package_index"],
@@ -92,7 +95,9 @@ class SecurityIndicatorsBandit:
     def create_si_bandit_metadata_dataframe(self, si_bandit_report: Dict[str, Any]) -> pd.DataFrame:
         """Create si-bandit report metadata dataframe.
 
-        :param si_bandit_report: SI bandit report retrieved from Ceph
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+
+        :output metadata_df: pandas.DataFrame with metadata obtained from `extract_data_from_si_bandit_metadata`.
         """
         metadata_si_bandit = self.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_df = pd.DataFrame([metadata_si_bandit])
@@ -105,12 +110,12 @@ class SecurityIndicatorsBandit:
     ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
         """Extract severity and confidence from result metrics.
 
-        :param si_bandit_report: SI bandit report retrieved from Ceph
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param filters_files: List of strings of files to be filtered from analysis
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
 
-        :output extracted_info: list of dictionary for each SEVERITY/CONFIDENCE combination
-        :output summary_files: dictionary with statistics about analyzed, filtered total files
+        :output extracted_info: list of dictionary for each SEVERITY/CONFIDENCE combination.
+        :output summary_files: dictionary with statistics about analyzed, filtered total files.
         """
         extracted_info: List[Dict[str, Any]] = []
 
@@ -182,9 +187,12 @@ class SecurityIndicatorsBandit:
     ) -> Tuple[pd.DataFrame, Dict[str, int]]:
         """Create Security/Confidence dataframe for si-bandit report.
 
-        :param si_bandit_report: SI bandit report retrieved from Ceph
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param filters_files: List of strings of files to be filtered from analysis
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+
+        :output sec_conf_df: pandas.DataFrame with all info about SEVERITY/CONFIDENCE for the package analyzed.
+        :output summary_files: dictionary with statistics about analyzed, filtered total files.
         """
         results_sec_conf, summary_files = self.extract_severity_confidence_info(
             si_bandit_report=si_bandit_report, filters_files=filters_files
@@ -207,7 +215,14 @@ class SecurityIndicatorsBandit:
     def produce_si_bandit_report_summary_dataframe(
         metadata_df: pd.DataFrame, si_bandit_sec_conf_df: pd.DataFrame, summary_files: Dict[str, int]
     ) -> pd.DataFrame:
-        """Create si-bandit report summary dataframe."""
+        """Create si-bandit report summary dataframe.
+
+        :param metadata_df: pandas.DataFrame provided by `create_si_bandit_metadata_dataframe`.
+        :param sec_conf_df: pandas.DataFrame provided by `create_security_confidence_dataframe`.
+        :output summary_files: dictionary with statistics about analyzed, filtered total files.
+
+        :output report_summary_df: pandas.DataFrame summary for a single si bandit report.
+        """
         subset_df = pd.DataFrame([si_bandit_sec_conf_df["_total"].to_dict()])
         report_summary_df = pd.concat([metadata_df, subset_df], axis=1)
         report_summary_df["number_of_files_with_severities"] = pd.to_numeric(
@@ -225,19 +240,31 @@ class SecurityIndicatorsBandit:
     def create_si_bandit_final_dataframe(
         self, si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
-        """Create final si-bandit dataframe."""
+        """Create final si-bandit dataframe.
+
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+        :param filters_files: List of strings of files to be filtered from analysis
+        e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+
+        :output report_summary_df: pandas.DataFrame summary for a single si bandit report.
+        """
         # Create metadata dataframe
         metadata_df = self.create_si_bandit_metadata_dataframe(si_bandit_report=si_bandit_report)
 
-        _LOGGER.info(f"Analyzing package_name: {metadata_df['package_name'][0]}")
-        _LOGGER.info(f"Analyzing package_version: {metadata_df['package_version'][0]}")
-        _LOGGER.info(f"Analyzing package_index: {metadata_df['package_index'][0]}")
+        package_name = metadata_df["package_name"][0]
+        package_version = metadata_df["package_version"][0]
+        package_index = metadata_df["package_index"][0]
+
+        _LOGGER.info(f"Analyzing si_bandit report for package_name: {package_name}")
+        _LOGGER.info(f"Analyzing si_bandit report for package_version: {package_version}")
+        _LOGGER.info(f"Analyzing si_bandit report for package_index: {package_index}")
 
         # Create Security/Confidence dataframe
         security_confidence_df, summary_files = self.create_security_confidence_dataframe(
             si_bandit_report=si_bandit_report, filters_files=filters_files
         )
 
+        # Create Summary dataframe
         si_bandit_report_summary_df = self.produce_si_bandit_report_summary_dataframe(
             metadata_df=metadata_df, si_bandit_sec_conf_df=security_confidence_df, summary_files=summary_files
         )
@@ -247,7 +274,14 @@ class SecurityIndicatorsBandit:
     def aggregate_si_bandit_final_dataframe(
         self, si_bandit_reports: List[Dict[str, Any]], filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
-        """Aggregate si-bandit final dataframes."""
+        """Aggregate si-bandit dataframes into final dataframe.
+
+        :param si_bandit_reports: list of SI bandit report provided by Thoth SI bandit analyzer.
+        :param filters_files: List of strings of files to be filtered from analysis
+        e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+
+        :output final_df: pandas.DataFrame aggregating all SI bandit reports provided.
+        """
         counter = 1
         final_df = pd.DataFrame()
         total_reports = len(si_bandit_reports)
@@ -267,7 +301,12 @@ class SecurityIndicatorsBandit:
         return final_df
 
     def create_security_indicators_scores(self, si_bandit_df: pd.DataFrame) -> pd.DataFrame:
-        """Create Security Indicators (SI) scores from si bandit outputs."""
+        """Create Security Indicators (SI) scores from si bandit outputs.
+
+        :param si_bandit_df: pandas.Dataframe as given by `aggregate_si_bandit_final_dataframe`.
+
+        :output si_bandit_df: Extend `si_bandit_df` with SI scores created using all rows (aka all packages).
+        """
         for security in ["LOW", "MEDIUM", "HIGH"]:
             for confidence in ["LOW", "MEDIUM", "HIGH"]:
 
@@ -320,7 +359,7 @@ class SecurityIndicatorsCloc:
         is_local: bool = True,
         security_indicator_cloc_repo_path: Path = Path("security/si-cloc"),
     ) -> List[Any]:
-        """Aggregate si_cloc results from jsons stored in Ceph or locally from `si_cloc` repo.
+        """Aggregate si_cloc results from Ceph or locally using the provided path.
 
         :param limit_results: reduce the number of si_cloc reports ids considered to `max_ids` to test analysis
         :param max_ids: maximum number of si_cloc reports ids considered
@@ -339,14 +378,18 @@ class SecurityIndicatorsCloc:
 
     @staticmethod
     def extract_data_from_si_cloc_metadata(si_cloc_report: Dict[str, Any]) -> Dict[str, Any]:
-        """Extract data from si-cloc report metadata."""
+        """Extract data from si-cloc report metadata.
+
+        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+        :output extracted_metadata: dictinary with metadata retrieved from SI cloc report.
+        """
         report_metadata = si_cloc_report["metadata"]
 
         extracted_metadata = {
-            "datetime": report_metadata["datetime"],
-            "analyzer": report_metadata["analyzer"],
-            "analyzer_version": report_metadata["analyzer_version"],
-            "document_id": report_metadata["document_id"],
+            "datetime_si_cloc": report_metadata["datetime"],
+            "analyzer_si_cloc": report_metadata["analyzer"],
+            "analyzer_version_si_cloc": report_metadata["analyzer_version"],
+            "document_id_si_cloc": report_metadata["document_id"],
             "package_name": report_metadata["arguments"]["app.py"]["package_name"],
             "package_version": report_metadata["arguments"]["app.py"]["package_version"],
             "package_index": report_metadata["arguments"]["app.py"]["package_index"],
@@ -355,7 +398,12 @@ class SecurityIndicatorsCloc:
         return extracted_metadata
 
     def create_si_cloc_metadata_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
-        """Create si-cloc report metadata dataframe."""
+        """Create si-cloc report metadata dataframe.
+
+        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+
+        :output metadata_df: pandas.DataFrame with metadata obtained from `extract_data_from_si_cloc_metadata`.
+        """
         metadata_si_cloc = self.extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_df = pd.DataFrame([metadata_si_cloc])
 
@@ -373,30 +421,51 @@ class SecurityIndicatorsCloc:
     def produce_si_cloc_report_summary_dataframe(
         metadata_df: pd.DataFrame, cloc_results_df: pd.DataFrame
     ) -> pd.DataFrame:
-        """Create si-cloc report summary dataframe."""
+        """Create si-cloc report summary dataframe.
+
+        :param metadata_df: pandas.DataFrame provided by `create_si_cloc_metadata_dataframe`.
+        :param cloc_results_df: pandas.DataFrame provided by `create_si_cloc_results_dataframe`.
+
+        :output report_summary_df: pandas.DataFrame summary for a single si cloc report.
+        """
         report_summary_df = pd.concat([metadata_df, cloc_results_df], axis=1)
 
         return report_summary_df
 
     def create_si_cloc_final_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
-        """Create final si-cloc final dataframe."""
+        """Create final si-cloc final dataframe.
+
+        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+
+        :output report_summary_df: pandas.DataFrame summary for a single si cloc report.
+        """
         # Create metadata dataframe
         metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report)
-        _LOGGER.info(f"Analyzing package_name: {metadata_df['package_name'][0]}")
-        _LOGGER.info(f"Analyzing package_version: {metadata_df['package_version'][0]}")
-        _LOGGER.info(f"Analyzing package_index: {metadata_df['package_index'][0]}")
 
-        # Create Security/Confidence dataframe
+        package_name = metadata_df["package_name"][0]
+        package_version = metadata_df["package_version"][0]
+        package_index = metadata_df["package_index"][0]
+
+        _LOGGER.info(f"Analyzing si_cloc report for package_name: {package_name}")
+        _LOGGER.info(f"Analyzing si_cloc report for package_version: {package_version}")
+        _LOGGER.info(f"Analyzing si_cloc report for package_index: {package_index}")
+
+        # Create cloc results dataframe
         cloc_results_df = self.create_si_cloc_results_dataframe(si_cloc_report=si_cloc_report)
 
-        si_cloc_report_summary_df = self.produce_si_cloc_report_summary_dataframe(
+        report_summary_df = self.produce_si_cloc_report_summary_dataframe(
             metadata_df=metadata_df, cloc_results_df=cloc_results_df
         )
 
-        return si_cloc_report_summary_df
+        return report_summary_df
 
     def aggregate_si_cloc_final_dataframes(self, si_cloc_reports: List[Dict[str, Any]]) -> pd.DataFrame:
-        """Aggregate final si-cloc dataframes."""
+        """Aggregate si-cloc dataframes into final dataframe.
+
+        :param si_cloc_reports: list of SI cloc report provided by Thoth SI cloc analyzer.
+
+        :output final_df: pandas.DataFrame aggregating all SI cloc reports provided.
+        """
         counter = 1
         total_reports = len(si_cloc_reports)
 
@@ -412,3 +481,44 @@ class SecurityIndicatorsCloc:
             counter += 1
 
         return final_df
+
+
+class SecurityIndicatorsAggregator:
+    """Class of methods used to aggregate reports from Security Indicators (SI) analyzers."""
+
+    si_bandit = SecurityIndicatorsBandit()
+    si_cloc = SecurityIndicatorsCloc()
+
+    def create_si_aggregated_dataframe(
+        self, si_bandit_report: Dict[str, Any], si_cloc_report: Dict[str, Any]
+    ) -> pd.DataFrame:
+        """Create dataframe with aggregated data from SI analyzers.
+
+        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+
+        :output aggregated_df: pandas.DataFrame aggregating all SI analyzers reports provided.
+        """
+        aggregated_df = pd.DataFrame()
+        si_bandit_df = self.si_bandit.create_si_bandit_final_dataframe(si_bandit_report=si_bandit_report)
+        si_cloc_df = self.si_cloc.create_si_cloc_final_dataframe(si_cloc_report=si_cloc_report)
+
+        package_info = ["package_name", "package_version", "package_index"]
+        si_bandit_package = set(str(v) for v in si_bandit_df[package_info].values)
+        si_cloc_package = set(str(v) for v in si_cloc_df[package_info].values)
+
+        if si_bandit_package - si_cloc_package:
+            raise ThothSIPackageNotMatchingException(
+                "The reports are from different packages, cannot be aggregated!"
+                f"\nsi_bandit:{si_bandit_package}"
+                f"\nsi_cloc: {si_cloc_package}"
+            )
+
+        package_df = si_bandit_df[package_info]
+
+        si_bandit_df.drop(columns=package_info)
+        si_cloc_df.drop(columns=package_info)
+
+        aggregated_df = pd.concat([package_df, si_bandit_df, si_cloc_df], axis=1)
+
+        return aggregated_df
