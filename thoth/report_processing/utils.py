@@ -38,11 +38,14 @@ STORE = {"si_bandit": SIBanditResultsStore, "si_cloc": SIClocResultsStore}
 
 
 def extract_zip_file(file_path: Path) -> None:
-    """Extract files from zip files."""
+    """Extract files from zip files.
+
+    :param file_path: Path where the zip file is locally stored.
+    """
     with ZipFile(file_path, "r") as zip_file:
         zip_file.printdir()
 
-        _LOGGER.debug("Extracting all the files now...")
+        _LOGGER.debug("Extracting all files...")
         zip_file.extractall()
 
 
