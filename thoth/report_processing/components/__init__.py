@@ -19,5 +19,6 @@
 
 from .security import SecurityIndicatorsBandit
 from .security import SecurityIndicatorsCloc
+from .security import SecurityIndicatorsAggregator
 
-__all__ = ["SecurityIndicatorsBandit", "SecurityIndicatorsCloc"]
+__all__ = ["SecurityIndicatorsBandit", "SecurityIndicatorsCloc", "SecurityIndicatorsAggregator"]
