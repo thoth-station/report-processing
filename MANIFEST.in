@@ -1,0 +1,16 @@
+include requirements.txt
+include Pipfile.lock
+include *.md
+include *.template
+include *.yaml
+include LICENSE
+include OWNERS
+include Pipfile
+include mypy.ini
+include .coafile
+recursive-include docs *.html
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include tests *.py
+recursive-include tests *.yaml
+recursive-include tests *.json

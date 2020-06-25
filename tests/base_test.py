@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# project template
-# Copyright(C) 2010 Red Hat, Inc.
+# thoth-report-processing
+# Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,9 +15,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This is the main script of the template project."""
+"""A base class for implementing tests."""
 
-from template.version import __version__
+from pathlib import Path
 
-if __name__ == "__main__":
-    print(f"A template project with Thoth integration, v{__version__}.")
+
+_HERE = Path(__file__).parent
+
+
+class ReportProcessingTestCase:
+    """A base class for implementing test cases."""
+
+    DATA = _HERE / "data"

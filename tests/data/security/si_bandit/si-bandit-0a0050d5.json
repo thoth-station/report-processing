@@ -1,0 +1,355 @@
+{
+  "metadata": {
+    "analyzer": "thoth-si-bandit",
+    "analyzer_version": "0.1.0",
+    "arguments": {
+      "si-bandit": {
+        "from_directory": null,
+        "no_pretty": false,
+        "output": "/mnt/workdir/si-bandit-0a0050d5",
+        "package_index": "https://thoth-station.ninja/",
+        "package_name": "thoth-test",
+        "package_version": "0.0.1"
+      }
+    },
+    "datetime": "2020-06-10T14:16:22.475945",
+    "distribution": {
+      "codename": "Ootpa",
+      "id": "rhel",
+      "like": "fedora",
+      "version": "8.2",
+      "version_parts": {
+        "build_number": "",
+        "major": "8",
+        "minor": "2"
+      }
+    },
+    "document_id": "si-bandit-0a0050d5",
+    "duration": null,
+    "hostname": "si-bandit-0a0050d5-2418416294",
+    "os_release": {
+      "id": "rhel",
+      "name": "Red Hat Enterprise Linux",
+      "platform_id": "platform:el8",
+      "redhat_bugzilla_product": "Red Hat Enterprise Linux 8",
+      "redhat_bugzilla_product_version": "8.2",
+      "redhat_support_product": "Red Hat Enterprise Linux",
+      "redhat_support_product_version": "8.2",
+      "version": "8.2 (Ootpa)",
+      "version_id": "8.2"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 8,
+      "minor": 6,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": null,
+    "timestamp": 1591798582
+  },
+  "result": {
+    "errors": [],
+    "generated_at": "2020-06-10T14:16:22Z",
+    "metrics": {
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/aiocontextvars/__init__.py": {
+        "CONFIDENCE.HIGH": 0.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 0.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 53,
+        "nosec": 0
+      },
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/docs/conf.py": {
+        "CONFIDENCE.HIGH": 0.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 0.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 39,
+        "nosec": 0
+      },
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/setup.py": {
+        "CONFIDENCE.HIGH": 0.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 0.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 44,
+        "nosec": 0
+      },
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/__init__.py": {
+        "CONFIDENCE.HIGH": 0.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 0.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 1,
+        "nosec": 0
+      },
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_aio.py": {
+        "CONFIDENCE.HIGH": 3.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 3.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 28,
+        "nosec": 0
+      },
+      "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py": {
+        "CONFIDENCE.HIGH": 12.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 12.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 45,
+        "nosec": 0
+      },
+      "_totals": {
+        "CONFIDENCE.HIGH": 15.0,
+        "CONFIDENCE.LOW": 0.0,
+        "CONFIDENCE.MEDIUM": 0.0,
+        "CONFIDENCE.UNDEFINED": 0.0,
+        "SEVERITY.HIGH": 0.0,
+        "SEVERITY.LOW": 15.0,
+        "SEVERITY.MEDIUM": 0.0,
+        "SEVERITY.UNDEFINED": 0.0,
+        "loc": 210,
+        "nosec": 0
+      }
+    },
+    "results": [
+      {
+        "code": "11     await asyncio.sleep(0.1)\n12     assert v.get() == x\n13 \n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_aio.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 12,
+        "line_range": [
+          12
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "31     async def sub():\n32         assert v.get('default') == 'initial'\n33         v.set('sub')\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_aio.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 32,
+        "line_range": [
+          32
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "37     await fut\n38     assert v.get('default') == 'update'\n39 \n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_aio.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 38,
+        "line_range": [
+          38
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "8         v.get()\n9     assert v.get(456) == 456\n10     return v\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 9,
+        "line_range": [
+          9
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "14     v = ContextVar('v', default=123)\n15     assert v.get() == 123\n16     assert v.get(456) == 456\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 15,
+        "line_range": [
+          15
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "15     assert v.get() == 123\n16     assert v.get(456) == 456\n17     return v\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 16,
+        "line_range": [
+          16
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "22     token = v.set(123)\n23     assert v.get() == 123\n24     assert v.get(789) == 123\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 23,
+        "line_range": [
+          23
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "23     assert v.get() == 123\n24     assert v.get(789) == 123\n25     return v, token\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 24,
+        "line_range": [
+          24
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "30     token = v.set(789)\n31     assert v.get() == 789\n32     assert v.get(0) == 789\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 31,
+        "line_range": [
+          31
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "31     assert v.get() == 789\n32     assert v.get(0) == 789\n33     return v, token\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 32,
+        "line_range": [
+          32
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "40     v2.set(2)\n41     assert v1.get() == 1\n42     assert v2.get() == 2\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 41,
+        "line_range": [
+          41
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "41     assert v1.get() == 1\n42     assert v2.get() == 2\n43 \n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 42,
+        "line_range": [
+          42
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "49         v.get()\n50     assert v.get(456) == 456\n51     with pytest.raises(RuntimeError):\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 50,
+        "line_range": [
+          50
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "57     v.reset(token)\n58     assert v.get() == 123\n59     assert v.get(0) == 0\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 58,
+        "line_range": [
+          58
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      },
+      {
+        "code": "58     assert v.get() == 123\n59     assert v.get(0) == 0\n",
+        "filename": "/tmp/tmpkqlqz2il/package/aiocontextvars-0.2.0/tests/test_var.py",
+        "issue_confidence": "HIGH",
+        "issue_severity": "LOW",
+        "issue_text": "Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.",
+        "line_number": 59,
+        "line_range": [
+          59
+        ],
+        "more_info": "https://bandit.readthedocs.io/en/latest/plugins/b101_assert_used.html",
+        "test_id": "B101",
+        "test_name": "assert_used"
+      }
+    ]
+  }
+}

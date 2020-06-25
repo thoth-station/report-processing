@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# project template
-# Copyright(C) 2010 Red Hat, Inc.
+# thoth-report-processing
+# Copyright(C) 2020 Francesco Murdaca
 #
 # This program is free software: you can redistribute it and / or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,6 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""This file carries the version of the template project."""
+"""Enum types used for Thoth components stores."""
 
-__version__ = "0.1.0"
+from enum import Enum, auto
+
+
+class ThothResultStoreEnum(Enum):
+    """Class for Thoth ResultsStore enums."""
+
+    si_bandit = auto()
+    si_cloc = auto()

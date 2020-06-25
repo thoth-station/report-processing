@@ -1,0 +1,21 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+thoth-storages = "*"
+pandas = "*"
+
+[dev-packages]
+pytest = "*"
+pytest-timeout = "*"
+pytest-cov = "*"
+pylint = "*"
+coala = "*"
+pytest-mypy = "*"
+mypy = "*"
+pre-commit = "==2.0.1"
+
+[requires]
+python_version = "3.6"

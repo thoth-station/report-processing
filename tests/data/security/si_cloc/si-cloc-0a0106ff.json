@@ -1,0 +1,167 @@
+{
+  "metadata": {
+    "analyzer": "si-cloc",
+    "analyzer_version": "0.1.0",
+    "arguments": {
+      "app.py": {
+        "from_directory": null,
+        "no_pretty": false,
+        "output": "/mnt/workdir/si-cloc-0a0106ff",
+        "package_index": "https://thoth-station.ninja/",
+        "package_name": "thoth-test",
+        "package_version": "0.0.1"
+      }
+    },
+    "datetime": "2020-06-15T18:44:16.375352",
+    "distribution": {
+      "codename": "",
+      "id": "fedora",
+      "like": "",
+      "version": "32",
+      "version_parts": {
+        "build_number": "",
+        "major": "32",
+        "minor": ""
+      }
+    },
+    "document_id": "si-cloc-0a0106ff",
+    "duration": null,
+    "hostname": "si-cloc-0a0106ff-4167090511",
+    "os_release": {
+      "id": "fedora",
+      "name": "Fedora",
+      "platform_id": "platform:f32",
+      "redhat_bugzilla_product": "Fedora",
+      "redhat_bugzilla_product_version": "32",
+      "redhat_support_product": "Fedora",
+      "redhat_support_product_version": "32",
+      "variant_id": "container",
+      "version": "32 (Container Image)",
+      "version_id": "32"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 3,
+      "minor": 8,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": null,
+    "timestamp": 1592246656
+  },
+  "result": {
+    "Bourne Shell": {
+      "blank": 21,
+      "code": 86,
+      "comment": 3,
+      "nFiles": 3
+    },
+    "C": {
+      "blank": 3949,
+      "code": 48663,
+      "comment": 10228,
+      "nFiles": 11
+    },
+    "C/C++ Header": {
+      "blank": 56,
+      "code": 290,
+      "comment": 104,
+      "nFiles": 2
+    },
+    "Cucumber": {
+      "blank": 0,
+      "code": 8,
+      "comment": 0,
+      "nFiles": 8
+    },
+    "Cython": {
+      "blank": 215,
+      "code": 949,
+      "comment": 26,
+      "nFiles": 5
+    },
+    "DOS Batch": {
+      "blank": 31,
+      "code": 230,
+      "comment": 2,
+      "nFiles": 2
+    },
+    "HTML": {
+      "blank": 0,
+      "code": 89,
+      "comment": 0,
+      "nFiles": 1
+    },
+    "INI": {
+      "blank": 14,
+      "code": 52,
+      "comment": 0,
+      "nFiles": 1
+    },
+    "JSON": {
+      "blank": 5,
+      "code": 17,
+      "comment": 0,
+      "nFiles": 2
+    },
+    "Markdown": {
+      "blank": 89,
+      "code": 263,
+      "comment": 0,
+      "nFiles": 4
+    },
+    "Python": {
+      "blank": 11247,
+      "code": 34549,
+      "comment": 2431,
+      "nFiles": 131
+    },
+    "SUM": {
+      "blank": 21337,
+      "code": 92085,
+      "comment": 17038,
+      "nFiles": 224
+    },
+    "SVG": {
+      "blank": 0,
+      "code": 610,
+      "comment": 1,
+      "nFiles": 3
+    },
+    "TOML": {
+      "blank": 0,
+      "code": 9,
+      "comment": 0,
+      "nFiles": 2
+    },
+    "YAML": {
+      "blank": 34,
+      "code": 302,
+      "comment": 36,
+      "nFiles": 6
+    },
+    "header": {
+      "cloc_url": "github.com/AlDanial/cloc",
+      "cloc_version": "1.82",
+      "elapsed_seconds": 3.30634117126465,
+      "files_per_second": 67.7486043929102,
+      "lines_per_second": 39457.5130763351,
+      "n_files": 224,
+      "n_lines": 130460
+    },
+    "make": {
+      "blank": 82,
+      "code": 356,
+      "comment": 27,
+      "nFiles": 3
+    },
+    "reStructuredText": {
+      "blank": 5594,
+      "code": 5612,
+      "comment": 4180,
+      "nFiles": 40
+    }
+  }
+}
