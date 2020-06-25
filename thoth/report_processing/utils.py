@@ -30,19 +30,22 @@ from thoth.storages.si_bandit import SIBanditResultsStore
 from thoth.storages.si_cloc import SIClocResultsStore
 from thoth.storages import SolverResultsStore
 
+from thoth.report_processing.exceptions import ThothNotKnownResultStore
+from thoth.report_processing.enums import ThothResultStoreEnum
+
 
 _LOGGER = logging.getLogger(__name__)
 
 STORE = {
     "adviser": AdvisersResultsStore,
     "inspection": InspectionResultsStore,
-    "si-bandit": SIBanditResultsStore,
-    "si-cloc": SIClocResultsStore,
+    "si_bandit": SIBanditResultsStore,
+    "si_cloc": SIClocResultsStore,
     "solver": SolverResultsStore,
 }
 
 
-def extract_zip_file(file_path: Path):
+def extract_zip_file(file_path: Path) -> None:
     """Extract files from zip files."""
     with ZipFile(file_path, "r") as zip_file:
         zip_file.printdir()
@@ -57,42 +60,44 @@ def aggregate_thoth_results(
     is_local: bool = True,
     repo_path: Optional[Path] = None,
     store_name: Optional[str] = None,
-    is_inspection: Optional[str] = None,
-) -> Union[list, dict]:
+    is_inspection: Optional[bool] = None,
+) -> Union[List[Any], Dict[Any, Any]]:
     """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
-    :param limit_results: reduce the number of reports ids considered to `max_ids` to test analysis
-    :param max_ids: maximum number of reports ids considered
-    :param is_local: flag to retreive the dataset locally or from S3 (credentials are required)
-    :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True
-    :param store: ResultStorageBase type depending on Thoth data (e.g solver, performance, adviser, etc.)
-    :param is_inspection: flag used only for InspectionResultStore as we store results in batches
+    :param limit_results: reduce the number of reports ids considered to `max_ids` for exploration.
+    :param max_ids: maximum number of reports ids considered.
+    :param is_local: flag to retreive the dataset locally (if not uses Ceph S3 (credentials are required)).
+    :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True.
+    :param store_name: compoent name type (e.g. adviser, ).
+    :param is_inspection: flag used only for InspectionResultStore as we store results in batches.
     """
     if limit_results:
         _LOGGER.debug(f"Limiting results to {max_ids} to test functions!!")
 
     if is_inspection:
-        files = {}
+        files = Dict[str, Any]
     else:
-        files = []
+        files = List[Any]
 
     if not is_local:
-        files, counter = aggregate_thoth_results_from_ceph(
+        files, counter = _aggregate_thoth_results_from_ceph(
             store_name=store_name, files=files, limit_results=limit_results, max_ids=max_ids
         )
 
-    elif is_local:
+        _LOGGER.info("Number of file retrieved is: %r" % counter)
 
-        files, counter = aggregate_thoth_results_from_local(
-            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids, is_inspection=is_inspection
-        )
+        return files
+
+    files, counter = _aggregate_thoth_results_from_local(
+        repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids, is_inspection=is_inspection
+    )
 
     _LOGGER.info("Number of file retrieved is: %r" % counter)
 
     return files
 
 
-def aggregate_thoth_results_from_local(
+def _aggregate_thoth_results_from_local(
     repo_path: Path,
     files: Union[dict, list],
     limit_results: bool = False,
@@ -126,10 +131,15 @@ def aggregate_thoth_results_from_local(
     return files, counter
 
 
-def aggregate_thoth_results_from_ceph(
-    store_name: str, files: Union[dict, list], limit_results: bool = False, max_ids: int = 5
+def _aggregate_thoth_results_from_ceph(
+    store_name: Optional[str], files: Union[dict, list], limit_results: bool = False, max_ids: int = 5
 ) -> Tuple[Union[Dict[Any, Any], List[Any]], int]:
     """Aggregate Thoth results from Ceph."""
+    if store_name and store_name not in ThothResultStoreEnum.__members__:
+        raise ThothNotKnownResultStore(
+            f"This store_name {store_name} is not known \
+                in Thoth: {ThothResultStoreEnum.__members__.keys()}"
+        )
     store_type = STORE[store_name]
     store = store_type()
     store.connect()
