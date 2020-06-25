@@ -500,6 +500,8 @@ class SecurityIndicatorsAggregator:
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+        :param filters_files: List of strings of files to be filtered from analysis
+        e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
 
         :output aggregated_df: pandas.DataFrame aggregating all SI analyzers reports provided.
         """
@@ -539,6 +541,8 @@ class SecurityIndicatorsAggregator:
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+        :param filters_files: List of strings of files to be filtered from analysis
+        e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
 
         :output: json file with aggregated SI analyzers reports provided.
         """
