@@ -19,16 +19,13 @@ The library can be installed via pip or Pipenv from `PyPI
 The library does not provide any CLI, it is rather a low level library
 supporting other parts of Thoth.
 
-Outputs, Reports Processing
-===========================
+Reports Processing
+==================
 
-The outputs, reports can be processed:
+The reports to be processed can be retrieved in two ways:
 
 - `locally`, providing a path.
-- `from Ceph S3`, providing the `store_name`.
-
-from `registered ones <https://github.com/thoth-station/report-processing/blob/master/thoth/report-processing/enums.py>`__
-and the following credentials:
+- Using `Ceph S3` providing the following environment variables:
 
    .. code-block:: console
 
@@ -40,11 +37,13 @@ and the following credentials:
       THOTH_CEPH_BUCKET_PREFIX=<ceph_bucket_prefix>
       THOTH_DEPLOYMENT_NAMR=<deployment_name>
 
+see currently available adapters from thoth-storages `here <https://github.com/thoth-station/report-processing/blob/master/thoth/report_processing/enums.py>`__.
+
 
 Security Indicators
 ===================
 
-Aggregating data from local path:
+Aggregating Security Indicators using local path:
 
 .. code-block:: python
 
