@@ -39,3 +39,31 @@ and the following credentials:
       THOTH_CEPH_BUCKET=<ceph_bucket>
       THOTH_CEPH_BUCKET_PREFIX=<ceph_bucket_prefix>
       THOTH_DEPLOYMENT_NAMR=<deployment_name>
+
+
+Security Indicators
+===================
+
+Aggregating data from local path:
+
+.. code-block:: console
+
+   from thoth.report_processing.components.security import SecurityIndicatorsBandit, SecurityIndicatorsCloc
+   from thoth.report_processing.components.security import SecurityIndicatorsAggregator
+
+   _SI_BANDIT_FOLDER_PATH =<>
+   _SI_CLOC_FOLDER_PATH =<>
+
+   security_aggregator = SecurityIndicatorsAggregator()
+
+   si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
+      security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
+   )[0]
+
+   si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
+      security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
+   )[0]
+
+   aggregated_json = security_aggregator.create_si_aggregated_json(
+      si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
+   )
