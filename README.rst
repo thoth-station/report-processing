@@ -6,10 +6,27 @@ This library called `thoth-report-processing
 <https://thoth-station.ninja>`__ to process all outputs provided by Thoth Components
 and stored using `thoth-storages library <https://github.com/thoth-station/storages>`__.
 
-The outputs/reports can be processed:
+Installation and Usage
+======================
 
-* locally, providing a path.
-* from Ceph S3, providing the `store_name`
+The library can be installed via pip or Pipenv from `PyPI
+<https://pypi.org/project/thoth-report-processing>`__:
+
+.. code-block:: console
+
+   pipenv install thoth-report-processing
+
+The library does not provide any CLI, it is rather a low level library
+supporting other parts of Thoth.
+
+Outputs, Reports Processing
+===========================
+
+The outputs, reports can be processed:
+
+- `locally`, providing a path.
+- `from Ceph S3`, providing the `store_name`.
+
 from `registered ones <https://github.com/thoth-station/report-processing/blob/master/thoth/report-processing/enums.py>`__
 and the following credentials:
 
@@ -24,15 +41,29 @@ and the following credentials:
       THOTH_DEPLOYMENT_NAMR=<deployment_name>
 
 
-Installation and Usage
-======================
+Security Indicators
+===================
 
-The library can be installed via pip or Pipenv from `PyPI
-<https://pypi.org/project/thoth-report-processing>`__:
+Aggregating data from local path:
 
 .. code-block:: console
 
-   pipenv install thoth-report-processing
+   from thoth.report_processing.components.security import SecurityIndicatorsBandit, SecurityIndicatorsCloc
+   from thoth.report_processing.components.security import SecurityIndicatorsAggregator
 
-The library does not provide any CLI, it is rather a low level library
-supporting other parts of Thoth.
+   _SI_BANDIT_FOLDER_PATH =<>
+   _SI_CLOC_FOLDER_PATH =<>
+
+   security_aggregator = SecurityIndicatorsAggregator()
+
+   si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
+      security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
+   )[0]
+
+   si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
+      security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
+   )[0]
+
+   aggregated_json = security_aggregator.create_si_aggregated_json(
+      si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
+   )
