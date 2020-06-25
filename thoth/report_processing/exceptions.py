@@ -24,3 +24,7 @@ class ThothReportProcessingException(Exception):
 
 class ThothNotKnownResultStore(ThothReportProcessingException):
     """An exception raised when the ResultsStore name is not registered."""
+
+
+class ThothMissingDatasetAtPath(ThothReportProcessingException):
+    """An exception raised when there is no dataset provided at that Path."""

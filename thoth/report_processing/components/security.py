@@ -21,7 +21,7 @@
 import logging
 
 from pathlib import Path
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Tuple, Dict, Any
 
 import pandas as pd
 
@@ -35,13 +35,23 @@ logging.basicConfig(level=logging.INFO)
 class SecurityIndicatorsBandit:
     """Class of methods used to process reports from Security Indicators (SI) bandit analyzer."""
 
+    # Weights for Confidence
+    HIGH_CONFIDENCE_WEIGHT = 1
+    MEDIUM_CONFIDENCE_WEIGHT = 0.5
+    LOW_CONFIDENCE_WEIGHT = 0.1
+
+    # Weights for Security
+    HIGH_SEVERITY_WEIGHT = 100
+    MEDIUM_SEVERITY_WEIGHT = 10
+    LOW_SEVERITY_WEIGHT = 1
+
     @staticmethod
     def aggregate_security_indicator_bandit_results(
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = True,
         security_indicator_bandit_repo_path: Path = Path("security/si-bandit"),
-    ) -> list:
+    ) -> List[Any]:
         """Aggregate si_bandit results from jsons stored in Ceph or locally from `si_bandit` repo.
 
         :param limit_results: reduce the number of si_bandit reports ids considered to `max_ids` to test analysis
@@ -49,18 +59,18 @@ class SecurityIndicatorsBandit:
         :param is_local: flag to retreive the dataset locally or from S3 (credentials are required)
         :param si_bandit_repo_path: path to retrieve the si_bandit dataset locally and `is_local` is set to True
         """
-        security_indicator_bandit_reports = aggregate_thoth_results(
+        security_indicator_bandit_reports: List[Any] = aggregate_thoth_results(
             limit_results=limit_results,
             max_ids=max_ids,
             is_local=is_local,
             repo_path=security_indicator_bandit_repo_path,
-            store_name="si-bandit",
+            store_name="si_bandit",
         )
 
         return security_indicator_bandit_reports
 
     @staticmethod
-    def extract_data_from_si_bandit_metadata(si_bandit_report: dict) -> dict:
+    def extract_data_from_si_bandit_metadata(si_bandit_report: Dict[str, Any]) -> Dict[str, Any]:
         """Extract data from si-bandit report metadata.
 
         :param si_bandit_report: SI bandit report retrieved from Ceph
@@ -79,7 +89,7 @@ class SecurityIndicatorsBandit:
 
         return extracted_metadata
 
-    def create_si_bandit_metadata_dataframe(self, si_bandit_report: dict) -> pd.DataFrame:
+    def create_si_bandit_metadata_dataframe(self, si_bandit_report: Dict[str, Any]) -> pd.DataFrame:
         """Create si-bandit report metadata dataframe.
 
         :param si_bandit_report: SI bandit report retrieved from Ceph
@@ -91,8 +101,8 @@ class SecurityIndicatorsBandit:
 
     @staticmethod
     def extract_severity_confidence_info(
-        si_bandit_report: dict, filters_files: Optional[List[str]] = None
-    ) -> Tuple[List[dict], Dict[str, int]]:
+        si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
         """Extract severity and confidence from result metrics.
 
         :param si_bandit_report: SI bandit report retrieved from Ceph
@@ -102,7 +112,7 @@ class SecurityIndicatorsBandit:
         :output extracted_info: list of dictionary for each SEVERITY/CONFIDENCE combination
         :output summary_files: dictionary with statistics about analyzed, filtered total files
         """
-        extracted_info = []
+        extracted_info: List[Dict[str, Any]] = []
 
         summary_files = {
             "number_of_analyzed_files": 0,
@@ -168,7 +178,7 @@ class SecurityIndicatorsBandit:
         return extracted_info, summary_files
 
     def create_security_confidence_dataframe(
-        self, si_bandit_report: dict, filters_files: Optional[List[str]] = None
+        self, si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None
     ) -> Tuple[pd.DataFrame, Dict[str, int]]:
         """Create Security/Confidence dataframe for si-bandit report.
 
@@ -213,7 +223,7 @@ class SecurityIndicatorsBandit:
         return report_summary_df
 
     def create_si_bandit_final_dataframe(
-        self, si_bandit_report: dict, filters_files: Optional[List[str]] = None
+        self, si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """Create final si-bandit dataframe."""
         # Create metadata dataframe
@@ -235,7 +245,7 @@ class SecurityIndicatorsBandit:
         return si_bandit_report_summary_df
 
     def aggregate_si_bandit_final_dataframe(
-        self, si_bandit_reports: List[dict], filters_files: Optional[List[str]] = None
+        self, si_bandit_reports: List[Dict[str, Any]], filters_files: Optional[List[str]] = None
     ) -> pd.DataFrame:
         """Aggregate si-bandit final dataframes."""
         counter = 1
@@ -256,53 +266,41 @@ class SecurityIndicatorsBandit:
 
         return final_df
 
-    @staticmethod
-    def define_si_scores(si_bandit_df: pd.DataFrame) -> pd.DataFrame():
-        """Define security scores from si bandit outputs.
-
-        WARNING: It depends on all data considered.
-        """
-        HIGH_CONFIDENCE_WEIGHT = 1
-        MEDIUM_CONFIDENCE_WEIGHT = 0.5
-        LOW_CONFIDENCE_WEIGHT = 0.1
-
+    def create_security_indicators_scores(self, si_bandit_df: pd.DataFrame) -> pd.DataFrame:
+        """Create Security Indicators (SI) scores from si bandit outputs."""
         for security in ["LOW", "MEDIUM", "HIGH"]:
             for confidence in ["LOW", "MEDIUM", "HIGH"]:
 
-                q = f"SEVERITY.{security}__CONFIDENCE.{confidence}"
+                vulnerability_class = f"SEVERITY.{security}__CONFIDENCE.{confidence}"
 
-                min_max_scaler = (si_bandit_df[q] - si_bandit_df[q].min()) / (
-                    si_bandit_df[q].max() - si_bandit_df[q].min()
+                min_max_scaler = (si_bandit_df[vulnerability_class] - si_bandit_df[vulnerability_class].min()) / (
+                    si_bandit_df[vulnerability_class].max() - si_bandit_df[vulnerability_class].min()
                 )
 
-                si_bandit_df[f"{q}_scaled"] = min_max_scaler
+                si_bandit_df[f"{vulnerability_class}_scaled"] = min_max_scaler
 
         si_bandit_df["SEVERITY.HIGH.sub_score"] = (
-            si_bandit_df["SEVERITY.HIGH__CONFIDENCE.HIGH"].fillna(0) * HIGH_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.MEDIUM"].fillna(0) * MEDIUM_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.LOW"].fillna(0) * LOW_CONFIDENCE_WEIGHT
+            si_bandit_df["SEVERITY.HIGH__CONFIDENCE.HIGH"].fillna(0) * self.HIGH_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.MEDIUM"].fillna(0) * self.MEDIUM_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.LOW"].fillna(0) * self.LOW_CONFIDENCE_WEIGHT
         ) / 3
 
         si_bandit_df["SEVERITY.MEDIUM.sub_score"] = (
-            si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.HIGH_scaled"].fillna(0) * HIGH_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.MEDIUM_scaled"].fillna(0) * MEDIUM_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.LOW_scaled"].fillna(0) * LOW_CONFIDENCE_WEIGHT
+            si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.HIGH_scaled"].fillna(0) * self.HIGH_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.MEDIUM_scaled"].fillna(0) * self.MEDIUM_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.MEDIUM__CONFIDENCE.LOW_scaled"].fillna(0) * self.LOW_CONFIDENCE_WEIGHT
         ) / 3
 
         si_bandit_df["SEVERITY.LOW.sub_score"] = (
-            si_bandit_df["SEVERITY.LOW__CONFIDENCE.HIGH_scaled"].fillna(0) * HIGH_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.LOW__CONFIDENCE.MEDIUM_scaled"].fillna(0) * MEDIUM_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.LOW__CONFIDENCE.LOW_scaled"].fillna(0) * LOW_CONFIDENCE_WEIGHT
+            si_bandit_df["SEVERITY.LOW__CONFIDENCE.HIGH_scaled"].fillna(0) * self.HIGH_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.LOW__CONFIDENCE.MEDIUM_scaled"].fillna(0) * self.MEDIUM_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.LOW__CONFIDENCE.LOW_scaled"].fillna(0) * self.LOW_CONFIDENCE_WEIGHT
         ) / 3
 
-        HIGH_SEVERITY_WEIGHT = 100
-        MEDIUM_SEVERITY_WEIGHT = 10
-        LOW_SEVERITY_WEIGHT = 1
-
         si_bandit_df["SEVERITY.score"] = (
-            si_bandit_df["SEVERITY.HIGH.sub_score"] * HIGH_SEVERITY_WEIGHT
-            + si_bandit_df["SEVERITY.MEDIUM.sub_score"] * MEDIUM_SEVERITY_WEIGHT
-            + si_bandit_df["SEVERITY.LOW.sub_score"] * LOW_SEVERITY_WEIGHT
+            si_bandit_df["SEVERITY.HIGH.sub_score"] * self.HIGH_SEVERITY_WEIGHT
+            + si_bandit_df["SEVERITY.MEDIUM.sub_score"] * self.MEDIUM_SEVERITY_WEIGHT
+            + si_bandit_df["SEVERITY.LOW.sub_score"] * self.LOW_SEVERITY_WEIGHT
         ) / 3
 
         si_bandit_df["SEVERITY.score.normalized"] = (
@@ -321,7 +319,7 @@ class SecurityIndicatorsCloc:
         max_ids: int = 5,
         is_local: bool = True,
         security_indicator_cloc_repo_path: Path = Path("security/si-cloc"),
-    ) -> list:
+    ) -> List[Any]:
         """Aggregate si_cloc results from jsons stored in Ceph or locally from `si_cloc` repo.
 
         :param limit_results: reduce the number of si_cloc reports ids considered to `max_ids` to test analysis
@@ -329,18 +327,18 @@ class SecurityIndicatorsCloc:
         :param is_local: flag to retreive the dataset locally or from S3 (credentials are required)
         :param si_cloc_repo_path: path to retrieve the si_cloc dataset locally and `is_local` is set to True
         """
-        security_indicator_cloc_reports = aggregate_thoth_results(
+        security_indicator_cloc_reports: List[Any] = aggregate_thoth_results(
             limit_results=limit_results,
             max_ids=max_ids,
             is_local=is_local,
             repo_path=security_indicator_cloc_repo_path,
-            store_name="si-cloc",
+            store_name="si_cloc",
         )
 
         return security_indicator_cloc_reports
 
     @staticmethod
-    def extract_data_from_si_cloc_metadata(si_cloc_report: dict) -> dict:
+    def extract_data_from_si_cloc_metadata(si_cloc_report: Dict[str, Any]) -> Dict[str, Any]:
         """Extract data from si-cloc report metadata."""
         report_metadata = si_cloc_report["metadata"]
 
@@ -356,14 +354,14 @@ class SecurityIndicatorsCloc:
 
         return extracted_metadata
 
-    def create_si_cloc_metadata_dataframe(self, si_cloc_report: dict) -> pd.DataFrame:
+    def create_si_cloc_metadata_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
         """Create si-cloc report metadata dataframe."""
         metadata_si_cloc = self.extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_df = pd.DataFrame([metadata_si_cloc])
 
         return metadata_df
 
-    def create_si_cloc_results_dataframe(self, si_cloc_report: dict) -> pd.DataFrame:
+    def create_si_cloc_results_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
         """Create si-cloc report results dataframe."""
         results = {k: v for k, v in si_cloc_report["result"].items() if k != "header"}
         results["SUM"]["n_lines"] = si_cloc_report["result"]["header"]["n_lines"]
@@ -380,7 +378,7 @@ class SecurityIndicatorsCloc:
 
         return report_summary_df
 
-    def create_si_cloc_final_dataframe(self, si_cloc_report: dict) -> pd.DataFrame:
+    def create_si_cloc_final_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
         """Create final si-cloc final dataframe."""
         # Create metadata dataframe
         metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report)
@@ -397,7 +395,7 @@ class SecurityIndicatorsCloc:
 
         return si_cloc_report_summary_df
 
-    def aggregate_si_cloc_final_dataframes(self, si_cloc_reports: list) -> pd.DataFrame:
+    def aggregate_si_cloc_final_dataframes(self, si_cloc_reports: List[Dict[str, Any]]) -> pd.DataFrame:
         """Aggregate final si-cloc dataframes."""
         counter = 1
         total_reports = len(si_cloc_reports)
