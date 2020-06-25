@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Securit Indicator cloc test suite."""
+"""Security Indicator cloc test suite."""
 
 from .base_test import ReportProcessingTestCase
 from thoth.report_processing.components.security import SecurityIndicatorsCloc
@@ -41,10 +41,10 @@ class TestSecurityReportsCloc(ReportProcessingTestCase):
         metadata_retrieved = SecurityIndicatorsCloc().extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [
-            "datetime",
-            "analyzer",
-            "analyzer_version",
-            "document_id",
+            "datetime_si_cloc",
+            "analyzer_si_cloc",
+            "analyzer_version_si_cloc",
+            "document_id_si_cloc",
             "package_name",
             "package_version",
             "package_index",

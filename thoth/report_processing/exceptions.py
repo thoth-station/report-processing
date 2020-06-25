@@ -28,3 +28,11 @@ class ThothNotKnownResultStore(ThothReportProcessingException):
 
 class ThothMissingDatasetAtPath(ThothReportProcessingException):
     """An exception raised when there is no dataset provided at that Path."""
+
+
+class ThothSecurityIndicatorReportProcessingException(ThothReportProcessingException):
+    """Class for thoth-report-processing exception for Security Indicators."""
+
+
+class ThothSIPackageNotMatchingException(ThothReportProcessingException):
+    """An exception raised when trying to aggregate SI reports from different packages."""

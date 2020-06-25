@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Securit Indicator bandit test suite."""
+"""Security Indicator bandit test suite."""
 
 from .base_test import ReportProcessingTestCase
 from thoth.report_processing.components.security import SecurityIndicatorsBandit
@@ -42,10 +42,10 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         metadata_retrieved = si_bandit.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [
-            "datetime",
-            "analyzer",
-            "analyzer_version",
-            "document_id",
+            "datetime_si_bandit",
+            "analyzer_si_bandit",
+            "analyzer_version_si_bandit",
+            "document_id_si_bandit",
             "package_name",
             "package_version",
             "package_index",
