@@ -52,7 +52,7 @@ class SecurityIndicatorsBandit:
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = True,
-        security_indicator_bandit_repo_path: Path = Path("security/si-bandit"),
+        security_indicator_bandit_repo_path: Path = Path("security-indicators"),
     ) -> List[Any]:
         """Aggregate si_bandit results from Ceph or locally using the provided path.
 
@@ -67,6 +67,7 @@ class SecurityIndicatorsBandit:
             is_local=is_local,
             repo_path=security_indicator_bandit_repo_path,
             store_name="si_bandit",
+            is_multiple=True,
         )
 
         return security_indicator_bandit_reports
@@ -358,7 +359,7 @@ class SecurityIndicatorsCloc:
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = True,
-        security_indicator_cloc_repo_path: Path = Path("security/si-cloc"),
+        security_indicator_cloc_repo_path: Path = Path("security-indicators"),
     ) -> List[Any]:
         """Aggregate si_cloc results from Ceph or locally using the provided path.
 
@@ -373,6 +374,7 @@ class SecurityIndicatorsCloc:
             is_local=is_local,
             repo_path=security_indicator_cloc_repo_path,
             store_name="si_cloc",
+            is_multiple=True,
         )
 
         return security_indicator_cloc_reports
@@ -489,6 +491,31 @@ class SecurityIndicatorsAggregator:
 
     si_bandit = SecurityIndicatorsBandit()
     si_cloc = SecurityIndicatorsCloc()
+
+    @staticmethod
+    def retrieve_security_indicator_aggregated_results(
+        limit_results: bool = False,
+        max_ids: int = 5,
+        is_local: bool = True,
+        security_indicator_aggregated_repo_path: Path = Path("security-indicators"),
+    ) -> List[Any]:
+        """Retrieve si_aggregated results from Ceph or locally using the provided path.
+
+        :param limit_results: reduce the number of si_aggregated reports ids considered to `max_ids` to test analysis.
+        :param max_ids: maximum number of si_aggregated reports ids considered.
+        :param is_local: flag to retreive the dataset locally or from S3 (credentials are required).
+        :param si_aggregated_repo_path: path to retrieve the si_aggregated data locally and `is_local` is set to True.
+        """
+        security_indicator_aggregated_reports: List[Any] = aggregate_thoth_results(
+            limit_results=limit_results,
+            max_ids=max_ids,
+            is_local=is_local,
+            repo_path=security_indicator_aggregated_repo_path,
+            store_name="si_aggregated",
+            is_multiple=True,
+        )
+
+        return security_indicator_aggregated_reports
 
     def create_si_aggregated_dataframe(
         self,

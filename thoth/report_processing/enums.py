@@ -25,3 +25,4 @@ class ThothResultStoreEnum(Enum):
 
     si_bandit = auto()
     si_cloc = auto()
+    si_aggregated = auto()
