@@ -24,7 +24,7 @@ from thoth.report_processing.components.security import SecurityIndicatorsCloc
 class TestSecurityReportsCloc(ReportProcessingTestCase):
     """Test implementation of security indicator cloc."""
 
-    _SI_CLOC_FOLDER_PATH = ReportProcessingTestCase.DATA / "security" / "si_cloc"
+    _SI_CLOC_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
 
     def test_get_security_indicator_cloc_report(self) -> None:
         """Test retrieving report from local path."""

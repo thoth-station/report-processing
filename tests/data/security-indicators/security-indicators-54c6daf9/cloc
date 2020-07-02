@@ -1,0 +1,113 @@
+{
+  "metadata": {
+    "analyzer": "si-cloc",
+    "analyzer_version": "0.1.0",
+    "arguments": {
+      "app.py": {
+        "from_directory": null,
+        "no_pretty": false,
+        "output": "/mnt/workdir/cloc_results",
+        "package_index": "https://pypi.org/simple",
+        "package_name": "botocore",
+        "package_version": "1.3.23"
+      }
+    },
+    "datetime": "2020-06-26T07:16:42.967672",
+    "distribution": {
+      "codename": "",
+      "id": "fedora",
+      "like": "",
+      "version": "32",
+      "version_parts": {
+        "build_number": "",
+        "major": "32",
+        "minor": ""
+      }
+    },
+    "document_id": "security-indicators-54c6daf9",
+    "duration": null,
+    "hostname": "security-indicators-54c6daf9-3066750908",
+    "os_release": {
+      "id": "fedora",
+      "name": "Fedora",
+      "platform_id": "platform:f32",
+      "redhat_bugzilla_product": "Fedora",
+      "redhat_bugzilla_product_version": "32",
+      "redhat_support_product": "Fedora",
+      "redhat_support_product_version": "32",
+      "variant_id": "container",
+      "version": "32 (Container Image)",
+      "version_id": "32"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 3,
+      "minor": 8,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": null,
+    "timestamp": 1593155802
+  },
+  "result": {
+    "Cucumber": {
+      "blank": 111,
+      "code": 560,
+      "comment": 52,
+      "nFiles": 52
+    },
+    "DOS Batch": {
+      "blank": 23,
+      "code": 166,
+      "comment": 1,
+      "nFiles": 1
+    },
+    "JSON": {
+      "blank": 5,
+      "code": 280274,
+      "comment": 0,
+      "nFiles": 400
+    },
+    "Python": {
+      "blank": 7687,
+      "code": 35772,
+      "comment": 10927,
+      "nFiles": 211
+    },
+    "SUM": {
+      "blank": 8052,
+      "code": 332367,
+      "comment": 11114,
+      "nFiles": 911
+    },
+    "XML": {
+      "blank": 16,
+      "code": 15069,
+      "comment": 0,
+      "nFiles": 232
+    },
+    "header": {
+      "cloc_url": "github.com/AlDanial/cloc",
+      "cloc_version": "1.82",
+      "elapsed_seconds": 9.60139298439026,
+      "files_per_second": 94.8820657045373,
+      "lines_per_second": 36612.7082363481,
+      "n_files": 911,
+      "n_lines": 351533
+    },
+    "make": {
+      "blank": 24,
+      "code": 124,
+      "comment": 5,
+      "nFiles": 1
+    },
+    "reStructuredText": {
+      "blank": 186,
+      "code": 402,
+      "comment": 129,
+      "nFiles": 14
+    }
+  }
+}

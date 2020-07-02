@@ -30,8 +30,7 @@ from thoth.report_processing.exceptions import ThothSIPackageNotMatchingExceptio
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security" / "si_bandit"
-    _SI_CLOC_REPORTS_PATH = ReportProcessingTestCase.DATA / "security" / "si_cloc"
+    _SI_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
 
     _SI_AGGREGATOR_REPORTS_FILE = ReportProcessingTestCase.DATA / "security" / "aggregated.json"
 
@@ -40,11 +39,11 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
         )[0]
 
         si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_CLOC_REPORTS_PATH
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
         )[0]
 
         si_cloc_report["metadata"]["arguments"]["app.py"]["package_name"] = "thoth-test-2"
@@ -58,18 +57,20 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
         )[0]
 
         si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_CLOC_REPORTS_PATH
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
         )[0]
 
         aggregated_json = security_aggregator.create_si_aggregated_json(
             si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
         )
+        keys = sorted([k for k in aggregated_json.keys()])
 
         with open(self._SI_AGGREGATOR_REPORTS_FILE) as json_file:
             aggregated_json_test = json.load(json_file)
+        keys_tests = sorted([k for k in aggregated_json_test.keys()])
 
-        assert aggregated_json == aggregated_json_test
+        assert keys == keys_tests
