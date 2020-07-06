@@ -33,15 +33,14 @@ class TestSecurityReportsCloc(ReportProcessingTestCase):
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
         )
-        si_cloc_report = si_cloc_reports[self._SI_REPORT_NAME]["cloc"]
-        assert si_cloc_report
+        assert si_cloc_reports[0]
 
     def test_get_metadata_df_from_cloc_report(self) -> None:
         """Test obtaining metadata from si cloc report."""
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
         )
-        si_cloc_report = si_cloc_reports[self._SI_REPORT_NAME]["cloc"]
+        si_cloc_report = si_cloc_reports[0]
         metadata_retrieved = SecurityIndicatorsCloc().extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [

@@ -476,6 +476,12 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         :output si_bandit_df: Extend `si_bandit_df` with SI scores created using all rows (aka all packages).
         """
+        if not any("SEVERITY" in column for column in si_bandit_df.columns):
+            si_bandit_df["SEVERITY.score"] = 0
+            si_bandit_df["SEVERITY.score.normalized"] = 0
+            _LOGGER.exception("All reports considered have no vulnerabilities")
+            return si_bandit_df
+
         for security in ["LOW", "MEDIUM", "HIGH"]:
             for confidence in ["LOW", "MEDIUM", "HIGH"]:
 
@@ -488,9 +494,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
                 si_bandit_df[f"{vulnerability_class}_scaled"] = min_max_scaler
 
         si_bandit_df["SEVERITY.HIGH.sub_score"] = (
-            si_bandit_df["SEVERITY.HIGH__CONFIDENCE.HIGH"].fillna(0) * self.HIGH_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.MEDIUM"].fillna(0) * self.MEDIUM_CONFIDENCE_WEIGHT
-            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.LOW"].fillna(0) * self.LOW_CONFIDENCE_WEIGHT
+            si_bandit_df["SEVERITY.HIGH__CONFIDENCE.HIGH_scaled"].fillna(0) * self.HIGH_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.MEDIUM_scaled"].fillna(0) * self.MEDIUM_CONFIDENCE_WEIGHT
+            + si_bandit_df["SEVERITY.HIGH__CONFIDENCE.LOW_scaled"].fillna(0) * self.LOW_CONFIDENCE_WEIGHT
         ) / 3
 
         si_bandit_df["SEVERITY.MEDIUM.sub_score"] = (

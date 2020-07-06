@@ -43,12 +43,12 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
+        si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
         )
-        si_cloc_report = si_cloc_reports[self._SI_REPORT_NAME]["cloc"]
+        si_cloc_report = si_cloc_reports[0]
 
         si_cloc_report["metadata"]["arguments"]["app.py"]["package_name"] = "thoth-test-2"
         with pytest.raises(ThothSIPackageNotMatchingException):
@@ -63,12 +63,12 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
+        si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
         )
-        si_cloc_report = si_cloc_reports[self._SI_REPORT_NAME]["cloc"]
+        si_cloc_report = si_cloc_reports[0]
 
         aggregated_json = security_aggregator.create_si_aggregated_json(
             si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report

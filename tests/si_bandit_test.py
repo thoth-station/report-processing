@@ -32,15 +32,14 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
-        assert si_bandit_report
+        assert si_bandit_reports[0]
 
     def test_get_metadata_df_from_bandit_report(self) -> None:
         """Test obtaining metadata from si bandit report."""
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
+        si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
         metadata_retrieved = si_bandit.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
@@ -60,7 +59,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
+        si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info, summary = si_bandit.extract_severity_confidence_info(
             si_bandit_report=si_bandit_report
@@ -83,7 +82,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
             security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH
         )
-        si_bandit_report = si_bandit_reports[self._SI_REPORT_NAME]["bandit"]
+        si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info_df, summary = si_bandit.create_security_confidence_dataframe(
             si_bandit_report=si_bandit_report
