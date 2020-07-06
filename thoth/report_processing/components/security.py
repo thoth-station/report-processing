@@ -26,15 +26,180 @@ from typing import List, Optional, Tuple, Dict, Any
 
 import pandas as pd
 
-from thoth.report_processing.utils import aggregate_thoth_results
 from thoth.report_processing.exceptions import ThothSIPackageNotMatchingException
+from thoth.report_processing.exceptions import ThothNotKnownResultStore
+from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
+from thoth.report_processing.enums import ThothSecurityIndicatorsFileStoreEnum
 
-_LOGGER = logging.getLogger("thoth.lab.security")
+from thoth.storages.security_indicators import SecurityIndicatorsResultsStore, SecurityIndicatorStore
+
+_LOGGER = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.INFO)
 
 
-class SecurityIndicatorsBandit:
+class _SecurityIndicators:
+    """Class of methods used to process reports from Security Indicators (SI) analyzer."""
+
+    RESULTS_STORE = SecurityIndicatorsResultsStore
+
+    FILE_STORE = SecurityIndicatorStore
+
+    def aggregate_thoth_security_indicators_results(
+        self,
+        store_files: Optional[List[str]] = None,
+        limit_results: bool = False,
+        max_ids: int = 5,
+        is_local: bool = True,
+        repo_path: Optional[Path] = None,
+    ) -> Dict[str, Any]:
+        """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
+
+        :param store_files: files to be retrieved from the Store for each result, if None all files are retrieved.
+        :param limit_results: reduce the number of reports ids considered to `max_ids`.
+        :param max_ids: maximum number of reports ids considered.
+        :param is_local: flag to retreive the dataset locally (if not uses Ceph S3 (credentials are required)).
+        :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True.
+        """
+        if store_files:
+            if any(store_file not in ThothSecurityIndicatorsFileStoreEnum.__members__ for store_file in store_files):
+                raise ThothNotKnownResultStore(
+                    f"SecurityIndicatorsStore does not contain some of the files listed: {store_files}. \
+                        \nSecurityIndicatorsStore: {ThothSecurityIndicatorsFileStoreEnum.__members__.keys()}"
+                )
+
+        if limit_results:
+            _LOGGER.debug(f"Limiting results to {max_ids}!")
+
+        files: Dict[str, Any] = {}
+
+        if is_local:
+            files, counter = self._aggregate_thoth_results_from_local(
+                repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids, store_files=store_files
+            )
+
+        else:
+            files, counter = self._aggregate_thoth_results_from_ceph(
+                store_files=store_files, files=files, limit_results=limit_results, max_ids=max_ids
+            )
+
+        _LOGGER.info("Number of file retrieved is: %r" % counter)
+
+        return files
+
+    @staticmethod
+    def _aggregate_thoth_results_from_local(
+        files: Dict[str, Any],
+        store_files: Optional[List[str]] = None,
+        repo_path: Optional[Path] = None,
+        limit_results: bool = False,
+        max_ids: int = 5,
+        is_multiple: Optional[bool] = None,
+    ) -> Tuple[Dict[str, Any], int]:
+        """Aggregate Thoth results from local repo."""
+        _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
+        if not repo_path:
+            return files, 0
+
+        if not repo_path.exists():
+            raise ThothMissingDatasetAtPath(f"There is no dataset at this path: {repo_path}.")
+
+        counter = 0
+
+        for result_path in repo_path.iterdir():
+            _LOGGER.info(f"Considering... {result_path}")
+
+            if "security-indicators" not in result_path.name:
+                raise Exception(f"This repo is not part of Security Indicators! {result_path}")
+
+            retrieved_files: Dict[str, Any] = {result_path.name: {}}
+
+            for file_path in result_path.iterdir():
+
+                if store_files and file_path.name in store_files:
+                    with open(file_path, "r") as json_file_type:
+                        json_file = json.load(json_file_type)
+
+                    retrieved_files[result_path.name][file_path.name] = json_file
+
+            files[result_path.name] = retrieved_files[result_path.name]
+
+            counter += 1
+
+            if limit_results:
+                if counter == max_ids:
+                    return files, counter
+
+        return files, counter
+
+    def _aggregate_thoth_results_from_ceph(
+        self,
+        files: Dict[str, Any],
+        store_files: Optional[List[str]] = None,
+        limit_results: bool = False,
+        max_ids: int = 5,
+    ) -> Tuple[Dict[str, Any], int]:
+        """Aggregate Thoth results from Ceph."""
+        store_class_type = self.RESULTS_STORE
+        store_class = store_class_type()
+        store_class.connect()
+
+        counter = 0
+
+        file_store_type = self.FILE_STORE
+
+        files_id = []
+        for security_indicator_key in store_class.get_listing():
+            security_indicator_id = security_indicator_key.split("/")[0]
+
+            if security_indicator_id not in files_id:
+                _LOGGER.info(f"Document id: {security_indicator_id}")
+
+                files_id.append(security_indicator_id)
+
+                try:
+                    file_store = file_store_type(security_indicator_id=security_indicator_id)
+                    file_store.connect()
+
+                    retrieved_files: Dict[str, Any] = {security_indicator_id: {}}
+
+                    if store_files and ThothSecurityIndicatorsFileStoreEnum.bandit.name in store_files:
+                        si_bandit_report = file_store.retrieve_si_bandit_document()
+                        retrieved_files[security_indicator_id][
+                            ThothSecurityIndicatorsFileStoreEnum.bandit.name
+                        ] = si_bandit_report
+
+                    if store_files and ThothSecurityIndicatorsFileStoreEnum.cloc.name in store_files:
+                        si_cloc_report = file_store.retrieve_si_cloc_document()
+                        retrieved_files[security_indicator_id][
+                            ThothSecurityIndicatorsFileStoreEnum.cloc.name
+                        ] = si_cloc_report
+
+                    if store_files and ThothSecurityIndicatorsFileStoreEnum.aggregated.name in store_files:
+                        si_aggregated_report = file_store.retrieve_si_aggregated_document()
+                        retrieved_files[security_indicator_id][
+                            ThothSecurityIndicatorsFileStoreEnum.aggregated.name
+                        ] = si_aggregated_report
+
+                    files[security_indicator_id] = retrieved_files[security_indicator_id]
+
+                    counter += 1
+
+                    _LOGGER.info("Documents retrieved: %r", counter)
+
+                    if limit_results:
+                        if counter == max_ids:
+                            return files, counter
+                except Exception as si_exception:
+                    _LOGGER.exception(
+                        f"Exception during retrieval of SI result {security_indicator_id}: {si_exception}"
+                    )
+                    pass
+
+        return files, counter
+
+
+class SecurityIndicatorsBandit(_SecurityIndicators):
     """Class of methods used to process reports from Security Indicators (SI) bandit analyzer."""
 
     # Weights for Confidence
@@ -61,15 +226,17 @@ class SecurityIndicatorsBandit:
         :param is_local: flag to retreive the dataset locally or from S3 (credentials are required).
         :param si_bandit_repo_path: path to retrieve the si_bandit dataset locally and `is_local` is set to True.
         """
-        security_indicator_bandit_reports: List[Any] = aggregate_thoth_results(
+        document_name = "bandit"
+        si_reports: Dict[str, Any] = _SecurityIndicators().aggregate_thoth_security_indicators_results(
+            store_files=[document_name],
             limit_results=limit_results,
             max_ids=max_ids,
             is_local=is_local,
             repo_path=security_indicator_bandit_repo_path,
-            store_name="si_bandit",
-            is_multiple=True,
         )
-
+        security_indicator_bandit_reports = [
+            document_results[document_name] for document_id, document_results in si_reports.items()
+        ]
         return security_indicator_bandit_reports
 
     @staticmethod
@@ -368,15 +535,18 @@ class SecurityIndicatorsCloc:
         :param is_local: flag to retreive the dataset locally or from S3 (credentials are required)
         :param si_cloc_repo_path: path to retrieve the si_cloc dataset locally and `is_local` is set to True
         """
-        security_indicator_cloc_reports: List[Any] = aggregate_thoth_results(
+        document_name = "cloc"
+
+        si_reports: Dict[str, Any] = _SecurityIndicators().aggregate_thoth_security_indicators_results(
+            store_files=[document_name],
             limit_results=limit_results,
             max_ids=max_ids,
             is_local=is_local,
             repo_path=security_indicator_cloc_repo_path,
-            store_name="si_cloc",
-            is_multiple=True,
         )
-
+        security_indicator_cloc_reports = [
+            document_results[document_name] for document_id, document_results in si_reports.items()
+        ]
         return security_indicator_cloc_reports
 
     @staticmethod
@@ -506,15 +676,18 @@ class SecurityIndicatorsAggregator:
         :param is_local: flag to retreive the dataset locally or from S3 (credentials are required).
         :param si_aggregated_repo_path: path to retrieve the si_aggregated data locally and `is_local` is set to True.
         """
-        security_indicator_aggregated_reports: List[Any] = aggregate_thoth_results(
+        document_name = "aggregated"
+
+        si_reports: Dict[str, Any] = _SecurityIndicators().aggregate_thoth_security_indicators_results(
+            store_files=[document_name],
             limit_results=limit_results,
             max_ids=max_ids,
             is_local=is_local,
             repo_path=security_indicator_aggregated_repo_path,
-            store_name="si_aggregated",
-            is_multiple=True,
         )
-
+        security_indicator_aggregated_reports = [
+            document_results[document_name] for document_id, document_results in si_reports.items()
+        ]
         return security_indicator_aggregated_reports
 
     def create_si_aggregated_dataframe(
