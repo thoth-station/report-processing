@@ -38,3 +38,8 @@ all the things that you see...
 * update codeowners
 * :arrow_up: updated standard configs, little bit of reformatting
 * :sparkles: added a default OWNERS file, dont forget to adjust it!!
+
+## Release 0.1.0 (2020-07-08T19:23:14)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.0 to 0.24.2 (#14)
+* Added json to report from Qeb-hwt (#12)
+* Update OWNERS
