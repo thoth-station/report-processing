@@ -31,7 +31,8 @@ from thoth.report_processing.exceptions import ThothNotKnownResultStore
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
 from thoth.report_processing.enums import ThothSecurityIndicatorsFileStoreEnum
 
-from thoth.storages.security_indicators import SecurityIndicatorsResultsStore, SecurityIndicatorStore
+from thoth.storages.security_indicators import SecurityIndicatorsResultsStore
+from thoth.storages.security_indicators import SIAggregatedStore, SIClocStore, SIBanditStore
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -42,8 +43,6 @@ class _SecurityIndicators:
     """Class of methods used to process reports from Security Indicators (SI) analyzer."""
 
     RESULTS_STORE = SecurityIndicatorsResultsStore
-
-    FILE_STORE = SecurityIndicatorStore
 
     def aggregate_thoth_security_indicators_results(
         self,
@@ -141,15 +140,11 @@ class _SecurityIndicators:
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         store_class_type = self.RESULTS_STORE
-        store_class = store_class_type()
-        store_class.connect()
 
         counter = 0
 
-        file_store_type = self.FILE_STORE
-
         files_id = []
-        for security_indicator_key in store_class.get_listing():
+        for security_indicator_key in store_class_type.iter_security_indicators():
             security_indicator_id = security_indicator_key.split("/")[0]
 
             if security_indicator_id not in files_id:
@@ -158,25 +153,31 @@ class _SecurityIndicators:
                 files_id.append(security_indicator_id)
 
                 try:
-                    file_store = file_store_type(security_indicator_id=security_indicator_id)
-                    file_store.connect()
-
                     retrieved_files: Dict[str, Any] = {security_indicator_id: {}}
 
                     if store_files and ThothSecurityIndicatorsFileStoreEnum.bandit.name in store_files:
-                        si_bandit_report = file_store.retrieve_si_bandit_document()
+                        si_bandit_store = SIBanditStore(security_indicator_id=security_indicator_id)
+                        si_bandit_store.connect()
+
+                        si_bandit_report = si_bandit_store.retrieve_document()
                         retrieved_files[security_indicator_id][
                             ThothSecurityIndicatorsFileStoreEnum.bandit.name
                         ] = si_bandit_report
 
                     if store_files and ThothSecurityIndicatorsFileStoreEnum.cloc.name in store_files:
-                        si_cloc_report = file_store.retrieve_si_cloc_document()
+                        si_cloc_store = SIClocStore(security_indicator_id=security_indicator_id)
+                        si_cloc_store.connect()
+
+                        si_cloc_report = si_cloc_store.retrieve_document()
                         retrieved_files[security_indicator_id][
                             ThothSecurityIndicatorsFileStoreEnum.cloc.name
                         ] = si_cloc_report
 
                     if store_files and ThothSecurityIndicatorsFileStoreEnum.aggregated.name in store_files:
-                        si_aggregated_report = file_store.retrieve_si_aggregated_document()
+                        si_aggregated_store = SIAggregatedStore(security_indicator_id=security_indicator_id)
+                        si_aggregated_store.connect()
+
+                        si_aggregated_report = si_aggregated_store.retrieve_document()
                         retrieved_files[security_indicator_id][
                             ThothSecurityIndicatorsFileStoreEnum.aggregated.name
                         ] = si_aggregated_report
