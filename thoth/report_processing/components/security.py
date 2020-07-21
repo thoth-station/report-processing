@@ -57,7 +57,7 @@ class _SecurityIndicators:
         :param store_files: files to be retrieved from the Store for each result, if None all files are retrieved.
         :param limit_results: reduce the number of reports ids considered to `max_ids`.
         :param max_ids: maximum number of reports ids considered.
-        :param is_local: flag to retreive the dataset locally (if not uses Ceph S3 (credentials are required)).
+        :param is_local: flag to retrieve the dataset locally (if not uses Ceph S3 (credentials are required)).
         :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True.
         """
         if store_files:
@@ -82,7 +82,7 @@ class _SecurityIndicators:
                 store_files=store_files, files=files, limit_results=limit_results, max_ids=max_ids
             )
 
-        _LOGGER.info("Number of file retrieved is: %r" % counter)
+        _LOGGER.info("Number of files retrieved is: %r" % counter)
 
         return files
 
