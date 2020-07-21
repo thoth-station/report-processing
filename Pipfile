@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-thoth-storages = "*"
+thoth-storages = ">=0.24.1"
 pandas = "*"
 
 [dev-packages]

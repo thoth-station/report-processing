@@ -24,20 +24,23 @@ from thoth.report_processing.components.security import SecurityIndicatorsCloc
 class TestSecurityReportsCloc(ReportProcessingTestCase):
     """Test implementation of security indicator cloc."""
 
-    _SI_CLOC_FOLDER_PATH = ReportProcessingTestCase.DATA / "security" / "si_cloc"
+    _SI_REPORT_NAME = "security-indicators-54c6daf9"
+
+    _SI_CLOC_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
 
     def test_get_security_indicator_cloc_report(self) -> None:
         """Test retrieving report from local path."""
-        si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
+        si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
-        )[0]
-        assert si_cloc_report
+        )
+        assert si_cloc_reports[0]
 
     def test_get_metadata_df_from_cloc_report(self) -> None:
         """Test obtaining metadata from si cloc report."""
-        si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
+        si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
             security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH
-        )[0]
+        )
+        si_cloc_report = si_cloc_reports[0]
         metadata_retrieved = SecurityIndicatorsCloc().extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [

@@ -20,8 +20,9 @@
 from enum import Enum, auto
 
 
-class ThothResultStoreEnum(Enum):
-    """Class for Thoth ResultsStore enums."""
+class ThothSecurityIndicatorsFileStoreEnum(Enum):
+    """Class for Thoth SecurityIndicator files enums."""
 
-    si_bandit = auto()
-    si_cloc = auto()
+    bandit = auto()
+    cloc = auto()
+    aggregated = auto()
