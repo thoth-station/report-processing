@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Security Indicators report processing."""
+"""Security Indicators reports processing methods."""
 
-
+import os
 import logging
 import json
 
@@ -34,9 +34,15 @@ from thoth.report_processing.enums import ThothSecurityIndicatorsFileStoreEnum
 from thoth.storages.security_indicators import SecurityIndicatorsResultsStore
 from thoth.storages.security_indicators import SIAggregatedStore, SIClocStore, SIBanditStore
 
-_LOGGER = logging.getLogger(__name__)
+# set up logging
+DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
 
-logging.basicConfig(level=logging.INFO)
+if DEBUG_LEVEL:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class _SecurityIndicators:
@@ -98,6 +104,7 @@ class _SecurityIndicators:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
+            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():

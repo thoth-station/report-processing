@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 thoth-storages = ">=0.24.1"
 pandas = "*"
+scikit-learn = "*"
+numpy = "*"
 
 [dev-packages]
 pytest = "*"
