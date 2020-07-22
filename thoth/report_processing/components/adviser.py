@@ -156,7 +156,7 @@ class Adviser:
                         return files, counter
 
             except Exception as exception:
-                _LOGGER.exception(f"Exception during retrieval of adviser result {ids}: {exception}")
+                _LOGGER.exception(f"Exception during retrieval of adviser result {document_id}: {exception}")
                 continue
 
         return files, counter
