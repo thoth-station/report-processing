@@ -17,23 +17,43 @@
 
 """Utils Create Markdown output from adviser report input."""
 
+import logging
+import os
+import json
+import hashlib
+import copy
+
+from datetime import datetime
+from pathlib import Path
+from typing import List, Optional, Dict, Any, Tuple
+
 import pandas as pd
-from typing import Dict, Any
+import numpy as np
+from numpy import array
+from sklearn.preprocessing import LabelEncoder
+
+from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
+
+from thoth.storages import CephStore
+from thoth.storages.advisers import AdvisersResultsStore
+
+# set up logging
+DEBUG_LEVEL = bool(int(os.getenv("DEBUG_LEVEL", 0)))
+
+if DEBUG_LEVEL:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
+
+_LOGGER = logging.getLogger(__name__)
 
 
 class Adviser:
-    """Helper util methods for Adviser report."""
+    """Class of methods used to process results from Adviser."""
 
-
-    RESULTS_STORE = SecurityIndicatorsResultsStore
-
+    @classmethod
     def aggregate_adviser_results(
-        self,
-        adviser_version: str,
-        limit_results: bool = False,
-        max_ids: int = 5,
-        is_local: bool = True,
-        repo_path: Optional[Path] = None,
+        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = True, repo_path: Optional[Path] = None,
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
@@ -47,16 +67,17 @@ class Adviser:
 
         files: Dict[str, Any] = {}
 
-        if is_local:
-            files, counter = self._aggregate_thoth_results_from_local(
-                adviser_version=adviser_version, repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids,
+        if not is_local:
+            files, counter = cls._aggregate_thoth_results_from_ceph(
+                files=files, limit_results=limit_results, max_ids=max_ids
             )
+            _LOGGER.info("Number of files retrieved is: %r" % counter)
 
-        else:
-            files, counter = self._aggregate_thoth_results_from_ceph(
-                adviser_version=adviser_version, files=files, limit_results=limit_results, max_ids=max_ids
-            )
+            return files
 
+        files, counter = cls._aggregate_thoth_results_from_local(
+            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids,
+        )
         _LOGGER.info("Number of files retrieved is: %r" % counter)
 
         return files
@@ -73,6 +94,7 @@ class Adviser:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
+            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():
@@ -80,23 +102,16 @@ class Adviser:
 
         counter = 0
 
-        for result_path in repo_path.iterdir():
-            _LOGGER.info(f"Considering... {result_path}")
+        for file_path in repo_path.iterdir():
+            _LOGGER.info(f"Considering... {file_path}")
 
-            if "security-indicators" not in result_path.name:
-                raise Exception(f"This repo is not part of Security Indicators! {result_path}")
+            if "adviser" not in file_path.name:
+                raise Exception(f"This repo is not part of Adviser {repo_path}")
 
-            retrieved_files: Dict[str, Any] = {result_path.name: {}}
+            with open(file_path, "r") as json_file_type:
+                json_file = json.load(json_file_type)
 
-            for file_path in result_path.iterdir():
-
-                if store_files and file_path.name in store_files:
-                    with open(file_path, "r") as json_file_type:
-                        json_file = json.load(json_file_type)
-
-                    retrieved_files[result_path.name][file_path.name] = json_file
-
-            files[result_path.name] = retrieved_files[result_path.name]
+            files[file_path.name] = json_file
 
             counter += 1
 
@@ -106,12 +121,9 @@ class Adviser:
 
         return files, counter
 
+    @staticmethod
     def _aggregate_thoth_results_from_ceph(
-        self,
-        files: Dict[str, Any],
-        store_files: Optional[List[str]] = None,
-        limit_results: bool = False,
-        max_ids: int = 5,
+        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         adviser_store = AdvisersResultsStore()
@@ -121,7 +133,6 @@ class Adviser:
 
         _LOGGER.info("Number of Adviser reports identified is: %r" % len(adviser_ids))
 
-        adviser_dict = {}
         number_adviser_results = len(adviser_ids)
 
         counter = 0
@@ -134,38 +145,7 @@ class Adviser:
 
             try:
                 document = adviser_store.retrieve_document(ids)
-
-                datetime = document["metadata"].get("datetime")
-                analyzer_version = document["metadata"].get("analyzer_version")
-
-                result = document["result"]
-
-                if int("".join(analyzer_version.split("."))) >= int("".join(adviser_version.split("."))):
-                    report = result.get("report")
-                    error = result["error"]
-
-                    if error:
-                        error_msg = result["error_msg"]
-                        adviser_dict[ids] = {
-                            "justification": [{"message": error_msg, "type": "ERROR"}],
-                            "error": error,
-                            "message": error_msg,
-                            "type": "ERROR",
-                        }
-                    else:
-                        adviser_dict = extract_adviser_justifications(report=report, adviser_dict=adviser_dict, ids=ids)
-
-                if ids in adviser_dict.keys():
-                    adviser_dict[ids]["datetime"] = datetime.strptime(datetime, "%Y-%m-%dT%H:%M:%S.%f")
-                    adviser_dict[ids]["analyzer_version"] = analyzer_version
-
-                current_a_counter += 1
-
-                if limit_results:
-                    if current_a_counter > max_ids:
-                        return _create_adviser_dataframe(adviser_dict)
-
-                files[ids] = retrieved_files[security_indicator_id]
+                files[ids] = document
 
                 counter += 1
 
@@ -175,86 +155,312 @@ class Adviser:
                     if counter == max_ids:
                         return files, counter
 
-            except Exception as si_exception:
-                _LOGGER.exception(
-                    f"Exception during retrieval of SI result {security_indicator_id}: {si_exception}"
-                )
-                pass
+            except Exception as exception:
+                _LOGGER.exception(f"Exception during retrieval of adviser result {ids}: {exception}")
+                continue
 
         return files, counter
 
-def aggregate_adviser_results(adviser_version: str, limit_results: bool = False, max_ids: int = 5) -> pd.DataFrame:
-    """Aggregate adviser results from jsons stored in Ceph.
+    @classmethod
+    def create_adviser_dataframe(cls, adviser_version: str, adviser_files: Dict[str, Any]) -> pd.DataFrame:
+        """Create adviser dataframe."""
+        adviser_dict = {}
 
-    :param adviser_version: minimum adviser version considered for the analysis of adviser runs
-    :param limit_results: reduce the number of adviser runs ids considered to `max_ids` to test analysis
-    :param max_ids: maximum number of adviser runs ids considered
-    """
-    adviser_store = AdvisersResultsStore()
-    adviser_store.connect()
-
-    adviser_ids = list(adviser_store.get_document_listing())
-
-    _LOGGER.info("Number of Adviser reports identified is: %r" % len(adviser_ids))
-
-    adviser_dict = {}
-    number_adviser_results = len(adviser_ids)
-    current_a_counter = 1
-
-    if limit_results:
-        _LOGGER.debug(f"Limiting results to {max_ids} to test functions!!")
-
-    for n, ids in enumerate(adviser_ids):
-        try:
-            document = adviser_store.retrieve_document(ids)
+        for document_id, document in adviser_files.items():
             datetime_advise_run = document["metadata"].get("datetime")
             analyzer_version = document["metadata"].get("analyzer_version")
-            _LOGGER.debug(f"Analysis n.{current_a_counter}/{number_adviser_results}")
+
             result = document["result"]
-            _LOGGER.debug(ids)
+
             if int("".join(analyzer_version.split("."))) >= int("".join(adviser_version.split("."))):
                 report = result.get("report")
                 error = result["error"]
+
                 if error:
                     error_msg = result["error_msg"]
-                    adviser_dict[ids] = {
+                    adviser_dict[document_id] = {
                         "justification": [{"message": error_msg, "type": "ERROR"}],
                         "error": error,
                         "message": error_msg,
                         "type": "ERROR",
                     }
                 else:
-                    adviser_dict = extract_adviser_justifications(report=report, adviser_dict=adviser_dict, ids=ids)
+                    adviser_dict = cls.extract_adviser_justifications(
+                        report=report, adviser_dict=adviser_dict, document_id=document_id
+                    )
 
-            if ids in adviser_dict.keys():
-                adviser_dict[ids]["datetime"] = datetime.strptime(datetime_advise_run, "%Y-%m-%dT%H:%M:%S.%f")
-                adviser_dict[ids]["analyzer_version"] = analyzer_version
+            if document_id in adviser_dict.keys():
+                adviser_dict[document_id]["datetime"] = datetime.strptime(datetime_advise_run, "%Y-%m-%dT%H:%M:%S.%f")
+                adviser_dict[document_id]["analyzer_version"] = analyzer_version
 
-            current_a_counter += 1
-
-            if limit_results:
-                if current_a_counter > max_ids:
-                    return _create_adviser_dataframe(adviser_dict)
-
-        except Exception as e:
-            _LOGGER.warning(e)
-
-    return _create_adviser_dataframe(adviser_dict)
+        return cls._create_adviser_dataframe(adviser_dict)
 
     @staticmethod
-    def create_pretty_report_from_json(report: Dict[Any, Any], is_justification: bool = False) -> str:
-        """Create Markdown output from adviser report input."""
-        md = ""
+    def _create_adviser_dataframe(adviser_data: Dict[str, Any]) -> pd.DataFrame:
+        """Create dataframe of adviser results from data collected."""
+        adviser_df = pd.DataFrame(
+            adviser_data, index=["datetime", "analyzer_version", "error", "justification", "message", "type"]
+        )
+        adviser_df = adviser_df.transpose()
+        adviser_df["date"] = pd.to_datetime(adviser_df["datetime"])
+
+        return adviser_df
+
+    @classmethod
+    def extract_adviser_justifications(
+        cls, report: Optional[Dict[str, Any]], adviser_dict: Dict[str, Any], document_id: str
+    ) -> Dict[str, Any]:
+        """Retrieve justifications from adviser document."""
         if not report:
-            return md
+            _LOGGER.warning(f"No report identified in adviser document: {document_id}")
+            return adviser_dict
+
+        products = report.get("products")
+        adviser_dict = cls.extract_justifications_from_products(
+            products=products, adviser_dict=adviser_dict, document_id=document_id
+        )
+
+        return adviser_dict
+
+    @staticmethod
+    def extract_justifications_from_products(
+        products: Optional[List[Dict[str, Any]]], adviser_dict: Dict[str, Any], document_id: str
+    ) -> Dict[str, Any]:
+        """Extract justifications from products in adviser document."""
+        if not products:
+            _LOGGER.warning(f"No products identified in adviser document: {document_id}")
+            return adviser_dict
+
+        for product in products:
+            justifications = product["justification"]
+
+            if justifications:
+                # Collect all justifications
+                for justification in justifications:
+                    if "advisory" in justification:
+                        adviser_dict[document_id] = {
+                            "justification": justification,
+                            "error": True,
+                            "message": justification["advisory"],
+                            "type": "INFO",
+                        }
+                    else:
+                        adviser_dict[document_id] = {
+                            "justification": justification,
+                            "error": False,
+                            "message": justification["message"],
+                            "type": justification["type"],
+                        }
+            else:
+                _LOGGER.warning(f"No justifications identified for adviser report: {document_id}")
+
+        return adviser_dict
+
+    @staticmethod
+    def create_summary_dataframes(adviser_dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        """Create summary dataframes with all information required for visualization or storage.
+
+        :param adviser_dataframe: DataFrame as returned by `create_adviser_dataframe` method.
+        """
+        jm_encoding = []
+        for index, row in adviser_dataframe[["message"]].iterrows():
+            hash_object = hashlib.sha256(bytes(row.values[0], "raw_unicode_escape"))
+            hex_dig = hash_object.hexdigest()
+            jm_encoding.append([index, row.values, hex_dig])
+
+        label_encoder = LabelEncoder()
+        justification_result = copy.deepcopy(adviser_dataframe.to_dict())
+
+        jm_hash_id_values = [hex_digits[2] for hex_digits in jm_encoding]
+        integer_jm_hash_id_values_encoded = label_encoder.fit_transform(array(jm_hash_id_values))
+
+        counter = 0
+        for jm_id in integer_jm_hash_id_values_encoded:
+            jm_encoding[counter] = jm_encoding[counter] + [jm_id]
+            counter += 1
+
+        justification_result["jm_hash_id_encoded"] = {el[0]: el[3] for el in jm_encoding}
+
+        total_dataframe = pd.DataFrame(justification_result)
+
+        info_dataframe = total_dataframe[total_dataframe["type"] == "INFO"]
+        error_dataframe = total_dataframe[total_dataframe["type"] == "ERROR"]
+
+        return total_dataframe, info_dataframe, error_dataframe
+
+    @staticmethod
+    def create_adviser_results_dataframe_histogram(adviser_type_dataframe: pd.DataFrame) -> pd.DataFrame:
+        """Create adviser results dataframe sorted for histogram plot.
+
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        """
+        histogram_data: Dict[str, Any] = {}
+
+        for index, row in adviser_type_dataframe[["jm_hash_id_encoded", "message", "type"]].iterrows():
+            encoded_id = row["jm_hash_id_encoded"]
+            if encoded_id not in histogram_data.keys():
+                histogram_data[encoded_id] = {
+                    "jm_hash_id_encoded": f"type-{encoded_id}",
+                    "message": row["message"],
+                    "type": row["type"],
+                    "count": adviser_type_dataframe["jm_hash_id_encoded"].value_counts()[encoded_id],
+                }
+
+        sorted_justifications_df = pd.DataFrame(histogram_data)
+        sorted_justifications_df = sorted_justifications_df.transpose()
+        sorted_justifications_df = sorted_justifications_df.sort_values(by="count", ascending=False)
+
+        return sorted_justifications_df
+
+    @staticmethod
+    def _aggregate_data_per_interval(adviser_type_dataframe: pd.DataFrame, number_days: int = 7) -> pd.DataFrame:
+        """Aggregate advise justifications per weekly time intervals.
+
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        """
+        begin = min(adviser_type_dataframe["date"].values)
+        end = max(adviser_type_dataframe["date"].values)
+
+        timestamps = []
+
+        delta = np.timedelta64(number_days, "D")
+        intervals = (end - begin) / delta
+        value = begin
+
+        for i in range(1, int(intervals) + 1):
+            value = value + delta
+            timestamps.append(value)
+
+        timestamps[0] = begin
+        timestamps[len(timestamps) - 1] = end
+
+        aggregated_data: Dict[str, Any] = {}
+
+        for l in range(0, len(timestamps)):
+            low = timestamps[l - 1]
+            high = timestamps[l]
+            aggregated_data[high] = {}
+            subset_df = adviser_type_dataframe[
+                (adviser_type_dataframe["date"] >= low) & (adviser_type_dataframe["date"] <= high)
+            ]
+
+            for index, row in subset_df[["jm_hash_id_encoded", "message", "date"]].iterrows():
+                encoded_id = row["jm_hash_id_encoded"]
+                if encoded_id not in aggregated_data[high].keys():
+                    aggregated_data[high][encoded_id] = {
+                        "jm_hash_id_encoded": f"type-{encoded_id}",
+                        "message": row["message"],
+                        "count": subset_df["jm_hash_id_encoded"].value_counts()[encoded_id],
+                    }
+
+        return aggregated_data
+
+    @staticmethod
+    def _create_heatmaps_values(input_data: Dict[str, Any], advise_encoded_type: List[int]) -> Dict[str, Any]:
+        """Create values for heatmaps."""
+        heatmaps_values: Dict[str, Any] = {}
+
+        for advise_type in set(advise_encoded_type):
+            _LOGGER.debug(f"Analyzing advise type... {advise_type}")
+            type_values = []
+
+            for upper_interval, interval_runs in input_data.items():
+                _LOGGER.debug(f"Checking for that advise type in 'interval'... {upper_interval}")
+
+                if advise_type in interval_runs.keys():
+                    type_values.append(interval_runs[advise_type]["count"])
+                else:
+                    type_values.append(0)
+
+            heatmaps_values[str(advise_type)] = type_values
+
+        return heatmaps_values
+
+    @classmethod
+    def create_adviser_results_dataframe_heatmap(
+        cls,
+        adviser_type_dataframe: pd.DataFrame,
+        file_name: Optional[str] = None,
+        save_result: bool = False,
+        output_dir: Optional[str] = None,
+    ) -> pd.DataFrame:
+        """Create adviser justifications heatmap plot.
+
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        :param file_name: file name used in the name of files saved
+        :param save_result: resulting plots created are stored in `output_dir`.
+        :param output_dir: output directory where plots are stored if `save_results` is set to True.
+        """
+        data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe)
+        heatmaps_values = cls._create_heatmaps_values(
+            input_data=data, advise_encoded_type=adviser_type_dataframe["jm_hash_id_encoded"].values
+        )
+        df_heatmap = pd.DataFrame(heatmaps_values)
+        df_heatmap["interval"] = data.keys()
+        df_heatmap = df_heatmap.set_index(["interval"])
+        df_heatmap = df_heatmap.transpose()
+
+        adviser_justifications_map: Dict[str, Any] = {}
+        for index, row in adviser_type_dataframe[["jm_hash_id_encoded", "message"]].iterrows():
+            if row["jm_hash_id_encoded"] not in adviser_justifications_map.keys():
+                adviser_justifications_map[row["jm_hash_id_encoded"]] = row["message"]
+
+        justifications_ordered = []
+        for index, row in df_heatmap.iterrows():
+
+            justifications_ordered.append(adviser_justifications_map[index])
+
+        df_heatmap["advise_type"] = justifications_ordered
+        df_heatmap = df_heatmap.set_index(["advise_type"])
+
+        return df_heatmap
+
+    @staticmethod
+    def _get_processed_data_prefix(ceph_bucket_prefix: str, processed_data_name: str, environment: str) -> str:
+        """Get prefix where processed data are stored."""
+        bucket_prefix = ceph_bucket_prefix
+        deployment_name = os.environ["THOTH_DEPLOYMENT_NAME"]
+        return f"{bucket_prefix}/{deployment_name}/{processed_data_name}-{environment}"
+
+    @classmethod
+    def connect_to_ceph(
+        cls, ceph_bucket_prefix: str, processed_data_name: str, environment: str, bucket: Optional[str] = None
+    ) -> CephStore:
+        """Connect to Ceph to store processed data."""
+        prefix = cls._get_processed_data_prefix(
+            ceph_bucket_prefix=ceph_bucket_prefix, processed_data_name=processed_data_name, environment=environment
+        )
+        ceph = CephStore(prefix=prefix, bucket=bucket)
+        ceph.connect()
+        return ceph
+
+    @staticmethod
+    def store_csv_from_dataframe(
+        ceph_sli: CephStore, df_name: str, df: pd.DataFrame, ceph_path: str, is_public: bool = False,
+    ) -> None:
+        """Store CSV obtained from pd.DataFrame on Ceph."""
+        csv = df.to_csv(index=False, header=False)
+        if is_public:
+            _LOGGER.info(f"Storing on public bucket... {ceph_path}")
+        else:
+            _LOGGER.info(f"Storing on private bucket... {ceph_path}")
+        ceph_sli.store_blob(blob=csv, object_key=ceph_path)
+        _LOGGER.info(f"Succesfully stored  {df_name} at {ceph_path}")
+
+    @staticmethod
+    def create_pretty_report_from_json(report: Dict[str, Any], is_justification: bool = False) -> str:
+        """Create Markdown output from adviser report input."""
+        md_report_complete = ""
+        if not report:
+            return md_report_complete
 
         products = report.get("products")
         if not products:
-            return md
+            return md_report_complete
 
-        md = "Report"
+        md_report_complete = "Report"
 
-        md += "\n\n" + "Justifications"
+        md_report_complete += "\n\n" + "Justifications"
 
         final_df = pd.DataFrame(columns=["message", "type"])
 
@@ -271,50 +477,50 @@ def aggregate_adviser_results(adviser_version: str, limit_results: bool = False,
                     final_df.loc[counter] = pd.DataFrame([justification]).iloc[0]
                     counter += 1
 
-        md += "\n\n" + final_df.to_markdown()
+        md_report_complete += "\n\n" + final_df.to_markdown()
 
         if is_justification:
-            return md
+            return md_report_complete
 
         # Packages in Advised Pipfile
-        md += Adviser._add_packages_in_advised_pipfile_to_md_report(product=product, is_dev=False)
+        md_report_complete += Adviser._add_packages_in_advised_pipfile_to_md_report(product=product, is_dev=False)
 
         # Dev-Packages in Advised Pipfile
-        md += Adviser._add_packages_in_advised_pipfile_to_md_report(product=product, is_dev=True)
+        md_report_complete += Adviser._add_packages_in_advised_pipfile_to_md_report(product=product, is_dev=True)
 
         requirements = product["project"]["requirements"]
 
         if "requires" in requirements:
             if requirements["requires"]:
-                md += "\n\n" + "Requires in Advised Pipfile"
+                md_report_complete += "\n\n" + "Requires in Advised Pipfile"
                 df = pd.DataFrame([requirements["requires"]])
-                md += "\n\n" + df.to_markdown()
+                md_report_complete += "\n\n" + df.to_markdown()
 
         if "source" in requirements:
             if requirements["source"]:
-                md += "\n\n" + "Source in Advised Pipfile"
+                md_report_complete += "\n\n" + "Source in Advised Pipfile"
                 df = pd.DataFrame(requirements["source"])
-                md += "\n\n" + df.to_markdown()
+                md_report_complete += "\n\n" + df.to_markdown()
 
         # Packages in Advised Pipfile.lock
-        md += Adviser._add_packages_in_advised_pipfile_lock_to_md_report(product=product, is_dev=False)
+        md_report_complete += Adviser._add_packages_in_advised_pipfile_lock_to_md_report(product=product, is_dev=False)
 
         # Dev-Packages in Advised Pipfile.lock
-        md += Adviser._add_packages_in_advised_pipfile_lock_to_md_report(product=product, is_dev=True)
+        md_report_complete += Adviser._add_packages_in_advised_pipfile_lock_to_md_report(product=product, is_dev=True)
 
         # Runtime Environment
-        md += Adviser._add_runtime_environment_to_md_report(product=product)
+        md_report_complete += Adviser._add_runtime_environment_to_md_report(product=product)
 
         if "score" in product:
             if product["score"]:
-                md += "\n\n" + "Software Stack Score"
+                md_report_complete += "\n\n" + "Software Stack Score"
                 df = pd.DataFrame([{"score": product["score"]}])
-                md += "\n\n" + df.to_markdown()
+                md_report_complete += "\n\n" + df.to_markdown()
 
-        return md
+        return md_report_complete
 
     @staticmethod
-    def _add_packages_in_advised_pipfile_to_md_report(product: Dict[Any, Any], is_dev: bool) -> str:
+    def _add_packages_in_advised_pipfile_to_md_report(product: Dict[str, Any], is_dev: bool) -> str:
         """Add Packages in Advised Pipfile to final report."""
         md_report = ""
 
@@ -346,7 +552,7 @@ def aggregate_adviser_results(adviser_version: str, limit_results: bool = False,
         return md_report
 
     @staticmethod
-    def _add_packages_in_advised_pipfile_lock_to_md_report(product: Dict[Any, Any], is_dev: bool) -> str:
+    def _add_packages_in_advised_pipfile_lock_to_md_report(product: Dict[str, Any], is_dev: bool) -> str:
         """Add Packages in Advised Pipfile.lock to final report."""
         md_report = ""
 
@@ -379,7 +585,7 @@ def aggregate_adviser_results(adviser_version: str, limit_results: bool = False,
         return md_report
 
     @staticmethod
-    def _add_runtime_environment_to_md_report(product: Dict[Any, Any]) -> str:
+    def _add_runtime_environment_to_md_report(product: Dict[str, Any]) -> str:
         """Add Packages in Advised Pipfile.lock to final report."""
         md_report = ""
 
