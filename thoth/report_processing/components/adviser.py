@@ -378,20 +378,14 @@ class Adviser:
 
     @classmethod
     def create_adviser_results_dataframe_heatmap(
-        cls,
-        adviser_type_dataframe: pd.DataFrame,
-        file_name: Optional[str] = None,
-        save_result: bool = False,
-        output_dir: Optional[str] = None,
+        cls, adviser_type_dataframe: pd.DataFrame, number_days: int = 7
     ) -> pd.DataFrame:
-        """Create adviser justifications heatmap plot.
+        """Create adviser justifications heatmap.
 
         :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
-        :param file_name: file name used in the name of files saved
-        :param save_result: resulting plots created are stored in `output_dir`.
-        :param output_dir: output directory where plots are stored if `save_results` is set to True.
+        :param number_days: number of days to split data.
         """
-        data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe)
+        data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe, number_days=number_days)
         heatmaps_values = cls._create_heatmaps_values(
             input_data=data, advise_encoded_type=adviser_type_dataframe["jm_hash_id_encoded"].values
         )
@@ -403,7 +397,7 @@ class Adviser:
         adviser_justifications_map: Dict[str, Any] = {}
         for index, row in adviser_type_dataframe[["jm_hash_id_encoded", "message"]].iterrows():
             if row["jm_hash_id_encoded"] not in adviser_justifications_map.keys():
-                adviser_justifications_map[row["jm_hash_id_encoded"]] = row["message"]
+                adviser_justifications_map[str(row["jm_hash_id_encoded"])] = row["message"]
 
         justifications_ordered = []
         for index, row in df_heatmap.iterrows():
@@ -436,15 +430,17 @@ class Adviser:
 
     @staticmethod
     def store_csv_from_dataframe(
-        ceph_sli: CephStore, df_name: str, df: pd.DataFrame, ceph_path: str, is_public: bool = False,
+        csv_from_df: str, ceph_sli: CephStore, df_name: str, df: pd.DataFrame, ceph_path: str, is_public: bool = False,
     ) -> None:
-        """Store CSV obtained from pd.DataFrame on Ceph."""
-        csv = df.to_csv(index=False, header=False)
+        """Store CSV obtained from pd.DataFrame on Ceph.
+
+        param: csv_from_df: CSV given from pd.DataFrame.to_csv()
+        """
         if is_public:
             _LOGGER.info(f"Storing on public bucket... {ceph_path}")
         else:
             _LOGGER.info(f"Storing on private bucket... {ceph_path}")
-        ceph_sli.store_blob(blob=csv, object_key=ceph_path)
+        ceph_sli.store_blob(blob=csv_from_df, object_key=ceph_path)
         _LOGGER.info(f"Succesfully stored  {df_name} at {ceph_path}")
 
     @staticmethod

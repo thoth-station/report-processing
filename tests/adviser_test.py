@@ -72,3 +72,25 @@ class TestAdviser(ReportProcessingTestCase):
         )
 
         assert sorted_justifications_df.shape[0] == 2
+
+    def test_create_adviser_dataframe_heatmap(self) -> None:
+        """Test create of adviser dataframe for heatmap plot from adviser documents."""
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+
+        adviser_version = "0.9.3"
+        adviser_dataframe = Adviser.create_adviser_dataframe(
+            adviser_version=adviser_version, adviser_files=adviser_files
+        )
+
+        final_dataframe, info_dataframe, error_dataframe = Adviser.create_summary_dataframes(
+            adviser_dataframe=adviser_dataframe
+        )
+
+        adviser_heatmap_df = Adviser.create_adviser_results_dataframe_heatmap(
+            adviser_type_dataframe=final_dataframe, number_days=1
+        )
+
+        last_date = [column for column in adviser_heatmap_df.columns][-1]
+        csv = adviser_heatmap_df[[last_date]].to_csv(header=False)
+
+        assert csv
