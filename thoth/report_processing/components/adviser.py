@@ -15,7 +15,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-"""Utils Create Markdown output from adviser report input."""
+"""Adviser reports processing methods."""
 
 import logging
 import os
@@ -140,12 +140,12 @@ class Adviser:
         if limit_results:
             _LOGGER.debug(f"Limiting results to {max_ids} to test functions!!")
 
-        for n, ids in enumerate(adviser_ids):
-            _LOGGER.debug(f"Analysis {ids} n.{counter + 1}/{number_adviser_results}")
+        for n, document_id in enumerate(adviser_ids):
+            _LOGGER.debug(f"Analysis {document_id} n.{counter + 1}/{number_adviser_results}")
 
             try:
-                document = adviser_store.retrieve_document(ids)
-                files[ids] = document
+                document = adviser_store.retrieve_document(document_id)
+                files[document_id] = document
 
                 counter += 1
 
