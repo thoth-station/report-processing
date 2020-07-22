@@ -43,3 +43,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency thoth-storages from 0.24.0 to 0.24.2 (#14)
 * Added json to report from Qeb-hwt (#12)
 * Update OWNERS
+
+## Release 0.2.0 (2020-07-22T14:58:18)
+* Add new adviser methods to Adviser class (#17)
+* Update security reports processing (#11)
