@@ -47,3 +47,6 @@ all the things that you see...
 ## Release 0.2.0 (2020-07-22T14:58:18)
 * Add new adviser methods to Adviser class (#17)
 * Update security reports processing (#11)
+
+## Release 0.2.1 (2020-07-24T14:36:16)
+* Adjust methods (#20)
