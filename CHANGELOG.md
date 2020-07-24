@@ -50,3 +50,8 @@ all the things that you see...
 
 ## Release 0.2.1 (2020-07-24T14:36:16)
 * Adjust methods (#20)
+
+## Release 0.2.2 (2020-07-24T16:35:57)
+* Add missing packages to requirements.txt (#26)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#25)
+* :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#24)
