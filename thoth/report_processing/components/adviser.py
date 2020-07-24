@@ -89,7 +89,6 @@ class Adviser:
         repo_path: Optional[Path] = None,
         limit_results: bool = False,
         max_ids: int = 5,
-        is_multiple: Optional[bool] = None,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
@@ -106,7 +105,7 @@ class Adviser:
             _LOGGER.info(f"Considering... {file_path}")
 
             if "adviser" not in file_path.name:
-                raise Exception(f"This repo is not part of Adviser {repo_path}")
+                raise Exception(f"This repo is not part of adviser! {repo_path}")
 
             with open(file_path, "r") as json_file_type:
                 json_file = json.load(json_file_type)
@@ -257,8 +256,8 @@ class Adviser:
         return adviser_dict
 
     @staticmethod
-    def create_summary_dataframes(adviser_dataframe: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
-        """Create summary dataframes with all information required for visualization or storage.
+    def create_summary_dataframe(adviser_dataframe: pd.DataFrame) -> pd.DataFrame:
+        """Create summary dataframe with all information required for visualization or storage.
 
         :param adviser_dataframe: DataFrame as returned by `create_adviser_dataframe` method.
         """
@@ -283,16 +282,13 @@ class Adviser:
 
         total_dataframe = pd.DataFrame(justification_result)
 
-        info_dataframe = total_dataframe[total_dataframe["type"] == "INFO"]
-        error_dataframe = total_dataframe[total_dataframe["type"] == "ERROR"]
-
-        return total_dataframe, info_dataframe, error_dataframe
+        return total_dataframe
 
     @staticmethod
     def create_adviser_results_dataframe_histogram(adviser_type_dataframe: pd.DataFrame) -> pd.DataFrame:
         """Create adviser results dataframe sorted for histogram plot.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframe`
         """
         histogram_data: Dict[str, Any] = {}
 
@@ -316,7 +312,7 @@ class Adviser:
     def _aggregate_data_per_interval(adviser_type_dataframe: pd.DataFrame, number_days: int = 7) -> pd.DataFrame:
         """Aggregate advise justifications per weekly time intervals.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframe`
         """
         begin = min(adviser_type_dataframe["date"].values)
         end = max(adviser_type_dataframe["date"].values)
@@ -382,7 +378,7 @@ class Adviser:
     ) -> pd.DataFrame:
         """Create adviser justifications heatmap.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframes`
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframe`
         :param number_days: number of days to split data.
         """
         data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe, number_days=number_days)
@@ -430,7 +426,7 @@ class Adviser:
 
     @staticmethod
     def store_csv_from_dataframe(
-        csv_from_df: str, ceph_sli: CephStore, df_name: str, df: pd.DataFrame, ceph_path: str, is_public: bool = False,
+        csv_from_df: str, ceph_sli: CephStore, file_name: str, ceph_path: str, is_public: bool = False,
     ) -> None:
         """Store CSV obtained from pd.DataFrame on Ceph.
 

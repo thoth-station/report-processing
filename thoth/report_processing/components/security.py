@@ -116,7 +116,7 @@ class _SecurityIndicators:
             _LOGGER.info(f"Considering... {result_path}")
 
             if "security-indicators" not in result_path.name:
-                raise Exception(f"This repo is not part of Security Indicators! {result_path}")
+                raise Exception(f"This repo is not part of security-indicators! {result_path}")
 
             retrieved_files: Dict[str, Any] = {result_path.name: {}}
 
