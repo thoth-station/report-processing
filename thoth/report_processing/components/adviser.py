@@ -53,7 +53,7 @@ class Adviser:
 
     @classmethod
     def aggregate_adviser_results(
-        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = True, repo_path: Optional[Path] = None,
+        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = True, repo_path: Optional[Path] = None
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
@@ -76,7 +76,7 @@ class Adviser:
             return files
 
         files, counter = cls._aggregate_thoth_results_from_local(
-            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids,
+            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids
         )
         _LOGGER.info("Number of files retrieved is: %r" % counter)
 
@@ -122,7 +122,7 @@ class Adviser:
 
     @staticmethod
     def _aggregate_thoth_results_from_ceph(
-        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5,
+        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         adviser_store = AdvisersResultsStore()
@@ -426,7 +426,7 @@ class Adviser:
 
     @staticmethod
     def store_csv_from_dataframe(
-        csv_from_df: str, ceph_sli: CephStore, file_name: str, ceph_path: str, is_public: bool = False,
+        csv_from_df: str, ceph_sli: CephStore, file_name: str, ceph_path: str, is_public: bool = False
     ) -> None:
         """Store CSV obtained from pd.DataFrame on Ceph.
 
@@ -437,7 +437,7 @@ class Adviser:
         else:
             _LOGGER.info(f"Storing on private bucket... {ceph_path}")
         ceph_sli.store_blob(blob=csv_from_df, object_key=ceph_path)
-        _LOGGER.info(f"Succesfully stored  {df_name} at {ceph_path}")
+        _LOGGER.info(f"Succesfully stored  {file_name} at {ceph_path}")
 
     @staticmethod
     def create_pretty_report_from_json(report: Dict[str, Any], is_justification: bool = False) -> str:
