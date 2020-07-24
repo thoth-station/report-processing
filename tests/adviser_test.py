@@ -63,9 +63,7 @@ class TestAdviser(ReportProcessingTestCase):
             adviser_version=adviser_version, adviser_files=adviser_files
         )
 
-        final_dataframe, info_dataframe, error_dataframe = Adviser.create_summary_dataframes(
-            adviser_dataframe=adviser_dataframe
-        )
+        final_dataframe = Adviser.create_summary_dataframe(adviser_dataframe=adviser_dataframe)
 
         sorted_justifications_df = Adviser.create_adviser_results_dataframe_histogram(
             adviser_type_dataframe=final_dataframe
@@ -82,9 +80,7 @@ class TestAdviser(ReportProcessingTestCase):
             adviser_version=adviser_version, adviser_files=adviser_files
         )
 
-        final_dataframe, info_dataframe, error_dataframe = Adviser.create_summary_dataframes(
-            adviser_dataframe=adviser_dataframe
-        )
+        final_dataframe = Adviser.create_summary_dataframe(adviser_dataframe=adviser_dataframe)
 
         adviser_heatmap_df = Adviser.create_adviser_results_dataframe_heatmap(
             adviser_type_dataframe=final_dataframe, number_days=1
