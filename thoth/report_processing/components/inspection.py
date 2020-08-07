@@ -446,7 +446,7 @@ class AmunInspection:
         inspections_df = pd.DataFrame(columns=extracted_columns)
 
         column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
-        print(column_names)
+
         for dataframe in processed_data.values():
 
             new_df = cls.evaluate_statistics_on_inspection_df(inspection_df=dataframe, column_names=column_names)
