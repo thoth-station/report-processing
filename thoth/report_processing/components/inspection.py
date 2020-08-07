@@ -26,7 +26,6 @@ import hashlib
 from pathlib import Path
 from typing import List, Optional, Tuple, Dict, Any
 
-from IPython.core.display import HTML
 from sklearn.preprocessing import LabelEncoder
 
 from numpy import array
@@ -367,7 +366,8 @@ class AmunInspection:
 
         return requirements_locked
 
-    def process_inspection_runs(self, inspection_runs: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
+    @classmethod
+    def process_inspection_runs(cls, inspection_runs: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
         :param inspection_runs: aggregated data provided by `aggregate_thoth_inspections_runs`.
@@ -380,20 +380,20 @@ class AmunInspection:
 
         for inspection_id, inspection_run in inspection_runs.items():
 
-            inspection_run_df = self.process_inspection_run(inspection_run=inspection_run)
+            inspection_run_df = cls.process_inspection_run(inspection_run=inspection_run)
 
             if inspection_run_df.shape[0] > 1:
                 processed_data[inspection_id] = inspection_run_df
 
         return processed_data
 
-    def process_inspection_run(self, inspection_run: Dict[str, Any]) -> pd.DataFrame:
+    @staticmethod
+    def process_inspection_run(inspection_run: Dict[str, Any]) -> pd.DataFrame:
         """Process an inspection run into pd.DataFrame.
 
         :param inspection_run: single aggregated inspection ID provided by `aggregate_thoth_inspections_runs`.
         """
         results = inspection_run["results"]
-
         final_df = pd.DataFrame()
 
         for inspection in results:
@@ -408,7 +408,7 @@ class AmunInspection:
     def evaluate_statistics_on_inspection_df(inspection_df: pd.DataFrame, column_names: List[str]) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
-            lambda x: x is True
+            lambda x: x == True  # noqa
         ]
         new_data = {}
         for c_name in inspection_df.columns.values:
@@ -445,11 +445,11 @@ class AmunInspection:
 
         inspections_df = pd.DataFrame(columns=extracted_columns)
 
+        column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
+        print(column_names)
         for dataframe in processed_data.values():
 
-            new_df = cls.evaluate_statistics_on_inspection_df(
-                inspection_df=dataframe, column_names=cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
-            )
+            new_df = cls.evaluate_statistics_on_inspection_df(inspection_df=dataframe, column_names=column_names)
             inspections_df.loc[index] = new_df.iloc[0]
             index += 1
 
@@ -579,15 +579,6 @@ class AmunInspectionsSummary:
         "script": ["script", "script_sha256", "stdout__component", "@parameters", "stdout__name", "stdout__component"],
         "exit_code": ["exit_code"],
     }
-
-    @staticmethod
-    def multi_table(table_dict: Dict[str, Any]) -> HTML:
-        """Accept a list of IpyTable objects and return a table which contains each IpyTable in a cell."""
-        return HTML(
-            '<table><br style="background-color:white;">'
-            + "".join(["<br>" + table._repr_html_() + "</br>" for table in table_dict.values()])
-            + "</br></table>"
-        )
 
     @staticmethod
     def _create_df_report(df: pd.DataFrame) -> pd.DataFrame:

@@ -8,7 +8,6 @@ thoth-storages = ">=0.24.1"
 pandas = "*"
 scikit-learn = "*"
 numpy = "*"
-ipython = "*"
 
 [dev-packages]
 pytest = "*"
