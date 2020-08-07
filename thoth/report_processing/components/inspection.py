@@ -17,7 +17,6 @@
 
 """Amun Inspection reports processing methods."""
 
-import re
 import os
 import logging
 import json
@@ -32,10 +31,6 @@ from sklearn.preprocessing import LabelEncoder
 
 from numpy import array
 import pandas as pd
-
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
 
 from thoth.report_processing.exceptions import ThothNotKnownResultStore
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
@@ -57,7 +52,18 @@ _LOGGER = logging.getLogger(__name__)
 class AmunInspection:
     """Class of methods used to process reports from Amun Inspections."""
 
-    RESULTS_STORE = InspectionStore
+    _INSPECTION_PERFORMANCE_VALUES = ["stdout__@result__elapsed", "stdout__@result__rate"]
+
+    _INSPECTION_USAGE_VALUES = [
+        "usage__ru_inblock",
+        "usage__ru_majflt",
+        "usage__ru_maxrss",
+        "usage__ru_minflt",
+        "usage__ru_nivcsw",
+        "usage__ru_nvcsw",
+        "usage__ru_stime",
+        "usage__ru_utime",
+    ]
 
     @classmethod
     def aggregate_thoth_inspections_results(
@@ -81,8 +87,8 @@ class AmunInspection:
         if store_files:
             if any(store_file not in ThothAmunInspectionFileStoreEnum.__members__ for store_file in store_files):
                 raise ThothNotKnownResultStore(
-                    f"InspectionStore does not contain some of the files listed: {store_files}. \
-                        \InspectionStore: {ThothAmunInspectionFileStoreEnum.__members__.keys()}"
+                    f"InspectionStore does not contain some of the files listed: {store_files}."
+                    f"InspectionStore: {ThothAmunInspectionFileStoreEnum.__members__.keys()}"
                 )
 
         if limit_results:
@@ -195,9 +201,11 @@ class AmunInspection:
                             for result in files[inspection_document_id]["results"]:
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
 
-                                requirements_locked = cls._parse_requirements_locked(requirements_locked=inspection_specification_document["python"][
-                                    "requirements_locked"
-                                ])
+                                requirements_locked = cls._parse_requirements_locked(
+                                    requirements_locked=inspection_specification_document["python"][
+                                        "requirements_locked"
+                                    ]
+                                )
                                 result["result"]["requirements_locked"] = requirements_locked
 
                                 modified_results.append(result)
@@ -219,8 +227,9 @@ class AmunInspection:
 
         return files, counter
 
+    @classmethod
     def _aggregate_thoth_results_from_ceph(
-        self,
+        cls,
         files: Dict[str, Any],
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
@@ -228,7 +237,7 @@ class AmunInspection:
         max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
-        store_class_type = self.RESULTS_STORE
+        store_class_type = InspectionStore
 
         # Inspection ID counter
         inspection_counter = 0
@@ -308,9 +317,11 @@ class AmunInspection:
                             for result in files[inspection_document_id]["results"]:
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
 
-                                requirements_locked = self._parse_requirements_locked(requirements_locked=inspection_specification_document["python"][
-                                    "requirements_locked"
-                                ])
+                                requirements_locked = cls._parse_requirements_locked(
+                                    requirements_locked=inspection_specification_document["python"][
+                                        "requirements_locked"
+                                    ]
+                                )
                                 result["result"]["requirements_locked"] = requirements_locked
 
                                 modified_results.append(result)
@@ -332,7 +343,8 @@ class AmunInspection:
 
                     except Exception as inspection_exception:
                         _LOGGER.exception(
-                            f"Exception during retrieval of inspection info for inspection id {inspection_document_id}: {inspection_exception}"
+                            f"Exception during retrieval of inspection info for"
+                            f"inspection id {inspection_document_id}: {inspection_exception}"
                         )
                         pass
 
@@ -348,13 +360,12 @@ class AmunInspection:
         for package_name, data in default.items():
 
             # Use PyPI index as default if index is missing
-            if not "index" in data.keys():
+            if "index" not in data.keys():
                 modified_data = data.copy()
                 modified_data["index"] = "pypi"
                 requirements_locked["default"][package_name].update(modified_data)
 
         return requirements_locked
-
 
     def process_inspection_runs(self, inspection_runs: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
@@ -397,7 +408,7 @@ class AmunInspection:
     def evaluate_statistics_on_inspection_df(inspection_df: pd.DataFrame, column_names: List[str]) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
-            lambda x: x == True
+            lambda x: x is True
         ]
         new_data = {}
         for c_name in inspection_df.columns.values:
@@ -420,21 +431,8 @@ class AmunInspection:
     def create_final_inspection_dataframe(cls, processed_data: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """Create final pd.DataFrame from processed inspections runs after evaluating statistics.
 
-        :param processed_data: dictionary containing inspection results per inspection ID provided by `process_inspection_runs`.
+        :param processed_data: dict with inspection results per inspection ID provided by `process_inspection_runs`.
         """
-        _INSPECTION_PERFORMANCE_VALUES = ["stdout__@result__elapsed", "stdout__@result__rate"]
-
-        _INSPECTION_USAGE_VALUES = [
-            "usage__ru_inblock",
-            "usage__ru_majflt",
-            "usage__ru_maxrss",
-            "usage__ru_minflt",
-            "usage__ru_nivcsw",
-            "usage__ru_nvcsw",
-            "usage__ru_stime",
-            "usage__ru_utime",
-        ]
-
         index = 0
 
         extracted_columns = []
@@ -450,7 +448,7 @@ class AmunInspection:
         for dataframe in processed_data.values():
 
             new_df = cls.evaluate_statistics_on_inspection_df(
-                inspection_df=dataframe, column_names=_INSPECTION_PERFORMANCE_VALUES + _INSPECTION_USAGE_VALUES
+                inspection_df=dataframe, column_names=cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
             )
             inspections_df.loc[index] = new_df.iloc[0]
             index += 1
@@ -468,7 +466,7 @@ class AmunInspection:
         for c_name in sws_df.columns.values:
             if "__index" in c_name:
                 python_packages_names.append(c_name.split("__")[2])
-        
+
         columns_packages = []
         for package in python_packages_names:
             columns_packages.append("".join(["requirements_locked__default__", package, "__index"]))
@@ -597,11 +595,11 @@ class AmunInspectionsSummary:
         dataframe_report = {}
         for column_name in df.columns.values:
             try:
-                unique_values = [value for value in df[column_name].unique() if str(value) != 'nan']
+                unique_values = [value for value in df[column_name].unique() if str(value) != "nan"]
                 dataframe_report[column_name] = [unique_values]
             except Exception as exc:
                 _LOGGER.warning(f"Could not evaluate unique values in column {column_name}: {exc}")
-                dataframe_report[column_name] = [value for value in df[column_name].values if str(value) != 'nan']
+                dataframe_report[column_name] = [value for value in df[column_name].values if str(value) != "nan"]
                 pass
         df_unique = pd.DataFrame(dataframe_report)
         return df_unique
