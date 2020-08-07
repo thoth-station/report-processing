@@ -59,8 +59,9 @@ class AmunInspection:
 
     RESULTS_STORE = InspectionStore
 
+    @classmethod
     def aggregate_thoth_inspections_results(
-        self,
+        cls,
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
         limit_results: bool = False,
@@ -93,7 +94,7 @@ class AmunInspection:
             store_files = ["results", "specification", "hardware_info"]
 
         if is_local:
-            files, counter = self._aggregate_thoth_results_from_local(
+            files, counter = cls._aggregate_thoth_results_from_local(
                 repo_path=repo_path,
                 inspections_identifiers=inspections_identifiers,
                 files=files,
@@ -103,7 +104,7 @@ class AmunInspection:
             )
 
         else:
-            files, counter = self._aggregate_thoth_results_from_ceph(
+            files, counter = cls._aggregate_thoth_results_from_ceph(
                 store_files=store_files,
                 inspections_identifiers=inspections_identifiers,
                 files=files,
@@ -503,6 +504,10 @@ class AmunInspection:
         :param python_packages_dataframe: data frame as returned by `create_python_package_df` method.
         :param inspection_df: data frame containing data of inspections results.
         """
+        if inspection_df.empty:
+            _LOGGER.exception("Inspections dataframe is empty!")
+            return pd.DataFrame()
+
         label_encoder = LabelEncoder()
 
         processed_string_result = copy.deepcopy(packages_versions)
@@ -515,6 +520,7 @@ class AmunInspection:
             sws_encoded.append([row.values, sws_string, hex_dig])
 
         re_encoded = []
+
         for index, row in inspection_df[
             ["os_release__id", "os_release__version_id", "requirements_locked___meta__requires__python_version"]
         ].iterrows():
@@ -591,11 +597,11 @@ class AmunInspectionsSummary:
         dataframe_report = {}
         for column_name in df.columns.values:
             try:
-                unique_values = [value for value in df[column_name].unique() if value != 'nan']
+                unique_values = [value for value in df[column_name].unique() if str(value) != 'nan']
                 dataframe_report[column_name] = [unique_values]
             except Exception as exc:
                 _LOGGER.warning(f"Could not evaluate unique values in column {column_name}: {exc}")
-                dataframe_report[column_name] = [value for value in df[column_name].values if value != 'nan']
+                dataframe_report[column_name] = [value for value in df[column_name].values if str(value) != 'nan']
                 pass
         df_unique = pd.DataFrame(dataframe_report)
         return df_unique
