@@ -55,3 +55,8 @@ all the things that you see...
 * Add missing packages to requirements.txt (#26)
 * :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#25)
 * :pushpin: Automatic update of dependency thoth-storages from 0.24.4 to 0.24.5 (#24)
+
+## Release 0.2.3 (2020-08-07T16:42:15)
+* Add Inspection class (#31)
+* :pushpin: Automatic update of dependency pandas from 1.0.5 to 1.1.0 (#30)
+* python script name changed and therefore metadata (#29)
