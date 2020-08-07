@@ -53,7 +53,7 @@ class Adviser:
 
     @classmethod
     def aggregate_adviser_results(
-        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = True, repo_path: Optional[Path] = None
+        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = False, repo_path: Optional[Path] = None
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 

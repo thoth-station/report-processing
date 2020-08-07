@@ -55,7 +55,7 @@ class _SecurityIndicators:
         store_files: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
-        is_local: bool = True,
+        is_local: bool = False,
         repo_path: Optional[Path] = None,
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
@@ -262,9 +262,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             "analyzer_si_bandit": report_metadata["analyzer"],
             "analyzer_version_si_bandit": report_metadata["analyzer_version"],
             "document_id_si_bandit": report_metadata["document_id"],
-            "package_name": report_metadata["arguments"]["app.py"]["package_name"],
-            "package_version": report_metadata["arguments"]["app.py"]["package_version"],
-            "package_index": report_metadata["arguments"]["app.py"]["package_index"],
+            "package_name": report_metadata["arguments"]["si-bandit"]["package_name"],
+            "package_version": report_metadata["arguments"]["si-bandit"]["package_version"],
+            "package_index": report_metadata["arguments"]["si-bandit"]["package_index"],
         }
 
         return extracted_metadata
@@ -475,6 +475,8 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
             counter += 1
 
+        final_df.reset_index(inplace=True, drop=True)
+
         return final_df
 
     def create_security_indicators_scores(self, si_bandit_df: pd.DataFrame) -> pd.DataFrame:
@@ -667,6 +669,8 @@ class SecurityIndicatorsCloc:
 
             counter += 1
 
+        final_df.reset_index(inplace=True, drop=True)
+
         return final_df
 
 
@@ -742,6 +746,8 @@ class SecurityIndicatorsAggregator:
         si_cloc_df.drop(columns=package_info, inplace=True)
 
         aggregated_df = pd.concat([package_df, si_bandit_df, si_cloc_df], axis=1)
+
+        aggregated_df.reset_index(inplace=True, drop=True)
 
         return aggregated_df
 

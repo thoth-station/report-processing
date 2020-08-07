@@ -18,8 +18,17 @@
 """Thoth components classes to process outputs."""
 
 from .adviser import Adviser
+from .inspection import AmunInspection
+from .inspection import AmunInspectionsSummary
 from .security import SecurityIndicatorsBandit
 from .security import SecurityIndicatorsCloc
 from .security import SecurityIndicatorsAggregator
 
-__all__ = ["Adviser", "SecurityIndicatorsBandit", "SecurityIndicatorsCloc", "SecurityIndicatorsAggregator"]
+__all__ = [
+    "Adviser",
+    "AmunInspection",
+    "AmunInspectionsSummary",
+    "SecurityIndicatorsBandit",
+    "SecurityIndicatorsCloc",
+    "SecurityIndicatorsAggregator",
+]

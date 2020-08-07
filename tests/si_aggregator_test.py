@@ -36,17 +36,17 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
 
     _SI_AGGREGATOR_REPORTS_FILE = ReportProcessingTestCase.DATA / "results" / "security-aggregated.json"
 
-    def test_create_si_aggreagated_dataframe(self) -> None:
+    def test_create_si_aggregated_dataframe(self) -> None:
         """Test aggregation of SI analuyzers reports for single package."""
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH, is_local=True
         )
         si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH, is_local=True
         )
         si_cloc_report = si_cloc_reports[0]
 
@@ -56,17 +56,17 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
                 si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
             )
 
-    def test_create_si_aggreagated_json(self) -> None:
+    def test_create_si_aggregated_json(self) -> None:
         """Test aggregation of SI analuyzers reports for single package."""
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH, is_local=True
         )
         si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH, is_local=True
         )
         si_cloc_report = si_cloc_reports[0]
 
