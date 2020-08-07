@@ -29,12 +29,12 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_get_adviser_files(self) -> None:
         """Test retrieving adviser results from local path."""
-        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
         assert adviser_files
 
     def test_create_adviser_dataframe_with_no_results(self) -> None:
         """Test create of adviser dataframe from adviser documents with no results."""
-        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
         adviser_version = "0.10.0"
         adviser_dataframe = Adviser.create_adviser_dataframe(
@@ -45,7 +45,7 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_create_adviser_dataframe_with_results(self) -> None:
         """Test create of adviser dataframe from adviser documents."""
-        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
         adviser_version = "0.9.3"
         adviser_dataframe = Adviser.create_adviser_dataframe(
@@ -56,7 +56,7 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_create_adviser_dataframe_histogram(self) -> None:
         """Test create of adviser dataframe for histogram plot from adviser documents."""
-        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
         adviser_version = "0.9.3"
         adviser_dataframe = Adviser.create_adviser_dataframe(
@@ -73,7 +73,7 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_create_adviser_dataframe_heatmap(self) -> None:
         """Test create of adviser dataframe for heatmap plot from adviser documents."""
-        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH)
+        adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
         adviser_version = "0.9.3"
         adviser_dataframe = Adviser.create_adviser_dataframe(
