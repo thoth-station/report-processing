@@ -26,3 +26,13 @@ class ThothSecurityIndicatorsFileStoreEnum(Enum):
     bandit = auto()
     cloc = auto()
     aggregated = auto()
+
+
+class ThothAmunInspectionFileStoreEnum(Enum):
+    """Class for Thoth Amun Inspection files enums."""
+
+    specification = auto()
+    build_logs = auto()
+    job_logs = auto()
+    hardware_info = auto()
+    results = auto()
