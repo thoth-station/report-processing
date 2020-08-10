@@ -310,9 +310,9 @@ class Adviser:
 
     @staticmethod
     def _aggregate_data_per_interval(adviser_type_dataframe: pd.DataFrame, number_days: int = 7) -> pd.DataFrame:
-        """Aggregate advise justifications per weekly time intervals.
+        """Aggregate advise justifications per days intervals.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_summary_dataframe`
+        :param adviser_type_dataframe dataframe produced by `create_summary_dataframe`
         """
         begin = min(adviser_type_dataframe["date"].values)
         end = max(adviser_type_dataframe["date"].values)
@@ -323,7 +323,7 @@ class Adviser:
         intervals = (end - begin) / delta
         value = begin
 
-        for i in range(1, int(intervals) + 1):
+        for i in range(0, int(intervals) + 1):
             value = value + delta
             timestamps.append(value)
 
