@@ -60,3 +60,6 @@ all the things that you see...
 * Add Inspection class (#31)
 * :pushpin: Automatic update of dependency pandas from 1.0.5 to 1.1.0 (#30)
 * python script name changed and therefore metadata (#29)
+
+## Release 0.2.4 (2020-08-10T10:48:58)
+* Adjust range for daily analysis (#34)
