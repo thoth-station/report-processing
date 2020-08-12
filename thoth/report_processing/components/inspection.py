@@ -641,10 +641,11 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
+        hardware = ["cpu_brand"]
         solver = ["os_name", "os_version", "python_interpreter"]
-        return final_inspections_df[
-            ["identifier"] + performance_packages + ["cpu_brand"] + solver + ["elapsed_time", "rate"]
-        ]
+        runtime_environment = hardware + solver
+        pi_info = ["pi_name"] + ["elapsed_time", "rate"]
+        return final_inspections_df[["identifier"] + performance_packages + runtime_environment + pi_info]
 
 
 class AmunInspectionsStatistics:
