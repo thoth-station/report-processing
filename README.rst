@@ -56,11 +56,11 @@ Aggregating Security Indicators using local path:
    security_aggregator = SecurityIndicatorsAggregator()
 
    si_bandit_report = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-      security_indicator_bandit_repo_path=_SI_BANDIT_FOLDER_PATH
+      security_indicator_bandit_repo_path=_SI_BANDIT_FOLDER_PATH, is_local=True
    )[0]
 
    si_cloc_report = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-      security_indicator_cloc_repo_path=_SI_CLOC_FOLDER_PATH
+      security_indicator_cloc_repo_path=_SI_CLOC_FOLDER_PATH, is_local=True
    )[0]
 
    aggregated_json = security_aggregator.create_si_aggregated_json(
