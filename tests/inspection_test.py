@@ -41,7 +41,9 @@ class TestAdviser(ReportProcessingTestCase):
         )
 
         processed_inspection_runs = AmunInspections.process_inspection_runs(inspections_runs)
-        inspections_df = AmunInspections.create_inspections_dataframe(processed_inspection_runs=processed_inspection_runs)
+        inspections_df = AmunInspections.create_inspections_dataframe(
+            processed_inspection_runs=processed_inspection_runs
+        )
 
         dfs_inspection_classes, dfs_unique_inspection_classes = AmunInspectionsSummary.create_dfs_inspection_classes(
             inspection_df=inspections_df
