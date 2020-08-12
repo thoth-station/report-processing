@@ -63,3 +63,7 @@ all the things that you see...
 
 ## Release 0.2.4 (2020-08-10T10:48:58)
 * Adjust range for daily analysis (#34)
+
+## Release 0.3.0 (2020-08-12T15:42:30)
+* Add solver class (#37)
+* Feature: add AmunInspectionStatistics class (#38)
