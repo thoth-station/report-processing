@@ -224,7 +224,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
     def aggregate_security_indicator_bandit_results(
         limit_results: bool = False,
         max_ids: int = 5,
-        is_local: bool = True,
+        is_local: bool = False,
         security_indicator_bandit_repo_path: Path = Path("security-indicators"),
     ) -> List[Any]:
         """Aggregate si_bandit results from Ceph or locally using the provided path.
@@ -541,7 +541,7 @@ class SecurityIndicatorsCloc:
     def aggregate_security_indicator_cloc_results(
         limit_results: bool = False,
         max_ids: int = 5,
-        is_local: bool = True,
+        is_local: bool = False,
         security_indicator_cloc_repo_path: Path = Path("security-indicators"),
     ) -> List[Any]:
         """Aggregate si_cloc results from Ceph or locally using the provided path.
@@ -684,7 +684,7 @@ class SecurityIndicatorsAggregator:
     def retrieve_security_indicator_aggregated_results(
         limit_results: bool = False,
         max_ids: int = 5,
-        is_local: bool = True,
+        is_local: bool = False,
         security_indicator_aggregated_repo_path: Path = Path("security-indicators"),
     ) -> List[Any]:
         """Retrieve si_aggregated results from Ceph or locally using the provided path.
