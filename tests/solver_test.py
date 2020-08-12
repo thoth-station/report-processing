@@ -35,8 +35,8 @@ class TestSolver(ReportProcessingTestCase):
     def test_get_metadata_df_from_solver_report(self) -> None:
         """Test obtaining metadata from si solver report."""
         solver_reports = Solver.aggregate_solver_results(repo_path=self._SOLVER_FOLDER_PATH, is_local=True)
-        solver_report = solver_reports['solver-fedora-31-py37-012b745d']
-        metadata_retrieved = Solver.extract_data_from_solver_metadata(solver_report_metadata=solver_report['metadata'])
+        solver_report = solver_reports["solver-fedora-31-py37-012b745d"]
+        metadata_retrieved = Solver.extract_data_from_solver_metadata(solver_report_metadata=solver_report["metadata"])
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [
             "document_id",
@@ -46,6 +46,6 @@ class TestSolver(ReportProcessingTestCase):
             "os_name",
             "os_version",
             "python_interpreter",
-            "analyzer_version"
+            "analyzer_version",
         ]
         assert metadata_retrieved_keys == metadata_test_keys
