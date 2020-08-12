@@ -24,6 +24,7 @@ from .inspection import AmunInspectionsStatistics
 from .security import SecurityIndicatorsBandit
 from .security import SecurityIndicatorsCloc
 from .security import SecurityIndicatorsAggregator
+from .solver import Solver
 
 __all__ = [
     "Adviser",
@@ -33,4 +34,5 @@ __all__ = [
     "SecurityIndicatorsBandit",
     "SecurityIndicatorsCloc",
     "SecurityIndicatorsAggregator",
+    "Solver",
 ]

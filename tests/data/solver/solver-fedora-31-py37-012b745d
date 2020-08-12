@@ -1,0 +1,3779 @@
+{
+  "metadata": {
+    "analyzer": "thoth-solver",
+    "analyzer_version": "1.5.1",
+    "arguments": {
+      "python": {
+        "exclude_packages": null,
+        "index": "https://pypi.org/simple",
+        "no_pretty": false,
+        "no_transitive": true,
+        "output": "/mnt/workdir/solver-fedora-31-py37-012b745d",
+        "requirements": "dask===2.17.2",
+        "virtualenv": "/home/solver/venv"
+      },
+      "thoth-solver": {
+        "verbose": false
+      }
+    },
+    "datetime": "2020-06-09T03:47:20.082100",
+    "distribution": {
+      "codename": "",
+      "id": "fedora",
+      "like": "",
+      "version": "31",
+      "version_parts": {
+        "build_number": "",
+        "major": "31",
+        "minor": ""
+      }
+    },
+    "document_id": "solver-fedora-31-py37-012b745d",
+    "duration": 8,
+    "hostname": "solver-fedora-31-py37-012b745d-4275875702",
+    "os_release": {
+      "id": "fedora",
+      "name": "Fedora",
+      "platform_id": "platform:f31",
+      "redhat_bugzilla_product": "Fedora",
+      "redhat_bugzilla_product_version": "31",
+      "redhat_support_product": "Fedora",
+      "redhat_support_product_version": "31",
+      "variant_id": "container",
+      "version": "31 (Container Image)",
+      "version_id": "31"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 6,
+      "minor": 7,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": "thoth-psi-stage",
+    "timestamp": 1591674440
+  },
+  "result": {
+    "environment": {
+      "implementation_name": "cpython",
+      "implementation_version": "3.7.6",
+      "os_name": "posix",
+      "platform_machine": "x86_64",
+      "platform_python_implementation": "CPython",
+      "platform_release": "3.10.0-957.21.2.el7.x86_64",
+      "platform_system": "Linux",
+      "platform_version": "#1 SMP Tue May 28 09:26:43 UTC 2019",
+      "python_full_version": "3.7.6",
+      "python_version": "3.7",
+      "sys_platform": "linux"
+    },
+    "environment_packages": [
+      {
+        "package_name": "pipdeptree",
+        "package_version": "0.13.2"
+      }
+    ],
+    "errors": [],
+    "tree": [
+      {
+        "dependencies": [
+          {
+            "extra": [],
+            "extras": [],
+            "marker": null,
+            "marker_evaluated": null,
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "pyyaml",
+            "package_name": "pyyaml",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "3.01",
+                  "3.02",
+                  "3.03",
+                  "3.04",
+                  "3.05",
+                  "3.06",
+                  "3.07",
+                  "3.08",
+                  "3.09",
+                  "3.10",
+                  "3.11",
+                  "3.12",
+                  "3.13",
+                  "5.1",
+                  "5.1.1",
+                  "5.1.2",
+                  "5.2",
+                  "5.3",
+                  "5.3.1"
+                ]
+              }
+            ],
+            "specifier": null
+          },
+          {
+            "extra": [
+              "array"
+            ],
+            "extras": [],
+            "marker": "extra == \"array\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "numpy",
+            "package_name": "numpy",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "1.13.0",
+                  "1.13.1",
+                  "1.13.3",
+                  "1.14.0",
+                  "1.14.1",
+                  "1.14.2",
+                  "1.14.3",
+                  "1.14.4",
+                  "1.14.5",
+                  "1.14.6",
+                  "1.15.0",
+                  "1.15.1",
+                  "1.15.2",
+                  "1.15.3",
+                  "1.15.4",
+                  "1.16.0",
+                  "1.16.1",
+                  "1.16.2",
+                  "1.16.3",
+                  "1.16.4",
+                  "1.16.5",
+                  "1.16.6",
+                  "1.17.0",
+                  "1.17.1",
+                  "1.17.2",
+                  "1.17.3",
+                  "1.17.4",
+                  "1.17.5",
+                  "1.18.0",
+                  "1.18.1",
+                  "1.18.2",
+                  "1.18.3",
+                  "1.18.4",
+                  "1.18.5"
+                ]
+              }
+            ],
+            "specifier": ">=1.13.0"
+          },
+          {
+            "extra": [
+              "array"
+            ],
+            "extras": [],
+            "marker": "extra == \"array\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "toolz",
+            "package_name": "toolz",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.10.0",
+                  "0.8.2",
+                  "0.9.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.8.2"
+          },
+          {
+            "extra": [
+              "bag"
+            ],
+            "extras": [],
+            "marker": "extra == \"bag\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "cloudpickle",
+            "package_name": "cloudpickle",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.2.2",
+                  "0.3.0",
+                  "0.3.1",
+                  "0.4.0",
+                  "0.4.1",
+                  "0.4.2",
+                  "0.4.3",
+                  "0.4.4",
+                  "0.5.0",
+                  "0.5.1",
+                  "0.5.2",
+                  "0.5.3",
+                  "0.5.4",
+                  "0.5.5",
+                  "0.5.6",
+                  "0.6.0",
+                  "0.6.1",
+                  "0.7.0",
+                  "0.8.0",
+                  "0.8.1",
+                  "1.0.0",
+                  "1.1.1",
+                  "1.2.0",
+                  "1.2.1",
+                  "1.2.2",
+                  "1.3.0",
+                  "1.4.0",
+                  "1.4.1"
+                ]
+              }
+            ],
+            "specifier": ">=0.2.2"
+          },
+          {
+            "extra": [
+              "bag"
+            ],
+            "extras": [],
+            "marker": "extra == \"bag\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "fsspec",
+            "package_name": "fsspec",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.6.0",
+                  "0.6.1",
+                  "0.6.2",
+                  "0.6.3",
+                  "0.7.0",
+                  "0.7.1",
+                  "0.7.2",
+                  "0.7.3",
+                  "0.7.4"
+                ]
+              }
+            ],
+            "specifier": ">=0.6.0"
+          },
+          {
+            "extra": [
+              "bag"
+            ],
+            "extras": [],
+            "marker": "extra == \"bag\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "toolz",
+            "package_name": "toolz",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.10.0",
+                  "0.8.2",
+                  "0.9.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.8.2"
+          },
+          {
+            "extra": [
+              "bag"
+            ],
+            "extras": [],
+            "marker": "extra == \"bag\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "partd",
+            "package_name": "partd",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.3.10",
+                  "1.0.0",
+                  "1.1.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.3.10"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "bokeh",
+            "package_name": "bokeh",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "1.0.0",
+                  "1.0.1",
+                  "1.0.2",
+                  "1.0.3",
+                  "1.0.4",
+                  "1.1.0",
+                  "1.2.0",
+                  "1.3.0",
+                  "1.3.1",
+                  "1.3.2",
+                  "1.3.4",
+                  "1.4.0",
+                  "2.0.0",
+                  "2.0.1",
+                  "2.0.2"
+                ]
+              }
+            ],
+            "specifier": ">=1.0.0"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "cloudpickle",
+            "package_name": "cloudpickle",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.2.2",
+                  "0.3.0",
+                  "0.3.1",
+                  "0.4.0",
+                  "0.4.1",
+                  "0.4.2",
+                  "0.4.3",
+                  "0.4.4",
+                  "0.5.0",
+                  "0.5.1",
+                  "0.5.2",
+                  "0.5.3",
+                  "0.5.4",
+                  "0.5.5",
+                  "0.5.6",
+                  "0.6.0",
+                  "0.6.1",
+                  "0.7.0",
+                  "0.8.0",
+                  "0.8.1",
+                  "1.0.0",
+                  "1.1.1",
+                  "1.2.0",
+                  "1.2.1",
+                  "1.2.2",
+                  "1.3.0",
+                  "1.4.0",
+                  "1.4.1"
+                ]
+              }
+            ],
+            "specifier": ">=0.2.2"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "distributed",
+            "package_name": "distributed",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "2.0.1",
+                  "2.1.0",
+                  "2.10.0",
+                  "2.11.0",
+                  "2.12.0",
+                  "2.13.0",
+                  "2.14.0",
+                  "2.15.0",
+                  "2.15.1",
+                  "2.15.2",
+                  "2.16.0",
+                  "2.17.0",
+                  "2.18.0",
+                  "2.2.0",
+                  "2.3.0",
+                  "2.3.1",
+                  "2.3.2",
+                  "2.4.0",
+                  "2.5.0",
+                  "2.5.1",
+                  "2.5.2",
+                  "2.6.0",
+                  "2.7.0",
+                  "2.8.0",
+                  "2.8.1",
+                  "2.9.0",
+                  "2.9.1",
+                  "2.9.2",
+                  "2.9.3"
+                ]
+              }
+            ],
+            "specifier": ">=2.0"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "fsspec",
+            "package_name": "fsspec",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.6.0",
+                  "0.6.1",
+                  "0.6.2",
+                  "0.6.3",
+                  "0.7.0",
+                  "0.7.1",
+                  "0.7.2",
+                  "0.7.3",
+                  "0.7.4"
+                ]
+              }
+            ],
+            "specifier": ">=0.6.0"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "numpy",
+            "package_name": "numpy",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "1.13.0",
+                  "1.13.1",
+                  "1.13.3",
+                  "1.14.0",
+                  "1.14.1",
+                  "1.14.2",
+                  "1.14.3",
+                  "1.14.4",
+                  "1.14.5",
+                  "1.14.6",
+                  "1.15.0",
+                  "1.15.1",
+                  "1.15.2",
+                  "1.15.3",
+                  "1.15.4",
+                  "1.16.0",
+                  "1.16.1",
+                  "1.16.2",
+                  "1.16.3",
+                  "1.16.4",
+                  "1.16.5",
+                  "1.16.6",
+                  "1.17.0",
+                  "1.17.1",
+                  "1.17.2",
+                  "1.17.3",
+                  "1.17.4",
+                  "1.17.5",
+                  "1.18.0",
+                  "1.18.1",
+                  "1.18.2",
+                  "1.18.3",
+                  "1.18.4",
+                  "1.18.5"
+                ]
+              }
+            ],
+            "specifier": ">=1.13.0"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "pandas",
+            "package_name": "pandas",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.23.0",
+                  "0.23.1",
+                  "0.23.2",
+                  "0.23.3",
+                  "0.23.4",
+                  "0.24.0",
+                  "0.24.1",
+                  "0.24.2",
+                  "0.25.0",
+                  "0.25.1",
+                  "0.25.2",
+                  "0.25.3",
+                  "1.0.0",
+                  "1.0.1",
+                  "1.0.2",
+                  "1.0.3",
+                  "1.0.4"
+                ]
+              }
+            ],
+            "specifier": ">=0.23.0"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "partd",
+            "package_name": "partd",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.3.10",
+                  "1.0.0",
+                  "1.1.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.3.10"
+          },
+          {
+            "extra": [
+              "complete"
+            ],
+            "extras": [],
+            "marker": "extra == \"complete\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "toolz",
+            "package_name": "toolz",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.10.0",
+                  "0.8.2",
+                  "0.9.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.8.2"
+          },
+          {
+            "extra": [
+              "dataframe"
+            ],
+            "extras": [],
+            "marker": "extra == \"dataframe\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "numpy",
+            "package_name": "numpy",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "1.13.0",
+                  "1.13.1",
+                  "1.13.3",
+                  "1.14.0",
+                  "1.14.1",
+                  "1.14.2",
+                  "1.14.3",
+                  "1.14.4",
+                  "1.14.5",
+                  "1.14.6",
+                  "1.15.0",
+                  "1.15.1",
+                  "1.15.2",
+                  "1.15.3",
+                  "1.15.4",
+                  "1.16.0",
+                  "1.16.1",
+                  "1.16.2",
+                  "1.16.3",
+                  "1.16.4",
+                  "1.16.5",
+                  "1.16.6",
+                  "1.17.0",
+                  "1.17.1",
+                  "1.17.2",
+                  "1.17.3",
+                  "1.17.4",
+                  "1.17.5",
+                  "1.18.0",
+                  "1.18.1",
+                  "1.18.2",
+                  "1.18.3",
+                  "1.18.4",
+                  "1.18.5"
+                ]
+              }
+            ],
+            "specifier": ">=1.13.0"
+          },
+          {
+            "extra": [
+              "dataframe"
+            ],
+            "extras": [],
+            "marker": "extra == \"dataframe\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "pandas",
+            "package_name": "pandas",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.23.0",
+                  "0.23.1",
+                  "0.23.2",
+                  "0.23.3",
+                  "0.23.4",
+                  "0.24.0",
+                  "0.24.1",
+                  "0.24.2",
+                  "0.25.0",
+                  "0.25.1",
+                  "0.25.2",
+                  "0.25.3",
+                  "1.0.0",
+                  "1.0.1",
+                  "1.0.2",
+                  "1.0.3",
+                  "1.0.4"
+                ]
+              }
+            ],
+            "specifier": ">=0.23.0"
+          },
+          {
+            "extra": [
+              "dataframe"
+            ],
+            "extras": [],
+            "marker": "extra == \"dataframe\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "toolz",
+            "package_name": "toolz",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.10.0",
+                  "0.8.2",
+                  "0.9.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.8.2"
+          },
+          {
+            "extra": [
+              "dataframe"
+            ],
+            "extras": [],
+            "marker": "extra == \"dataframe\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "partd",
+            "package_name": "partd",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.3.10",
+                  "1.0.0",
+                  "1.1.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.3.10"
+          },
+          {
+            "extra": [
+              "dataframe"
+            ],
+            "extras": [],
+            "marker": "extra == \"dataframe\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "fsspec",
+            "package_name": "fsspec",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.6.0",
+                  "0.6.1",
+                  "0.6.2",
+                  "0.6.3",
+                  "0.7.0",
+                  "0.7.1",
+                  "0.7.2",
+                  "0.7.3",
+                  "0.7.4"
+                ]
+              }
+            ],
+            "specifier": ">=0.6.0"
+          },
+          {
+            "extra": [
+              "delayed"
+            ],
+            "extras": [],
+            "marker": "extra == \"delayed\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "cloudpickle",
+            "package_name": "cloudpickle",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.2.2",
+                  "0.3.0",
+                  "0.3.1",
+                  "0.4.0",
+                  "0.4.1",
+                  "0.4.2",
+                  "0.4.3",
+                  "0.4.4",
+                  "0.5.0",
+                  "0.5.1",
+                  "0.5.2",
+                  "0.5.3",
+                  "0.5.4",
+                  "0.5.5",
+                  "0.5.6",
+                  "0.6.0",
+                  "0.6.1",
+                  "0.7.0",
+                  "0.8.0",
+                  "0.8.1",
+                  "1.0.0",
+                  "1.1.1",
+                  "1.2.0",
+                  "1.2.1",
+                  "1.2.2",
+                  "1.3.0",
+                  "1.4.0",
+                  "1.4.1"
+                ]
+              }
+            ],
+            "specifier": ">=0.2.2"
+          },
+          {
+            "extra": [
+              "delayed"
+            ],
+            "extras": [],
+            "marker": "extra == \"delayed\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "toolz",
+            "package_name": "toolz",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "0.10.0",
+                  "0.8.2",
+                  "0.9.0"
+                ]
+              }
+            ],
+            "specifier": ">=0.8.2"
+          },
+          {
+            "extra": [
+              "diagnostics"
+            ],
+            "extras": [],
+            "marker": "extra == \"diagnostics\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "bokeh",
+            "package_name": "bokeh",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "1.0.0",
+                  "1.0.1",
+                  "1.0.2",
+                  "1.0.3",
+                  "1.0.4",
+                  "1.1.0",
+                  "1.2.0",
+                  "1.3.0",
+                  "1.3.1",
+                  "1.3.2",
+                  "1.3.4",
+                  "1.4.0",
+                  "2.0.0",
+                  "2.0.1",
+                  "2.0.2"
+                ]
+              }
+            ],
+            "specifier": ">=1.0.0"
+          },
+          {
+            "extra": [
+              "distributed"
+            ],
+            "extras": [],
+            "marker": "extra == \"distributed\"",
+            "marker_evaluated": "python_version >= \"0.0\"",
+            "marker_evaluation_error": null,
+            "marker_evaluation_result": true,
+            "normalized_package_name": "distributed",
+            "package_name": "distributed",
+            "resolved_versions": [
+              {
+                "index": "https://pypi.org/simple",
+                "versions": [
+                  "2.0.1",
+                  "2.1.0",
+                  "2.10.0",
+                  "2.11.0",
+                  "2.12.0",
+                  "2.13.0",
+                  "2.14.0",
+                  "2.15.0",
+                  "2.15.1",
+                  "2.15.2",
+                  "2.16.0",
+                  "2.17.0",
+                  "2.18.0",
+                  "2.2.0",
+                  "2.3.0",
+                  "2.3.1",
+                  "2.3.2",
+                  "2.4.0",
+                  "2.5.0",
+                  "2.5.1",
+                  "2.5.2",
+                  "2.6.0",
+                  "2.7.0",
+                  "2.8.0",
+                  "2.8.1",
+                  "2.9.0",
+                  "2.9.1",
+                  "2.9.2",
+                  "2.9.3"
+                ]
+              }
+            ],
+            "specifier": ">=2.0"
+          }
+        ],
+        "importlib_metadata": {
+          "entry_points": [],
+          "files": [
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg"
+              },
+              "path": "dask-2.17.2.dist-info/INSTALLER",
+              "size": 4
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "oCH8JqKXu7DE5wAStRZXOb515_bU-CfdTHRkubC4hGU"
+              },
+              "path": "dask-2.17.2.dist-info/LICENSE.txt",
+              "size": 1488
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "G73ngxSxD8Ytw4cFA7KE81zVdqOSVaQWNKWJN0QA2-A"
+              },
+              "path": "dask-2.17.2.dist-info/METADATA",
+              "size": 3414
+            },
+            {
+              "hash": null,
+              "path": "dask-2.17.2.dist-info/RECORD",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "g4nMs7d-Xl9-xC9XovUrsDHGXt-FT0E17Yqo92DEfvY"
+              },
+              "path": "dask-2.17.2.dist-info/WHEEL",
+              "size": 92
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iT6x3D1cKsV7ordRW_UwlPRBdavTonNRtWVPB-Kti7U"
+              },
+              "path": "dask-2.17.2.dist-info/top_level.txt",
+              "size": 5
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "kN5H3SeJ1wdJ88g3VgHvtUXxQx6ZWuDQDhEZMUbudj4"
+              },
+              "path": "dask/__init__.py",
+              "size": 444
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/_version.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/base.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/blockwise.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/cache.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/callbacks.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/compatibility.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/config.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/context.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/datasets.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/delayed.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/distributed.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/dot.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/hashing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/highlevelgraph.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/local.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/multiprocessing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/optimization.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/order.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/rewrite.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/sizeof.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/system.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/threaded.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/__pycache__/utils_test.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "auStZVoHvNBJmZHZeFWrhZyaRrOyFY63s5t6kXx4Icc"
+              },
+              "path": "dask/_version.py",
+              "size": 472
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "JurUR9Fs4rL0dnkCr1V2rWVdgOGCg05gpvLsnK3CXi0"
+              },
+              "path": "dask/array/__init__.py",
+              "size": 4788
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/backends.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/blockwise.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/chunk.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/creation.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/einsumfuncs.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/fft.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/gufunc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/image.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/linalg.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/ma.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/numpy_compat.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/optimization.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/overlap.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/percentile.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/random.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/rechunk.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/reductions.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/reshape.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/routines.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/slicing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/stats.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/svg.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/tiledb_io.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/ufunc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/__pycache__/wrap.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "1lPp7ElYB2Uxeu0-jqRnjsCgvP7M3Cl6D4j5mZBCpRI"
+              },
+              "path": "dask/array/backends.py",
+              "size": 2110
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Zbe2yeZSnskrGHieDgQf49sM06UtmPx8H_-iiW-ei8s"
+              },
+              "path": "dask/array/blockwise.py",
+              "size": 8904
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "CDAxwAGNZdRIPaVfPYHfDJFZTe1gB0uVPmVrJBEHNTE"
+              },
+              "path": "dask/array/chunk.py",
+              "size": 10628
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iEmCg2aI5QTc985vSUXinri_MVN5zDQj8o-iPbxNtwA"
+              },
+              "path": "dask/array/core.py",
+              "size": 152165
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "qM7mlUSlENG0QL4z3t1LWXpF_E_ri0r0EZnhaxA3AD0"
+              },
+              "path": "dask/array/creation.py",
+              "size": 36992
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Wrpv6PoZcE-bu5-xj6hAmgPlpgyIk450PH8rGl1maGU"
+              },
+              "path": "dask/array/einsumfuncs.py",
+              "size": 8940
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "b7BNPl-b4CKQIF4pJT2CEhDHz15nbkfPLbbMQ_9CEMk"
+              },
+              "path": "dask/array/fft.py",
+              "size": 7030
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "NGAzvITy4kx6BvZyi3AU31tlBRPrRjUc4n56G0Y2vlI"
+              },
+              "path": "dask/array/gufunc.py",
+              "size": 30738
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "pKI_G53Y_o_WakK_tRlgrKqv0bKBQawgAEw3hNwoyK8"
+              },
+              "path": "dask/array/image.py",
+              "size": 1932
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "xS_qa0uAzLp1oa6-DSb99456hwVV6BUW5iiC0bNKrew"
+              },
+              "path": "dask/array/linalg.py",
+              "size": 46292
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "MreVUbTvjcOk1bGcM3rfx7U4ABJindUCgsxHKa83WLs"
+              },
+              "path": "dask/array/ma.py",
+              "size": 7376
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "IGWg-2nn3V2JULwvVkAV_NHyp6I-ZaWVi7lLgOpI_Is"
+              },
+              "path": "dask/array/numpy_compat.py",
+              "size": 11515
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "7SqyUM4SFSrUHWSfqSkYm4mWOkfDwFKXQjFUBVvyOnE"
+              },
+              "path": "dask/array/optimization.py",
+              "size": 11290
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "e1Z2Ul7Fih1iP031fbia48D5cJAqWMAA4zrRHtFdik0"
+              },
+              "path": "dask/array/overlap.py",
+              "size": 19854
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "3hmVBrKMyNtqvJ8d5BodUlNuGHafhTofj1vd4jDJ7HQ"
+              },
+              "path": "dask/array/percentile.py",
+              "size": 8985
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "NhTNlR-6Iygpa-YCceuvwjy2dCkTDrEzadXRQ6OkcA0"
+              },
+              "path": "dask/array/random.py",
+              "size": 19970
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "64W3WCCD_8CrnIu-zwv3bZBtvBbqDHGJUtT-QMf7Xl0"
+              },
+              "path": "dask/array/rechunk.py",
+              "size": 22091
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "LAc4uzMBiWAkVlN1JGvoYzPN5wzq1EgiGaqKC6w1tzw"
+              },
+              "path": "dask/array/reductions.py",
+              "size": 41611
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "eZtPJGKPjKGmSQz09B1WoPb9IyQ0H73FssQXCleFHv0"
+              },
+              "path": "dask/array/reshape.py",
+              "size": 6447
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "qRk_ko4hYzgd1mPBRe5mayrhQf1e1NRyhqU9dTAJowA"
+              },
+              "path": "dask/array/routines.py",
+              "size": 41355
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "lXm38YBlE5kHXhR-zRkp1GGygwnK7BIE4S8Qz44ne34"
+              },
+              "path": "dask/array/slicing.py",
+              "size": 37850
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "HUUm_6kg4isTr0cfpQqn3xaT3liUnf2yXMujGXX_g3c"
+              },
+              "path": "dask/array/stats.py",
+              "size": 13835
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "nmv5O6W-JH8as0gXPsCzPTwL-t2DGrybU8gVEP3dp3Y"
+              },
+              "path": "dask/array/svg.py",
+              "size": 7700
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/array/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_array_core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_array_function.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_array_utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_atop.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_chunk.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_creation.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_cupy.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_fft.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_gufunc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_image.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_linalg.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_linearoperator.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_masked.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_numpy_compat.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_optimization.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_overlap.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_percentiles.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_random.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_rechunk.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_reductions.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_reshape.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_routines.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_slicing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_sparse.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_stats.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_svg.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_testing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_ufunc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_wrap.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/array/tests/__pycache__/test_xarray.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Ci9JD3TYVbIwM844sG3AQhdxTgBq_MlJk73n2F-DnaE"
+              },
+              "path": "dask/array/tests/test_array_core.py",
+              "size": 128013
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "YNVMzCd3XCf5ZVgUoa0zunveqSfGAUeGK5CycTkyIQ4"
+              },
+              "path": "dask/array/tests/test_array_function.py",
+              "size": 6992
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "dhQVCo4O2ZvsYAi5r7rS0TBQaz98ocUjQM0X0qKQ-Iw"
+              },
+              "path": "dask/array/tests/test_array_utils.py",
+              "size": 1585
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wqSDay0Whx32SulHq2PJUMjuUQIX8M62_HR8AIFi8r0"
+              },
+              "path": "dask/array/tests/test_atop.py",
+              "size": 17215
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "C-TeYPiFmhFK5G7qYusrRS-IzkojIF3MGWIC76cV2V0"
+              },
+              "path": "dask/array/tests/test_chunk.py",
+              "size": 2705
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iNq1_NnGhXQYh48TLnKxus7FoVIgGLscGewKsS_c2rE"
+              },
+              "path": "dask/array/tests/test_creation.py",
+              "size": 24256
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "od-hZx4c_vuvCgykojcoH-xFJEiX5rlq9mUSCqSLMyk"
+              },
+              "path": "dask/array/tests/test_cupy.py",
+              "size": 27622
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "fo5E_fRPvElb8ePGzkbIiChNOW0UyhikFOPhFNOZjFs"
+              },
+              "path": "dask/array/tests/test_fft.py",
+              "size": 8416
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "sAJlQlA9abV9xsMd3SrawtQlKfV2B3ijd97zYoK7aSU"
+              },
+              "path": "dask/array/tests/test_gufunc.py",
+              "size": 17808
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "FGgGTQIuYq3lSGXvi_ogOfgurbo-iefsU2kv_jefTB4"
+              },
+              "path": "dask/array/tests/test_image.py",
+              "size": 1446
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "NJLwhQoUBw9rDeDkY3CKNTaJZWAFgtZi8Tnxzt77HOQ"
+              },
+              "path": "dask/array/tests/test_linalg.py",
+              "size": 28977
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "5Bq-bZDi9tQM44up1NE8Ql9S2BUo2NwnxkVd8X4lj6M"
+              },
+              "path": "dask/array/tests/test_linearoperator.py",
+              "size": 829
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "-9_GrrrQBmB5XQ11rkZ2ZojzvFXUlSOK-COaigwO8rk"
+              },
+              "path": "dask/array/tests/test_masked.py",
+              "size": 12126
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "crG8fFR6GGjTMZd1S1y6McKyM_AfhBoMPXLQBm3WQa0"
+              },
+              "path": "dask/array/tests/test_numpy_compat.py",
+              "size": 1286
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Nyl-rXfWoqgJSUSCfTAYxTcBqB8AQk-zAeOi3jFLxz0"
+              },
+              "path": "dask/array/tests/test_optimization.py",
+              "size": 12487
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "6d95ONTXaTgdwanaLoJuW4dRZ2CV4Al7iNFtFYVlCHQ"
+              },
+              "path": "dask/array/tests/test_overlap.py",
+              "size": 17110
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "c5z8gaA5YNi5TUH9FkyVwIZhOlsC7NQ-74M_rN6lzMI"
+              },
+              "path": "dask/array/tests/test_percentiles.py",
+              "size": 2805
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "nJLv8WEaCUFUjBoWQ2-wa4p1QZPVZJhXNc63yKfKx2o"
+              },
+              "path": "dask/array/tests/test_random.py",
+              "size": 11670
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Rf9r5c9qXxt3BTkzjDf7uCJwGNQRA79d0QSG75xFA3I"
+              },
+              "path": "dask/array/tests/test_rechunk.py",
+              "size": 23859
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "MGfjMJGjcHNpd4K0QHXe-tj8gWjMBVcm3uZvEPSZGbE"
+              },
+              "path": "dask/array/tests/test_reductions.py",
+              "size": 25645
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "FKf1Nq9CaJ7n2ZoTG37JN0XTPCVCsYkExkAI3cyAP9M"
+              },
+              "path": "dask/array/tests/test_reshape.py",
+              "size": 2412
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wJ3MEH6c5NOI2z5cpavQwaez2a6Z64cpjHm2aRbSQok"
+              },
+              "path": "dask/array/tests/test_routines.py",
+              "size": 51595
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "82mIrIPA-1htfbdwQUAfM8_WBWT7DO6hXrFkYhCdfMo"
+              },
+              "path": "dask/array/tests/test_slicing.py",
+              "size": 28283
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "yWfpF7ETdcFQ_Cs_ZyIhrjUfRkxVtUnLpdGdT-SbRyc"
+              },
+              "path": "dask/array/tests/test_sparse.py",
+              "size": 6206
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Oxs8EyeEDcDAQZf69to0xfqoKymCiDlQXY09Hmmapp8"
+              },
+              "path": "dask/array/tests/test_stats.py",
+              "size": 4134
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "YLLItEReSxuNpcQU_Eb8zlJVZnIPu8t8GoPlnFbf848"
+              },
+              "path": "dask/array/tests/test_svg.py",
+              "size": 2424
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "PX7eyWlufFmJLAT9RwdRXyzLvvxqekMGfd9-coVYPHw"
+              },
+              "path": "dask/array/tests/test_testing.py",
+              "size": 483
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "9TmIFPQiDCg-IA9QXb_HVwGib3bpMcc8ZacR_OqD_As"
+              },
+              "path": "dask/array/tests/test_ufunc.py",
+              "size": 12967
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Wu1RkSa0EIeE72MrkIYc1dJyetr9em1KkkfdOZ0tAco"
+              },
+              "path": "dask/array/tests/test_wrap.py",
+              "size": 1653
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "m6BFcbSUB5IljMFORS9WYCTC2076CL0JkD7SHofJVsg"
+              },
+              "path": "dask/array/tests/test_xarray.py",
+              "size": 474
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "JBKOE17qbALnUt1iq6YzJQUfGICJILPt9Lll8a1are4"
+              },
+              "path": "dask/array/tiledb_io.py",
+              "size": 4957
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "CJYRXSkf8ErTsaJbZ7N8MPbDkG3cIQ6E4Lgxpj2zdI4"
+              },
+              "path": "dask/array/ufunc.py",
+              "size": 10577
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "WaDcBFE9VKuYr0XuMxvKjF2a974O6V04KX7Kres2pHs"
+              },
+              "path": "dask/array/utils.py",
+              "size": 11059
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "WPMU0yEKjkVZIGHgVdNj7_SM1U1V33zSpIL3CfgEDCc"
+              },
+              "path": "dask/array/wrap.py",
+              "size": 3995
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "dKFQ5tvvNIvHwwt8p33oyyus-mAR0HY8IwNsXVpagF8"
+              },
+              "path": "dask/bag/__init__.py",
+              "size": 749
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/avro.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/chunk.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/random.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/text.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "oNw7bT2Srv_QsyzzpL120MpYnxSRYu2NJsByLQTJNZk"
+              },
+              "path": "dask/bag/avro.py",
+              "size": 8919
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "BzbDsVBiKHXpn0tHmjzl3DDReiT5OhjQbuytqL0uH0E"
+              },
+              "path": "dask/bag/chunk.py",
+              "size": 728
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "cEzXZ9AMb4r3XgaIHbULr22zq5u1VL20iANO2p7yjx4"
+              },
+              "path": "dask/bag/core.py",
+              "size": 77970
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "DYNqq-JKOH8PRWrsG6UPhNByZ_z3iD2uQftgKvochXQ"
+              },
+              "path": "dask/bag/random.py",
+              "size": 2324
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/bag/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/tests/__pycache__/test_avro.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/tests/__pycache__/test_bag.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/tests/__pycache__/test_random.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bag/tests/__pycache__/test_text.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "_UJYLm0608xSp7AKF9ekYf2DMJS7wpQ8KbE7N-sYvyI"
+              },
+              "path": "dask/bag/tests/test_avro.py",
+              "size": 3770
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "uorwPTKHaP8L7dz7_CInZ5KnA2tWWUzlUls87vLflZ8"
+              },
+              "path": "dask/bag/tests/test_bag.py",
+              "size": 44090
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "0eBp5mue3TE1nWBYbWJjOjTjBgvMltDNKI1qlfsdyhU"
+              },
+              "path": "dask/bag/tests/test_random.py",
+              "size": 1656
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "BNCFmWKJG_QTGZqVLJF6YKVa8oYF1hoovi2xn_hZrcU"
+              },
+              "path": "dask/bag/tests/test_text.py",
+              "size": 4034
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "agmSS1aWyX4STDAvKO_EvZrnv6WcRWEMhrRT3FhsZm4"
+              },
+              "path": "dask/bag/text.py",
+              "size": 5114
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "qKQXFBbjt5VbHqAYiJOcvTvF3OnlUaLPpN77BGKPSIY"
+              },
+              "path": "dask/bag/utils.py",
+              "size": 180
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "p3zlrBRnN7iMssKEYyO6totP3zvuRVDnxrD5T6Yjw54"
+              },
+              "path": "dask/base.py",
+              "size": 35544
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "2yEra7BUWVD1PSOrTe8wYZ7W47uRjQSf2h_0T3Qnv9I"
+              },
+              "path": "dask/blockwise.py",
+              "size": 30769
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "KvNGF0Sq3B_FUPyjNuTAA-QJoFIcxnEFl9stZpUmjYE"
+              },
+              "path": "dask/bytes/__init__.py",
+              "size": 493
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/__pycache__/_compatibility.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "pRvc5V9peMT9cgoHrGReCqVwh-2CAx-OkpqiNIj3p_s"
+              },
+              "path": "dask/bytes/_compatibility.py",
+              "size": 146
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Z-oUOl_wd-acADN_WRRphyyY9QzWlUn4xHP_O6Kb--w"
+              },
+              "path": "dask/bytes/core.py",
+              "size": 6539
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/bytes/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_bytes_utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_compression.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_hdfs.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_http.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_local.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/bytes/tests/__pycache__/test_s3.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iWFKI0NYIF9jm4rNYR_gkZPzCc_LqvYPz9TqOR3535g"
+              },
+              "path": "dask/bytes/tests/test_bytes_utils.py",
+              "size": 5126
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "TF9sH-7YALgfrh5z0sN6hZK2dFXCbP85xIyq3dhSdgs"
+              },
+              "path": "dask/bytes/tests/test_compression.py",
+              "size": 494
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "2K6dB0aOTDHfiT6pOFN3Vhreoj-VQoqR1F6lZlZ4Pqo"
+              },
+              "path": "dask/bytes/tests/test_hdfs.py",
+              "size": 7744
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "CIFFBNiMJlCoyhJi34y7oUOVEb16J2dGnWeObkTcjYA"
+              },
+              "path": "dask/bytes/tests/test_http.py",
+              "size": 5942
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "C4kypJHLJlexgTfIEt3ekOXLEgoAzbs_G9p8oyziFHc"
+              },
+              "path": "dask/bytes/tests/test_local.py",
+              "size": 14414
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "-cy7lfrC_3u5dduEoMyL-NBp_SwSpgwYHS6Urcz44vE"
+              },
+              "path": "dask/bytes/tests/test_s3.py",
+              "size": 14943
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "2HghmPzqv3u9Ra7W_RvGO7GjVvFVkXhBenMCQiHimIw"
+              },
+              "path": "dask/bytes/utils.py",
+              "size": 464
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "rVLnIZpXqfPscpQF7Z0Y1TaYzXSS1G9tmFrwFNx7zsU"
+              },
+              "path": "dask/cache.py",
+              "size": 1992
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "QMj1NtEa7QFzRg0_PfkunEgQcULjtnGvDVVTyOL_xow"
+              },
+              "path": "dask/callbacks.py",
+              "size": 3971
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "y6g-DUrdfMbs7c8ZDDdBw1IStYH-GIflUgQinF_WkJ0"
+              },
+              "path": "dask/compatibility.py",
+              "size": 498
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "53nejXwQGVzgRbtqGrpBi6eSCzRiigFhlp7FtU4Axps"
+              },
+              "path": "dask/config.py",
+              "size": 16510
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "hwT362wcKBMdWlAZWuYPHP1xb08KFdkb7tWlHqUb_iM"
+              },
+              "path": "dask/context.py",
+              "size": 1733
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "LIoGMKT0yYO0GXRwiNuny5RxxAJGmVdHFzoBgS7KJ1c"
+              },
+              "path": "dask/core.py",
+              "size": 12369
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "NuZqB_sBMiox8Kzdjyzd1Rj22gVlsGzIllVdR7BqRo4"
+              },
+              "path": "dask/dask-schema.yaml",
+              "size": 2927
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "yuGzMbTBj290HVh3cWMTzXYsDoVUdrMQ2vZVOCYYF7k"
+              },
+              "path": "dask/dask.yaml",
+              "size": 525
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Xna6LbD-vm95gLdr-FHTHsawxnZt_i1skjC3c4uXD-A"
+              },
+              "path": "dask/dataframe/__init__.py",
+              "size": 1425
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/_accessor.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/_compat.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/_dtypes.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/accessor.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/backends.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/categorical.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/extensions.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/groupby.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/hyperloglog.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/indexing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/methods.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/multi.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/numeric.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/optimize.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/partitionquantiles.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/reshape.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/rolling.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/shuffle.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "_bXNE6fpdDf0tbJvl8zp8MGDqOS3aPuIJPLZAJ2bnkU"
+              },
+              "path": "dask/dataframe/_accessor.py",
+              "size": 2544
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "6V0gpb31Y8FELHiMX2bGJzMPNJxVOrjWMoBFxetIybA"
+              },
+              "path": "dask/dataframe/_compat.py",
+              "size": 2286
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "v1-M3lOqrYrPTpDSXnPH7Su4EijGizHCyPvBHxgD52s"
+              },
+              "path": "dask/dataframe/_dtypes.py",
+              "size": 510
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "ud-qelcPod5VocA5auFbSM6F_UZ9ZuqxxePJtGugXeE"
+              },
+              "path": "dask/dataframe/accessor.py",
+              "size": 5362
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "55lAI--kqtXGkgYCMKPu-boQNfviAQiNkm8qRSw1mtY"
+              },
+              "path": "dask/dataframe/backends.py",
+              "size": 577
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "NzqdD50igIpMO1h9X-z_9VlSO4BtJeq2AajsaSSrWPk"
+              },
+              "path": "dask/dataframe/categorical.py",
+              "size": 9118
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "VZR2u0gIHB-X7FGKE6H3pJ94ihImjhORDZ4M9DdRNH0"
+              },
+              "path": "dask/dataframe/core.py",
+              "size": 222771
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "hf5lgqaLjY7BH2LxQ0rXIcgf82hYtaebJ1D-3QH1p_U"
+              },
+              "path": "dask/dataframe/extensions.py",
+              "size": 500
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "fjM4mO1O_ZPXJP6sEQVANLTqiJ-iKNzWqJ2eVEnpa5M"
+              },
+              "path": "dask/dataframe/groupby.py",
+              "size": 61966
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iuGVkzv-Irqz3u2_eYqrBWBDexSL0YHhaXDdNL4qQtE"
+              },
+              "path": "dask/dataframe/hyperloglog.py",
+              "size": 2437
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "YWr1CVlHW4_U6xuJ7oGMvswbv0stPw1eDvlzbzvmPTc"
+              },
+              "path": "dask/dataframe/indexing.py",
+              "size": 11949
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "8hkGDhaBJkmy-Ie3bzRUl7tF9nZzZzb6Y6_5S82XJCk"
+              },
+              "path": "dask/dataframe/io/__init__.py",
+              "size": 458
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/csv.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/demo.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/hdf.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/io.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/json.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/orc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/sql.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "YW8GhPePWWxbqywoRmZGDXtGPekw-8ZpolXwLnCRVHk"
+              },
+              "path": "dask/dataframe/io/csv.py",
+              "size": 29656
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "3JOgenIQpNO7T2lqnkCHZsRIKdV3uddqHbbj3GrFhQo"
+              },
+              "path": "dask/dataframe/io/demo.py",
+              "size": 8517
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "k8_md8VTdlhf1IRI9F3-C_M27eZpXh4_W591JgrC5oc"
+              },
+              "path": "dask/dataframe/io/hdf.py",
+              "size": 17363
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "5nVeZSqfOQb-phLUbmOSyR4lXaqrmJEBW4Xkdx0hhg4"
+              },
+              "path": "dask/dataframe/io/io.py",
+              "size": 20706
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "UY0cWhjUXPZm9u8E6fnGgLEbvYRLQmXgkt-9MAdQ0FA"
+              },
+              "path": "dask/dataframe/io/json.py",
+              "size": 7492
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "ETaVwUdpDmTrpSs-n8wMp8-wZmnGeyzBpwW61-oahyg"
+              },
+              "path": "dask/dataframe/io/orc.py",
+              "size": 3189
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "4C5YG9GJxWT-Xzy2vtz-Bm75Z1dXqaz9ManGG0ujGhM"
+              },
+              "path": "dask/dataframe/io/parquet/__init__.py",
+              "size": 62
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/parquet/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/parquet/__pycache__/arrow.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/parquet/__pycache__/core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/parquet/__pycache__/fastparquet.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/parquet/__pycache__/utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "dDskFU-fXxUVABsaOC42vLNfl2g44eg7qBjy-JaXqdk"
+              },
+              "path": "dask/dataframe/io/parquet/arrow.py",
+              "size": 31580
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "zVFNVDzHcrsNxmvJWy2-kEZTzGd28XV6hqjh15tiI3w"
+              },
+              "path": "dask/dataframe/io/parquet/core.py",
+              "size": 28074
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "cyeQlz5lHUtLyIvNkZe02H2n7_R_KXrjDDDe-Mv-Jn4"
+              },
+              "path": "dask/dataframe/io/parquet/fastparquet.py",
+              "size": 23873
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "yh1-YsJbLXnmKwQ2vGr8W-on9zisMOj_IIbjf0K1-OE"
+              },
+              "path": "dask/dataframe/io/parquet/utils.py",
+              "size": 15822
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wBlKqhOwR8nqlbTsOIJNu7ddQsjd5amlrm1TD4HvXvE"
+              },
+              "path": "dask/dataframe/io/sql.py",
+              "size": 8049
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/dataframe/io/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_csv.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_demo.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_hdf.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_io.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_json.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_orc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_parquet.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/io/tests/__pycache__/test_sql.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "scSlfOb1jxlalI7BxwovfioE-DRRTUNxbHu4rayQByA"
+              },
+              "path": "dask/dataframe/io/tests/test_csv.py",
+              "size": 48495
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "DRQ9mo7O0v1mqegrnNnoedyajiBmQjc7XltTxEFqu6E"
+              },
+              "path": "dask/dataframe/io/tests/test_demo.py",
+              "size": 3680
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "VUf-b9300vyaT8a9IvUVPCCx2-hEp68UmeG4DXw5hzY"
+              },
+              "path": "dask/dataframe/io/tests/test_hdf.py",
+              "size": 25133
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "51_GPGHhZalWJRsFrcfHtDDNQA-11VhX09ZOyh4GNZM"
+              },
+              "path": "dask/dataframe/io/tests/test_io.py",
+              "size": 22234
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "6xAOEg-BxJoeM7eC3jArjNCrSApWh6h4JglkL4xATuc"
+              },
+              "path": "dask/dataframe/io/tests/test_json.py",
+              "size": 4541
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "zRbS_ShdF9I_vXMLnjNQHCPIr6xCYstJtB-ICMJhKk4"
+              },
+              "path": "dask/dataframe/io/tests/test_orc.py",
+              "size": 1959
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "6I9cdcNON3GgpOX4bHPxcHzVtzXYISa3n5dt4sIRfo4"
+              },
+              "path": "dask/dataframe/io/tests/test_parquet.py",
+              "size": 82218
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "rt5JeuIWSny4k6g6cmp5iBxJgvBBvG8Q7q7wIMNnAx8"
+              },
+              "path": "dask/dataframe/io/tests/test_sql.py",
+              "size": 10012
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "tL1lBL-gCRt4gJjeu6LdSt6UGHIjO-tJ9N0-KlFNWr0"
+              },
+              "path": "dask/dataframe/io/utils.py",
+              "size": 3019
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "HLOdxmJ4rlBk6BbyVb29UOI7svYR-bHH7_rXgScprxE"
+              },
+              "path": "dask/dataframe/methods.py",
+              "size": 15800
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "AsNA_zSVE-wzizsA-SznwuB_Ple4d_AJP6HoCdUqLrA"
+              },
+              "path": "dask/dataframe/multi.py",
+              "size": 37138
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "mhYoJRaS6xETsSaN3qiEr2fTNFjVg1PXRu1w3XApP78"
+              },
+              "path": "dask/dataframe/numeric.py",
+              "size": 1506
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "24nTbH8dOQRXdkDsHndbJdSLUa7IIxEU5Cb0NDBZGxM"
+              },
+              "path": "dask/dataframe/optimize.py",
+              "size": 4215
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "G5qleXjP6u7NiuSL2dyI-ddjaRMDcIRucGZOniFKDK0"
+              },
+              "path": "dask/dataframe/partitionquantiles.py",
+              "size": 19109
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "j75VGO-EOUnTH8XqXA4OtxCslOzTBzC2HxM3n4Ikka0"
+              },
+              "path": "dask/dataframe/reshape.py",
+              "size": 10146
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "GgKoK-4yM4tujCFQ56ro4exfV8e1rCSsNxMxB2aEZGQ"
+              },
+              "path": "dask/dataframe/rolling.py",
+              "size": 13718
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "QKHC9x5X2SPU1upFF-ZA3ahirIwbUedhvH9FFI72zLc"
+              },
+              "path": "dask/dataframe/shuffle.py",
+              "size": 31296
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/dataframe/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_accessors.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_arithmetics_reduction.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_boolean.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_categorical.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_dataframe.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_extensions.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_format.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_groupby.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_hashing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_hyperloglog.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_indexing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_merge_column_and_index.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_multi.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_numeric.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_optimize_dataframe.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_reshape.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_rolling.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_shuffle.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_ufunc.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tests/__pycache__/test_utils_dataframe.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "gLYqQs2kjwQBzMKtS0U1kAH_PITL94fnzMY8bMmPoxI"
+              },
+              "path": "dask/dataframe/tests/test_accessors.py",
+              "size": 8165
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Xjt-QNwha-Q2oxovYeN2Z8sWXlxEICNrjXUZNpHKz6o"
+              },
+              "path": "dask/dataframe/tests/test_arithmetics_reduction.py",
+              "size": 51303
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Il1MGyxIHdNqmM2lRlaX9UjsCI1DbdF6XLTMVm6_rl8"
+              },
+              "path": "dask/dataframe/tests/test_boolean.py",
+              "size": 1028
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "9yYwBOuzzAbbtPiuHexIOGFwLuiGi6UF4siHMdwHTuc"
+              },
+              "path": "dask/dataframe/tests/test_categorical.py",
+              "size": 14735
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Xm5y-5t7J0bsOIXMXqkqsE1B0HUQPz4a-kaVC-YLc8Q"
+              },
+              "path": "dask/dataframe/tests/test_dataframe.py",
+              "size": 133083
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "or_7BRKMbOWqi3KrsJRaXhF-ATTK2r7MTw98dxMaSHE"
+              },
+              "path": "dask/dataframe/tests/test_extensions.py",
+              "size": 1349
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "8RjDz1qQhdi4lfuG2ijKDEImGoma_0s7VNhhUnj1X5w"
+              },
+              "path": "dask/dataframe/tests/test_format.py",
+              "size": 13919
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "j37ERA8q48Q0_tcNkdEj8SyS9Frh0xYCygLgyQzdUEQ"
+              },
+              "path": "dask/dataframe/tests/test_groupby.py",
+              "size": 78504
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "M_NYfvdULWX2Q8kPihHNDP0XjeFh0egpkbzAwUluofw"
+              },
+              "path": "dask/dataframe/tests/test_hashing.py",
+              "size": 2664
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "BrtVY2TQP21RADFO7EPS4pJJ30Z02zU9Sjr5ATDo2PQ"
+              },
+              "path": "dask/dataframe/tests/test_hyperloglog.py",
+              "size": 3050
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "T6CwiAq2KtORaZy1uc009lTlQMkfVCnX-OdG817K_OY"
+              },
+              "path": "dask/dataframe/tests/test_indexing.py",
+              "size": 17731
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "9Ht2d17w_LJZsdtkqrHF08nObVKLrVAR7cSDa62OOMY"
+              },
+              "path": "dask/dataframe/tests/test_merge_column_and_index.py",
+              "size": 5481
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "ry_iqe8vId_nDf5TqlTrbAExizx16-jczJLPzYHL_i4"
+              },
+              "path": "dask/dataframe/tests/test_multi.py",
+              "size": 70111
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "7BPGmkWce7OyzJZET0bYXpyIcu5PWMaDRHF9VO26iMk"
+              },
+              "path": "dask/dataframe/tests/test_numeric.py",
+              "size": 1598
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "28DJtZYjZn5UMLX190koPLPl2nESqc4_bUezlI5yGcM"
+              },
+              "path": "dask/dataframe/tests/test_optimize_dataframe.py",
+              "size": 1030
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "W3sb4YeIRXYF54YlNAqP0wdK3BnVvN2F_bKjmTpFLWo"
+              },
+              "path": "dask/dataframe/tests/test_reshape.py",
+              "size": 8779
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wmE81CPR_-gIM7I4R7cXM_bqfj-hydz-xlCBtiQXTjU"
+              },
+              "path": "dask/dataframe/tests/test_rolling.py",
+              "size": 13232
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "MiQBz9lh2iHBk0tyjIUGsJnbcw2ENaoGzTaXZQOjBGY"
+              },
+              "path": "dask/dataframe/tests/test_shuffle.py",
+              "size": 32665
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "9NF0Je06AtjvbYw9ZrcOkrWS0mPtbKkSvm2xV9kU1Ag"
+              },
+              "path": "dask/dataframe/tests/test_ufunc.py",
+              "size": 15183
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wpacIvusOn-y3DfM1kmqakWeSsBeDhUb_ydXxMG2_rI"
+              },
+              "path": "dask/dataframe/tests/test_utils_dataframe.py",
+              "size": 13949
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/dataframe/tseries/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tseries/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tseries/__pycache__/resample.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "JDt44J_cnmuB5hbUawIK4dzSqW8i3Zhy74Y40FtFj-o"
+              },
+              "path": "dask/dataframe/tseries/resample.py",
+              "size": 7814
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/dataframe/tseries/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tseries/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/dataframe/tseries/tests/__pycache__/test_resample.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "qnAKkriBRYFMq_dcSWTzdsgVTqN1Yxu89Yy55k7Z2ME"
+              },
+              "path": "dask/dataframe/tseries/tests/test_resample.py",
+              "size": 5234
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "wVl8kZduMv9Ym1XGsFstdQJFPG6XyO2QDUMOfLTiWUg"
+              },
+              "path": "dask/dataframe/utils.py",
+              "size": 31489
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "N3TD3RrD2pjWEFaS5dd4IlTzfmIyr-48WTJ4jUf4Aew"
+              },
+              "path": "dask/datasets.py",
+              "size": 4847
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "ijKNRZVrE8TfOKIvyOMqF8AkQS7oEJVJ3OCiAN37n38"
+              },
+              "path": "dask/delayed.py",
+              "size": 21504
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "mmjx3fI0cdOwPt48lJeOvk3ULs1e9gB1WX1gmc2qSXU"
+              },
+              "path": "dask/diagnostics/__init__.py",
+              "size": 171
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/__pycache__/profile.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/__pycache__/profile_visualize.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/__pycache__/progress.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "dK_h3vNpWUJlR-DNXP9g_0T2BsnRtltFQKVKiYhmlQc"
+              },
+              "path": "dask/diagnostics/profile.py",
+              "size": 11204
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "iMhnaiDNL3SECLHDZ8uKV6mGwvPML-rd_qzHVb5TUYM"
+              },
+              "path": "dask/diagnostics/profile_visualize.py",
+              "size": 14902
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "uBbQWTtMMBzKoDCqBtcaHofKNk2pRsLgfyRLgEiUwZ4"
+              },
+              "path": "dask/diagnostics/progress.py",
+              "size": 4219
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/diagnostics/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/tests/__pycache__/test_profiler.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/diagnostics/tests/__pycache__/test_progress.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "eUGlnY7AC5eg0GnaO2cptmTZwnCFaV65JlXpx6oOnlU"
+              },
+              "path": "dask/diagnostics/tests/test_profiler.py",
+              "size": 10832
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "_p1Jj172RCzCA1eoQMLYWlRSEstO6muAB5NF87qCv0U"
+              },
+              "path": "dask/diagnostics/tests/test_progress.py",
+              "size": 3145
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "TRbzvJmVPIo8eV2c32FjPYr3n6aKiVjc4gbHw7AFxvc"
+              },
+              "path": "dask/distributed.py",
+              "size": 412
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "ntI89dD_hCgtoc0RONqzL5Fw08nPP6jvGwooT9Xtej0"
+              },
+              "path": "dask/dot.py",
+              "size": 8565
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "PwKdjUBawxTZfx_m3NABnuhOEQXvN80UsAPUlzYzjC4"
+              },
+              "path": "dask/hashing.py",
+              "size": 2462
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "e5hBBBegPz0HP7SkWZ-zu6JYXBCMLczjoO_WpUyL5i4"
+              },
+              "path": "dask/highlevelgraph.py",
+              "size": 7778
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Jo7mjFaOLH48kWKraCqsAqWtYOzE2x0gyEg4i5ZanCQ"
+              },
+              "path": "dask/local.py",
+              "size": 16510
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "MLgw73sUHLJehy3KcDzBOSIKezHVjV8wBBd0D9Nptfo"
+              },
+              "path": "dask/multiprocessing.py",
+              "size": 6745
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "bAJITpwEa-Q1HZwasD49a_rwdjGRBSRuzJu0yvBkuh4"
+              },
+              "path": "dask/optimization.py",
+              "size": 36170
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "IO0Dr2kCPfKTCaOc_5OY5PZoj01MKcEMegNUkmwZEbc"
+              },
+              "path": "dask/order.py",
+              "size": 27868
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "R7itIPv8Plr6NHPCztDXkXa_-IO6PtlNzktW4BIoHFc"
+              },
+              "path": "dask/rewrite.py",
+              "size": 12594
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "1R5a0Nm5sKZfXQBzORNfT3XzLmZaGjmdvo-4eMjH3H8"
+              },
+              "path": "dask/sizeof.py",
+              "size": 4406
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "-5_4wvnW3Nr8PHZMCJED0I4xP5FEPIa_yzyH9R6Ai5U"
+              },
+              "path": "dask/system.py",
+              "size": 1458
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "47DEQpj8HBSa-_TImW-5JCeuQeRkm5NMpJWZG3hSuFU"
+              },
+              "path": "dask/tests/__init__.py",
+              "size": 0
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/__init__.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_base.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_cache.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_callbacks.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_config.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_context.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_core.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_datasets.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_delayed.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_distributed.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_dot.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_hashing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_highgraph.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_local.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_multiprocessing.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_optimization.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_order.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_rewrite.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_sizeof.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_system.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_threaded.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": null,
+              "path": "dask/tests/__pycache__/test_utils.cpython-37.pyc",
+              "size": null
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "vWv9AkvBJ_qZCbRH63gMYYdrb-89QdffR_mfHLVCrK8"
+              },
+              "path": "dask/tests/test_base.py",
+              "size": 29892
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Xs0rkZuKNIK-EX7SzMuK6Xyw_lo5w3QdP5z1PJAHoA8"
+              },
+              "path": "dask/tests/test_cache.py",
+              "size": 1575
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "5yE_KTGHLXL_6IV1j53yyTdUIZokc1B14jMcn9lxn10"
+              },
+              "path": "dask/tests/test_callbacks.py",
+              "size": 2534
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "kpgGMXuoaEKJWY0i-yFQj9ZpPGEWhTanJmJrx7Cx7ok"
+              },
+              "path": "dask/tests/test_config.py",
+              "size": 12817
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "JETlTOv9LtgBwx39Sxdn9t8DK01cOB68amPU3YlUjLI"
+              },
+              "path": "dask/tests/test_context.py",
+              "size": 1059
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "EfM00vPs4v8QErBTR1abf-4WC3O27sJnEJNr-VB9ofE"
+              },
+              "path": "dask/tests/test_core.py",
+              "size": 6519
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "hWhXRGj4_lNLwZeA1KXxmycI5VOnZRePhHdZNKsg8vk"
+              },
+              "path": "dask/tests/test_datasets.py",
+              "size": 761
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "4_qHKO4VohdOJmH_MpSEqLQ4dsqwguAh4xJAZ_Xp2rg"
+              },
+              "path": "dask/tests/test_delayed.py",
+              "size": 18365
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "SEutvNT_YDmeXImGi4sT-m7ih9iDSOrLI_gndmZJRoo"
+              },
+              "path": "dask/tests/test_distributed.py",
+              "size": 5475
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "CJiAXN9TyRwiFmLWr1t-av_wV6WbyGMXtvPn7xPguJ0"
+              },
+              "path": "dask/tests/test_dot.py",
+              "size": 8729
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "4bUGnadK0sxIbfIImmWohqfdkZxc5R-0WAiIsQATuxI"
+              },
+              "path": "dask/tests/test_hashing.py",
+              "size": 1060
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "lD1h304B6ioIM4vEXqd8qBnQVKD6Cp9I8DXRSpJm2JU"
+              },
+              "path": "dask/tests/test_highgraph.py",
+              "size": 974
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "Bpn6mXk_W5I5qg_kuKNvXDwcob1Oswevm5Gv3GKsITY"
+              },
+              "path": "dask/tests/test_local.py",
+              "size": 4604
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "1u5my3Aj9fTsWSC-qnAAeoKi17M_XwIyK4DF0XM_mNE"
+              },
+              "path": "dask/tests/test_multiprocessing.py",
+              "size": 7969
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "u2RAFEZc8tQN-xaToYRrk7w3g4FezOvB3l_VtMMOcbg"
+              },
+              "path": "dask/tests/test_optimization.py",
+              "size": 42522
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "fSXUAKzqJfRYxAhEC_rjLU3B_57rCrKaRU_MnKJTZYk"
+              },
+              "path": "dask/tests/test_order.py",
+              "size": 20282
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "GBIigyyFjhh5p9ScyUZ7ufQIfbL-nGmv0S5D3nI71C4"
+              },
+              "path": "dask/tests/test_rewrite.py",
+              "size": 4648
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "kQww4HXggKJ2HO32CaGzh9CEl28WrlKu3kAVUOhHnkU"
+              },
+              "path": "dask/tests/test_sizeof.py",
+              "size": 3781
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "bRB9QgzBGnI3U5XH89voI12P9q26Sn3tXfLGuRuJeQA"
+              },
+              "path": "dask/tests/test_system.py",
+              "size": 1369
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "gDeVl3B6uu405AzBQdum78PNv_5vnUS5FKLRDy1JlfA"
+              },
+              "path": "dask/tests/test_threaded.py",
+              "size": 4271
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "eqSERm5RVujawOR2ipZOem0g18ba5Pe1GlVMDVe5Ww0"
+              },
+              "path": "dask/tests/test_utils.py",
+              "size": 12736
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "WUrnBSp2ba3ZbHcrf_GZCzsdPJACGlNzRBAnipgckxE"
+              },
+              "path": "dask/threaded.py",
+              "size": 2539
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "K_Y6N417YVa2HC3YlfYRm91kQpzOHGd9_UfFLmef2vc"
+              },
+              "path": "dask/utils.py",
+              "size": 34387
+            },
+            {
+              "hash": {
+                "mode": "sha256",
+                "value": "uIlcSXXROlpWYXbDrhr30ItwlgjmSxBukwb3R9l_E1o"
+              },
+              "path": "dask/utils_test.py",
+              "size": 3505
+            }
+          ],
+          "metadata": {
+            "Classifier": [
+              "Programming Language :: Python :: 3",
+              "Programming Language :: Python :: 3.6",
+              "Programming Language :: Python :: 3.7",
+              "Programming Language :: Python :: 3.8"
+            ],
+            "Home-page": "https://github.com/dask/dask/",
+            "Keywords": "task-scheduling parallel numpy pandas pydata",
+            "License": "BSD",
+            "Maintainer": "Matthew Rocklin",
+            "Maintainer-email": "mrocklin@gmail.com",
+            "Metadata-Version": "2.1",
+            "Name": "dask",
+            "Platform": [
+              "UNKNOWN"
+            ],
+            "Provides-Extra": [
+              "array",
+              "bag",
+              "complete",
+              "dataframe",
+              "delayed",
+              "diagnostics",
+              "distributed"
+            ],
+            "Requires-Dist": [
+              "pyyaml",
+              "numpy (>=1.13.0) ; extra == 'array'",
+              "toolz (>=0.8.2) ; extra == 'array'",
+              "cloudpickle (>=0.2.2) ; extra == 'bag'",
+              "fsspec (>=0.6.0) ; extra == 'bag'",
+              "toolz (>=0.8.2) ; extra == 'bag'",
+              "partd (>=0.3.10) ; extra == 'bag'",
+              "bokeh (>=1.0.0) ; extra == 'complete'",
+              "cloudpickle (>=0.2.2) ; extra == 'complete'",
+              "distributed (>=2.0) ; extra == 'complete'",
+              "fsspec (>=0.6.0) ; extra == 'complete'",
+              "numpy (>=1.13.0) ; extra == 'complete'",
+              "pandas (>=0.23.0) ; extra == 'complete'",
+              "partd (>=0.3.10) ; extra == 'complete'",
+              "toolz (>=0.8.2) ; extra == 'complete'",
+              "numpy (>=1.13.0) ; extra == 'dataframe'",
+              "pandas (>=0.23.0) ; extra == 'dataframe'",
+              "toolz (>=0.8.2) ; extra == 'dataframe'",
+              "partd (>=0.3.10) ; extra == 'dataframe'",
+              "fsspec (>=0.6.0) ; extra == 'dataframe'",
+              "cloudpickle (>=0.2.2) ; extra == 'delayed'",
+              "toolz (>=0.8.2) ; extra == 'delayed'",
+              "bokeh (>=1.0.0) ; extra == 'diagnostics'",
+              "distributed (>=2.0) ; extra == 'distributed'"
+            ],
+            "Requires-Python": ">=3.6",
+            "Summary": "Parallel PyData with Task Scheduling",
+            "Version": "2.17.2"
+          },
+          "requires": [
+            "pyyaml",
+            "numpy (>=1.13.0) ; extra == 'array'",
+            "toolz (>=0.8.2) ; extra == 'array'",
+            "cloudpickle (>=0.2.2) ; extra == 'bag'",
+            "fsspec (>=0.6.0) ; extra == 'bag'",
+            "toolz (>=0.8.2) ; extra == 'bag'",
+            "partd (>=0.3.10) ; extra == 'bag'",
+            "bokeh (>=1.0.0) ; extra == 'complete'",
+            "cloudpickle (>=0.2.2) ; extra == 'complete'",
+            "distributed (>=2.0) ; extra == 'complete'",
+            "fsspec (>=0.6.0) ; extra == 'complete'",
+            "numpy (>=1.13.0) ; extra == 'complete'",
+            "pandas (>=0.23.0) ; extra == 'complete'",
+            "partd (>=0.3.10) ; extra == 'complete'",
+            "toolz (>=0.8.2) ; extra == 'complete'",
+            "numpy (>=1.13.0) ; extra == 'dataframe'",
+            "pandas (>=0.23.0) ; extra == 'dataframe'",
+            "toolz (>=0.8.2) ; extra == 'dataframe'",
+            "partd (>=0.3.10) ; extra == 'dataframe'",
+            "fsspec (>=0.6.0) ; extra == 'dataframe'",
+            "cloudpickle (>=0.2.2) ; extra == 'delayed'",
+            "toolz (>=0.8.2) ; extra == 'delayed'",
+            "bokeh (>=1.0.0) ; extra == 'diagnostics'",
+            "distributed (>=2.0) ; extra == 'distributed'"
+          ],
+          "version": "2.17.2"
+        },
+        "index_url": "https://pypi.org/simple",
+        "package_name": "dask",
+        "package_version": "2.17.2",
+        "package_version_requested": "2.17.2",
+        "sha256": [
+          "c8809a016ce72b01e0d7a39aa9b553f796c14c21c1899fad4e8bbe51eca87536",
+          "76a877a4ff6f774dc1378ee215e58519f7894f48584984e7a3d0715b2d96d9d2"
+        ]
+      }
+    ],
+    "unparsed": [],
+    "unresolved": []
+  }
+}
