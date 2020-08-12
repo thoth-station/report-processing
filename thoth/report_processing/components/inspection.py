@@ -554,6 +554,7 @@ class AmunInspections:
         processed_string_result["solver_string"] = [pp[1] for pp in re_encoded]
         processed_string_result["solver_hash_id"] = [pp[2] for pp in re_encoded]
         # Hardware:
+        # TODO: Add HW info in final results
 
         # PI
         processed_string_result["pi_name"] = [pi_n[0] for pi_n in inspections_df[["stdout__name"]].values]
