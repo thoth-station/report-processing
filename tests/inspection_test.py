@@ -19,7 +19,7 @@
 
 from tests.base_test import ReportProcessingTestCase
 
-from thoth.report_processing.components.inspection import AmunInspection, AmunInspectionsSummary
+from thoth.report_processing.components.inspection import AmunInspections, AmunInspectionsSummary
 
 
 class TestAdviser(ReportProcessingTestCase):
@@ -29,19 +29,21 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_get_inspection_runs(self) -> None:
         """Test retrieving adviser results from local path."""
-        inspections_runs = AmunInspection.aggregate_thoth_inspections_results(
+        inspections_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
         assert inspections_runs
 
     def test_create_inspection_summary(self) -> None:
         """Test retrieving adviser results from local path."""
-        inspections_runs = AmunInspection.aggregate_thoth_inspections_results(
+        inspections_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
 
-        processed_data = AmunInspection.process_inspection_runs(inspections_runs)
-        inspections_df = AmunInspection.create_final_inspection_dataframe(processed_data=processed_data)
+        processed_inspection_runs = AmunInspections.process_inspection_runs(inspections_runs)
+        inspections_df = AmunInspections.create_inspections_dataframe(
+            processed_inspection_runs=processed_inspection_runs
+        )
 
         dfs_inspection_classes, dfs_unique_inspection_classes = AmunInspectionsSummary.create_dfs_inspection_classes(
             inspection_df=inspections_df
