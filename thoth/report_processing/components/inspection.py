@@ -645,9 +645,7 @@ class AmunInspections:
         solver = ["os_name", "os_version", "python_interpreter"]
         runtime_environment = hardware + solver
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
-        return final_inspections_df[
-            ["identifier"] + performance_packages + runtime_environment + pi_info
-        ]
+        return final_inspections_df[["identifier"] + performance_packages + runtime_environment + pi_info]
 
 
 class AmunInspectionsStatistics:
