@@ -551,10 +551,15 @@ class AmunInspections:
         # Runtime Environment:
         # Solver: OSName-OSVersion-PythonInterpreterVersion
         processed_string_result["solver"] = [pp[0] for pp in re_encoded]
+        processed_string_result["os_name"] = [solver[0] for solver in processed_string_result["solver"]]
+        processed_string_result["os_version"] = [solver[1] for solver in processed_string_result["solver"]]
+        processed_string_result["python_interpreter"] = [solver[2] for solver in processed_string_result["solver"]]
         processed_string_result["solver_string"] = [pp[1] for pp in re_encoded]
         processed_string_result["solver_hash_id"] = [pp[2] for pp in re_encoded]
         # Hardware:
-        # TODO: Add HW info in final results
+        processed_string_result["cpu_brand"] = [
+            cpu_brand[0] for cpu_brand in inspections_df[["hwinfo__cpu_info__brand_raw"]].values
+        ]
 
         # PI
         processed_string_result["pi_name"] = [pi_n[0] for pi_n in inspections_df[["stdout__name"]].values]
@@ -636,7 +641,10 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
-        return final_inspections_df[["identifier"] + performance_packages + ["solver"] + ["elapsed_time", "rate"]]
+        solver = ["os_name", "os_version", "python_interpreter"]
+        return final_inspections_df[
+            ["identifier"] + performance_packages + ["cpu_brand"] + solver + ["elapsed_time", "rate"]
+        ]
 
 
 class AmunInspectionsStatistics:
@@ -761,7 +769,7 @@ class AmunInspectionsSummary:
         "platform": ["hwinfo__platform"],
         "processor": ["cpu_type__is", "cpu_type__has"],
         "ncpus": ["hwinfo__cpu_type__ncpus"],
-        "family": ["runtime_environment__hardware__cpu_family"],
+        "family": ["runtime_environment__hardware__cpu_family", "hwinfo__cpu_info__brand_raw"],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
         "base_image": ["os_release__name", "os_release__version"],
         "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component"],
