@@ -195,8 +195,6 @@ class AmunInspections:
                         with open(f"{result_path}/build/specification", "r") as specification_file:
                             inspection_specification_document = json.load(specification_file)
 
-                            files[inspection_document_id]["specification"] = inspection_specification_document
-
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
@@ -211,6 +209,7 @@ class AmunInspections:
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
+                            files[inspection_document_id]["specification"] = inspection_specification_document
 
                     if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
 
@@ -311,8 +310,6 @@ class AmunInspections:
                         if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
                             inspection_specification_document = inspection_store.retrieve_specification()
 
-                            files[inspection_document_id]["specification"] = inspection_specification_document
-
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
@@ -327,6 +324,7 @@ class AmunInspections:
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
+                            files[inspection_document_id]["specification"] = inspection_specification_document
 
                         if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
                             inspection_build_logs = inspection_store.build.retrieve_log()
@@ -556,9 +554,21 @@ class AmunInspections:
         processed_string_result["python_interpreter"] = [solver[2] for solver in processed_string_result["solver"]]
         processed_string_result["solver_string"] = [pp[1] for pp in re_encoded]
         processed_string_result["solver_hash_id"] = [pp[2] for pp in re_encoded]
+
         # Hardware:
+        # CPU
         processed_string_result["cpu_brand"] = [
             cpu_brand[0] for cpu_brand in inspections_df[["hwinfo__cpu_info__brand_raw"]].values
+        ]
+        processed_string_result["cpu_family"] = [
+            cpu_brand[0] for cpu_brand in inspections_df[["runtime_environment__hardware__cpu_family"]].values
+        ]
+        processed_string_result["cpu_model"] = [
+            cpu_brand[0] for cpu_brand in inspections_df[["runtime_environment__hardware__cpu_model"]].values
+        ]
+        # GPU
+        processed_string_result["cuda_version"] = [
+            cpu_brand[0] for cpu_brand in inspections_df[["runtime_environment__cuda_version"]].values
         ]
 
         # PI
@@ -594,15 +604,23 @@ class AmunInspections:
         final_inspections_df: pd.DataFrame,
         pi_name: Optional[str] = None,
         pi_component: Optional[str] = None,
-        solver: Optional[str] = None,
+        os_name: Optional[str] = None,
+        os_version: Optional[str] = None,
+        python_interpreter: Optional[str] = None,
+        cpu_family: Optional[str] = None,
+        cpu_model: Optional[str] = None,
         packages: Optional[List[Tuple[str, str, str]]] = None,
     ) -> pd.DataFrame:
         """Filter final inspections dataframe for plots.
 
-        :param final_inspections_df: df for plots provided by `create_final_dataframe`.
+        :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
         :param pi_name: fiter by performance indicator name (e.g PIMatmul)
         :param pi_component: filter by performance indicator component (e.g. tensorflow)
-        :param solver: filter by solver (rhel-8-py36)
+        :param os_name: e.g rhel
+        :param os_version: e.g 8
+        :param python_interpreter: e.g 3.6
+        :param cpu_family: e.g 6
+        :param cpu_model: e.g. 85
         :param packages: filter by list of packages [(name, version, index)] in software stack.
         """
         if not final_inspections_df.shape[0]:
@@ -610,18 +628,36 @@ class AmunInspections:
 
         filters: List[Tuple[str, Any]] = []
 
+        # Software stack
+        if packages:
+            for package in packages:
+                filters.append((package[0], package))
+
+        # Runtime Environment
+        # Operating System
+        if os_name:
+            filters.append(("os_name", os_name))
+
+        if os_version:
+            filters.append(("os_version", os_version))
+
+        # Python Interpreter
+        if python_interpreter:
+            filters.append(("python_interpreter", python_interpreter))
+
+        # Hardware
+        if cpu_family:
+            filters.append(("cpu_family", cpu_family))
+
+        if cpu_model:
+            filters.append(("cpu_model", cpu_model))
+
+        # Performance Indicator (PI)
         if pi_name:
             filters.append(("pi_name", pi_name))
 
         if pi_component:
             filters.append(("pi_component", pi_component))
-
-        if solver:
-            filters.append(("solver_string", solver))
-
-        if packages:
-            for package in packages:
-                filters.append((package[0], package))
 
         filtered_final_df = cls._filter_df(final_inspections_df, filters)
 
@@ -641,10 +677,12 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
-        hardware = ["cpu_brand"]
         solver = ["os_name", "os_version", "python_interpreter"]
-        runtime_environment = hardware + solver
+        hardware = ["cpu_brand", "cpu_family", "cpu_model"]
+        runtime_environment = solver + hardware
+
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
+
         return final_inspections_df[["identifier"] + performance_packages + runtime_environment + pi_info]
 
 
@@ -733,6 +771,7 @@ class AmunInspectionsStatistics:
                 results.append(
                     {
                         "inspection_id": inspection_id,
+                        "inspection_batch": inspection_parameters_df.shape[0],
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
                         "parameter": inspection_parameter,
                         "cv_mean": cv_mean,
@@ -759,7 +798,7 @@ class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": ["platform", "processor", "ncpus", "family"],
+        "hardware": ["platform", "processor", "ncpus", "info"],
         "software_stack": ["requirements_locked"],
         "base_image": ["base_image"],
         "pi": ["script"],
@@ -770,7 +809,12 @@ class AmunInspectionsSummary:
         "platform": ["hwinfo__platform"],
         "processor": ["cpu_type__is", "cpu_type__has"],
         "ncpus": ["hwinfo__cpu_type__ncpus"],
-        "family": ["runtime_environment__hardware__cpu_family", "hwinfo__cpu_info__brand_raw"],
+        "info": [
+            "runtime_environment__hardware__cpu_family",
+            "runtime_environment__hardware__cpu_model",
+            "hwinfo__cpu_info__brand_raw",
+            "runtime_environment__cuda_version"
+        ],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
         "base_image": ["os_release__name", "os_release__version"],
         "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component"],
