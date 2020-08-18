@@ -585,7 +585,12 @@ class AmunInspections:
         final_df = pd.DataFrame(processed_string_result)
 
         final_df["inspection_id"] = inspections_df["inspection_document_id"]
-        inspection_identifiers = [identifier.split("-")[1] for identifier in final_df["inspection_id"].values]
+        inspection_identifiers = [
+            "-".join(identifier.split("-")[1:len(identifier.split("-")) - 1])
+            if len(identifier.split("-")) > 2
+            else identifier
+            for identifier in final_df["inspection_id"].values
+        ]
         final_df["identifier"] = inspection_identifiers
 
         return final_df
@@ -602,6 +607,7 @@ class AmunInspections:
     def filter_final_inspections_dataframe(
         cls,
         final_inspections_df: pd.DataFrame,
+        inspection_ids: Optional[List[str]] = None,
         pi_name: Optional[str] = None,
         pi_component: Optional[str] = None,
         os_name: Optional[str] = None,
@@ -614,6 +620,7 @@ class AmunInspections:
         """Filter final inspections dataframe for plots.
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
+        :param inspection_ids: fiter by inspection ids
         :param pi_name: fiter by performance indicator name (e.g PIMatmul)
         :param pi_component: filter by performance indicator component (e.g. tensorflow)
         :param os_name: e.g rhel
@@ -632,6 +639,11 @@ class AmunInspections:
         if packages:
             for package in packages:
                 filters.append((package[0], package))
+
+        # Software stack
+        if inspection_ids:
+            for inspection_id in inspection_ids:
+                filters.append(("inspection_document_id", inspection_id))
 
         # Runtime Environment
         # Operating System
@@ -749,9 +761,10 @@ class AmunInspectionsStatistics:
                 )
                 std = inspection_parameters_df[inspection_parameter].std()
                 median = inspection_parameters_df[inspection_parameter].median()
-                q = inspection_parameters_df[inspection_parameter].quantile([0.25, 0.75])
-                q1 = q.iloc[[0.25]].values[0]
-                q3 = q.iloc[[0.75]].values[0]
+                q1 = inspection_parameters_df[inspection_parameter].quantile([0.25])
+                q3 = inspection_parameters_df[inspection_parameter].quantile([0.75])
+                q1 = q1.iloc[[0.25]].values[0]
+                q3 = q3.iloc[[0.75]].values[0]
                 iqr = q3 - q1
                 cv_mean = (
                     inspection_parameters_df[inspection_parameter].std()
@@ -813,7 +826,7 @@ class AmunInspectionsSummary:
             "runtime_environment__hardware__cpu_family",
             "runtime_environment__hardware__cpu_model",
             "hwinfo__cpu_info__brand_raw",
-            "runtime_environment__cuda_version"
+            "runtime_environment__cuda_version",
         ],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
         "base_image": ["os_release__name", "os_release__version"],
