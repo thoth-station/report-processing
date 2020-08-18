@@ -323,6 +323,8 @@ class AmunInspections:
                                 )
                                 result["result"]["requirements_locked"] = requirements_locked
 
+                                result["result"]["run"] = inspection_specification_document["run"]
+
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
@@ -835,7 +837,7 @@ class AmunInspectionsSummary:
         ],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
         "base_image": ["os_release__name", "os_release__version"],
-        "number_cpus_run": ["run__requests__cpu"]
+        "number_cpus_run": ["run__requests__cpu"],
         "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component"],
         "exit_code": ["exit_code"],
     }
