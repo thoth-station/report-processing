@@ -622,6 +622,7 @@ class AmunInspections:
         python_interpreter: Optional[str] = None,
         cpu_family: Optional[str] = None,
         cpu_model: Optional[str] = None,
+        cpus_number: Optional[str] = None,
         packages: Optional[List[Tuple[str, str, str]]] = None,
     ) -> pd.DataFrame:
         """Filter final inspections dataframe for plots.
@@ -635,6 +636,7 @@ class AmunInspections:
         :param python_interpreter: e.g 3.6
         :param cpu_family: e.g 6
         :param cpu_model: e.g. 85
+        :param cpus_number: e.g. 2
         :param packages: filter by list of packages [(name, version, index)] in software stack.
         """
         if not final_inspections_df.shape[0]:
@@ -670,6 +672,9 @@ class AmunInspections:
 
         if cpu_model:
             filters.append(("cpu_model", cpu_model))
+
+        if cpus_number:
+            filters.append(("number_cpus", cpu_model))
 
         # Performance Indicator (PI)
         if pi_name:
