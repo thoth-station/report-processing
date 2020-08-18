@@ -643,7 +643,7 @@ class AmunInspections:
         # Software stack
         if inspection_ids:
             for inspection_id in inspection_ids:
-                filters.append(("inspection_document_id", inspection_id))
+                filters.append(("inspection_id", inspection_id))
 
         # Runtime Environment
         # Operating System
