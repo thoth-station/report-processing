@@ -206,6 +206,8 @@ class AmunInspections:
                                 )
                                 result["result"]["requirements_locked"] = requirements_locked
 
+                                result["result"]["run"] = inspection_specification_document["run"]
+
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
@@ -566,6 +568,9 @@ class AmunInspections:
         processed_string_result["cpu_model"] = [
             cpu_brand[0] for cpu_brand in inspections_df[["runtime_environment__hardware__cpu_model"]].values
         ]
+        processed_string_result["number_cpus"] = [
+            cpu_brand[0] for cpu_brand in inspections_df[["run__requests__cpu"]].values
+        ]
         # GPU
         processed_string_result["cuda_version"] = [
             cpu_brand[0] for cpu_brand in inspections_df[["runtime_environment__cuda_version"]].values
@@ -690,7 +695,7 @@ class AmunInspections:
         :param performance_packages: list of packages names
         """
         solver = ["os_name", "os_version", "python_interpreter"]
-        hardware = ["cpu_brand", "cpu_family", "cpu_model"]
+        hardware = ["cpu_brand", "cpu_family", "cpu_model", "number_cpus"]
         runtime_environment = solver + hardware
 
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
