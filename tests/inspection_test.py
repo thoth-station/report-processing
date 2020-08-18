@@ -58,9 +58,9 @@ class TestAdviser(ReportProcessingTestCase):
         )
         processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
 
-        inspections_df = AmunInspections.create_inspections_dataframe(processed_inspection_runs=processed_inspection_runs)
-
-        final_dataframe = AmunInspections.create_final_dataframe(
-            inspections_df=inspections_df
+        inspections_df = AmunInspections.create_inspections_dataframe(
+            processed_inspection_runs=processed_inspection_runs
         )
+
+        final_dataframe = AmunInspections.create_final_dataframe(inspections_df=inspections_df)
         assert not final_dataframe.empty

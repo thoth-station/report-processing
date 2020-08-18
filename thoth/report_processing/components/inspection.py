@@ -586,7 +586,7 @@ class AmunInspections:
 
         final_df["inspection_id"] = inspections_df["inspection_document_id"]
         inspection_identifiers = [
-            "-".join(identifier.split("-")[1:len(identifier.split("-")) - 1])
+            "-".join(identifier.split("-")[1 : len(identifier.split("-")) - 1])
             if len(identifier.split("-")) > 2
             else identifier
             for identifier in final_df["inspection_id"].values
