@@ -674,7 +674,7 @@ class AmunInspections:
             filters.append(("cpu_model", cpu_model))
 
         if cpus_number:
-            filters.append(("number_cpus", cpu_model))
+            filters.append(("number_cpus", cpus_number))
 
         # Performance Indicator (PI)
         if pi_name:
