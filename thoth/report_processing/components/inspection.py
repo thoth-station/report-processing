@@ -640,15 +640,15 @@ class AmunInspections:
 
         filters: List[Tuple[str, Any]] = []
 
+        # Inspection IDs
+        if inspection_ids:
+            for inspection_id in inspection_ids:
+                filters.append(("inspection_id", inspection_id))
+
         # Software stack
         if packages:
             for package in packages:
                 filters.append((package[0], package))
-
-        # Software stack
-        if inspection_ids:
-            for inspection_id in inspection_ids:
-                filters.append(("inspection_id", inspection_id))
 
         # Runtime Environment
         # Operating System
