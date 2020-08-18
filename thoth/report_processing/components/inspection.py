@@ -818,7 +818,7 @@ class AmunInspectionsSummary:
     _INSPECTION_REPORT_FEATURES = {
         "hardware": ["platform", "processor", "ncpus", "info"],
         "software_stack": ["requirements_locked"],
-        "base_image": ["base_image"],
+        "base_image": ["base_image", "number_cpus_run"],
         "pi": ["script"],
         "exit_codes": ["exit_code"],
     }
@@ -835,6 +835,7 @@ class AmunInspectionsSummary:
         ],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
         "base_image": ["os_release__name", "os_release__version"],
+        "number_cpus_run": ["run__requests__cpu"]
         "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component"],
         "exit_code": ["exit_code"],
     }
