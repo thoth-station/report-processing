@@ -683,9 +683,10 @@ class AmunInspections:
         if not final_inspections_df.shape[0]:
             _LOGGER.info("DataFrame provided is empty, nothing can be filtered.")
 
+        filtered_df = final_inspections_df.copy()
         # Inspection IDs
         if inspection_ids:
-            final_inspections_df.query(f"`inspection_id` == @inspection_ids", inplace=True)
+            filtered_df.query(f"`inspection_id` == @inspection_ids", inplace=True)
 
         # Software stack
         if packages:
@@ -699,46 +700,46 @@ class AmunInspections:
                     dynamic_query += f" and `{package}` == {package_query}"
 
                 counter += 1
-            final_inspections_df.query(dynamic_query, inplace=True)
+            filtered_df.query(dynamic_query, inplace=True)
 
         # Runtime Environment
         if base:
-            final_inspections_df.query(f'base == @base', inplace=True)
+            filtered_df.query(f'base == @base', inplace=True)
 
         # Operating System
         if os_name:
-            final_inspections_df.query(f'os_name == @os_name', inplace=True)
+            filtered_df.query(f'os_name == @os_name', inplace=True)
 
         if os_version:
-            final_inspections_df.query(f'os_version == @os_version', inplace=True)
+            filtered_df.query(f'os_version == @os_version', inplace=True)
 
         # Python Interpreter
         if python_interpreter:
-            final_inspections_df.query(f'python_interpreter == @python_interpreter', inplace=True)
+            filtered_df.query(f'python_interpreter == @python_interpreter', inplace=True)
 
         # Hardware
         if cpu_family:
-            final_inspections_df.query(f'cpu_family == @cpu_family', inplace=True)
+            filtered_df.query(f'cpu_family == @cpu_family', inplace=True)
 
         if cpu_model:
-            final_inspections_df.query(f'cpu_model == @cpu_model', inplace=True)
+            filtered_df.query(f'cpu_model == @cpu_model', inplace=True)
 
         if cpus_number:
-            final_inspections_df.query(f'number_cpus == @cpus_number', inplace=True)
+            filtered_df.query(f'number_cpus == @cpus_number', inplace=True)
 
         # Performance Indicator (PI)
         if pi_name:
-            final_inspections_df.query(f'pi_name == @pi_name', inplace=True)
+            filtered_df.query(f'pi_name == @pi_name', inplace=True)
 
         if pi_component:
-            final_inspections_df.query(f'pi_component == @pi_component', inplace=True)
+            filtered_df.query(f'pi_component == @pi_component', inplace=True)
 
-        if not final_inspections_df.shape[0]:
+        if not filtered_df.shape[0]:
             _LOGGER.info("There are no results for the filters selected. Please change filters.")
 
-        _LOGGER.info(f"Number of software stacks identified: {final_inspections_df.shape[0]}")
+        _LOGGER.info(f"Number of software stacks identified: {filtered_df.shape[0]}")
 
-        return final_inspections_df
+        return filtered_df
 
     @staticmethod
     def create_performance_results_summary(
