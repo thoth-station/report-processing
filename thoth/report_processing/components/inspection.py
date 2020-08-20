@@ -654,6 +654,7 @@ class AmunInspections:
         cls,
         final_inspections_df: pd.DataFrame,
         inspection_ids: Optional[List[str]] = None,
+        standardized_ids: Optional[List[str]] = None,
         pi_name: Optional[List[str]] = None,
         pi_component: Optional[List[str]] = None,
         base: Optional[List[str]] = None,
@@ -669,6 +670,7 @@ class AmunInspections:
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
         :param inspection_ids: fiter by inspection ids
+        :param standardized_ids: filter by standardized ids
         :param pi_name: fiter by performance indicator names (e.g PIMatmul)
         :param pi_component: filter by performance indicator components (e.g. tensorflow)
         :param base: filter by base images used e.g. quay.io/thoth-station/s2i-thoth-ubi8-py36
@@ -687,6 +689,9 @@ class AmunInspections:
         # Inspection IDs
         if inspection_ids:
             filtered_df.query(f"`inspection_id` == @inspection_ids", inplace=True)
+
+        if standardized_ids:
+            filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
 
         # Software stack
         if packages:
@@ -828,18 +833,6 @@ class AmunInspectionsStatistics:
                 q1 = q1.iloc[[0.25]].values[0]
                 q3 = q3.iloc[[0.75]].values[0]
                 iqr = q3 - q1
-                cv_mean = (
-                    inspection_parameters_df[inspection_parameter].std()
-                    / inspection_parameters_df[inspection_parameter].mean()
-                    * 100
-                )
-                cv_median = (
-                    inspection_parameters_df[inspection_parameter].std()
-                    / inspection_parameters_df[inspection_parameter].median()
-                    * 100
-                )
-                cv_q1 = inspection_parameters_df[inspection_parameter].std() / q1 * 100
-                cv_q3 = inspection_parameters_df[inspection_parameter].std() / q3 * 100
                 maxr = inspection_parameters_df[inspection_parameter].max()
                 minr = inspection_parameters_df[inspection_parameter].min()
 
@@ -849,10 +842,6 @@ class AmunInspectionsStatistics:
                         "inspection_batch": inspection_parameters_df.shape[0],
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
                         "parameter": inspection_parameter,
-                        "cv_mean": cv_mean,
-                        "cv_median": cv_median,
-                        "cv_q1": cv_q1,
-                        "cv_q3": cv_q3,
                         "std_error": std_error,
                         "std": std,
                         "median": median,
