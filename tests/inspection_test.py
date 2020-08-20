@@ -80,8 +80,8 @@ class TestAdviser(ReportProcessingTestCase):
 
         filtered_df = AmunInspections.filter_final_inspections_dataframe(
             final_inspections_df=final_dataframe,
-            pi_name="PiMatmul",
-            cpus_number="2",
+            pi_name=["PiMatmul"],
+            cpus_number=["2"],
             packages={
                 "absl-py": ["absl-py-0.9.0-pypi", "absl-py-0.9.0-pypi"],
                 "tensorflow-cpu": ["tensorflow-cpu-2.2.0-pypi"],

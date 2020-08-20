@@ -654,31 +654,31 @@ class AmunInspections:
         cls,
         final_inspections_df: pd.DataFrame,
         inspection_ids: Optional[List[str]] = None,
-        pi_name: Optional[str] = None,
-        pi_component: Optional[str] = None,
-        base: Optional[str] = None,
-        os_name: Optional[str] = None,
-        os_version: Optional[str] = None,
-        python_interpreter: Optional[str] = None,
-        cpu_family: Optional[str] = None,
-        cpu_model: Optional[str] = None,
-        cpus_number: Optional[str] = None,
+        pi_name: Optional[List[str]] = None,
+        pi_component: Optional[List[str]] = None,
+        base: Optional[List[str]] = None,
+        os_name: Optional[List[str]] = None,
+        os_version: Optional[List[str]] = None,
+        python_interpreter: Optional[List[str]] = None,
+        cpu_family: Optional[List[str]] = None,
+        cpu_model: Optional[List[str]] = None,
+        cpus_number: Optional[List[str]] = None,
         packages: Optional[Dict[str, Any]] = None,
     ) -> pd.DataFrame:
         """Filter final inspections dataframe for plots.
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
         :param inspection_ids: fiter by inspection ids
-        :param pi_name: fiter by performance indicator name (e.g PIMatmul)
-        :param pi_component: filter by performance indicator component (e.g. tensorflow)
-        :param base: filter by base image used e.g. quay.io/thoth-station/s2i-thoth-ubi8-py36
-        :param os_name: e.g rhel
-        :param os_version: e.g 8
-        :param python_interpreter: e.g 3.6
-        :param cpu_family: e.g 6
-        :param cpu_model: e.g. 85
-        :param cpus_number: e.g. 2
-        :param packages: filter by list of packages [(name, version, index)] in software stack.
+        :param pi_name: fiter by performance indicator names (e.g PIMatmul)
+        :param pi_component: filter by performance indicator components (e.g. tensorflow)
+        :param base: filter by base images used e.g. quay.io/thoth-station/s2i-thoth-ubi8-py36
+        :param os_name: filter by Operating System names e.g rhel
+        :param os_version: filter by Operatin System versions e.g 8
+        :param python_interpreter: filter by Python interpreters e.g 3.6
+        :param cpu_family: filter by CPU family e.g 6
+        :param cpu_model: filter by CPU model e.g. 85
+        :param cpus_number: filter by number of CPUs e.g. 2
+        :param packages: filter by packages in software stack: for each package {"name": ["name-version-index"]}.
         """
         if not final_inspections_df.shape[0]:
             _LOGGER.info("DataFrame provided is empty, nothing can be filtered.")
@@ -699,40 +699,39 @@ class AmunInspections:
                     dynamic_query += f" and `{package}` == {package_query}"
 
                 counter += 1
-            print(dynamic_query)
             final_inspections_df.query(dynamic_query, inplace=True)
 
         # Runtime Environment
         if base:
-            final_inspections_df.query(f'base == "{base}"', inplace=True)
+            final_inspections_df.query(f'base == @base', inplace=True)
 
         # Operating System
         if os_name:
-            final_inspections_df.query(f'os_name == "{os_name}"', inplace=True)
+            final_inspections_df.query(f'os_name == @os_name', inplace=True)
 
         if os_version:
-            final_inspections_df.query(f'os_version == "{os_version}"', inplace=True)
+            final_inspections_df.query(f'os_version == @os_version', inplace=True)
 
         # Python Interpreter
         if python_interpreter:
-            final_inspections_df.query(f'python_interpreter == "{python_interpreter}"', inplace=True)
+            final_inspections_df.query(f'python_interpreter == @python_interpreter', inplace=True)
 
         # Hardware
         if cpu_family:
-            final_inspections_df.query(f'cpu_family == "{cpu_family}"', inplace=True)
+            final_inspections_df.query(f'cpu_family == @cpu_family', inplace=True)
 
         if cpu_model:
-            final_inspections_df.query(f'cpu_model == "{cpu_model}"', inplace=True)
+            final_inspections_df.query(f'cpu_model == @cpu_model', inplace=True)
 
         if cpus_number:
-            final_inspections_df.query(f'number_cpus == "{cpus_number}"', inplace=True)
+            final_inspections_df.query(f'number_cpus == @cpus_number', inplace=True)
 
         # Performance Indicator (PI)
         if pi_name:
-            final_inspections_df.query(f'pi_name == "{pi_name}"', inplace=True)
+            final_inspections_df.query(f'pi_name == @pi_name', inplace=True)
 
         if pi_component:
-            final_inspections_df.query(f'pi_component == "{pi_component}"', inplace=True)
+            final_inspections_df.query(f'pi_component == @pi_component', inplace=True)
 
         if not final_inspections_df.shape[0]:
             _LOGGER.info("There are no results for the filters selected. Please change filters.")
