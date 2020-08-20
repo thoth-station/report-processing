@@ -704,35 +704,35 @@ class AmunInspections:
 
         # Runtime Environment
         if base:
-            filtered_df.query(f'base == @base', inplace=True)
+            filtered_df.query(f"base == @base", inplace=True)
 
         # Operating System
         if os_name:
-            filtered_df.query(f'os_name == @os_name', inplace=True)
+            filtered_df.query(f"os_name == @os_name", inplace=True)
 
         if os_version:
-            filtered_df.query(f'os_version == @os_version', inplace=True)
+            filtered_df.query(f"os_version == @os_version", inplace=True)
 
         # Python Interpreter
         if python_interpreter:
-            filtered_df.query(f'python_interpreter == @python_interpreter', inplace=True)
+            filtered_df.query(f"python_interpreter == @python_interpreter", inplace=True)
 
         # Hardware
         if cpu_family:
-            filtered_df.query(f'cpu_family == @cpu_family', inplace=True)
+            filtered_df.query(f"cpu_family == @cpu_family", inplace=True)
 
         if cpu_model:
-            filtered_df.query(f'cpu_model == @cpu_model', inplace=True)
+            filtered_df.query(f"cpu_model == @cpu_model", inplace=True)
 
         if cpus_number:
-            filtered_df.query(f'number_cpus == @cpus_number', inplace=True)
+            filtered_df.query(f"number_cpus == @cpus_number", inplace=True)
 
         # Performance Indicator (PI)
         if pi_name:
-            filtered_df.query(f'pi_name == @pi_name', inplace=True)
+            filtered_df.query(f"pi_name == @pi_name", inplace=True)
 
         if pi_component:
-            filtered_df.query(f'pi_component == @pi_component', inplace=True)
+            filtered_df.query(f"pi_component == @pi_component", inplace=True)
 
         if not filtered_df.shape[0]:
             _LOGGER.info("There are no results for the filters selected. Please change filters.")
@@ -750,13 +750,14 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
+        identifier = ["inspection_id", "identifier", "standardized_identifier"]
         solver = ["os_name", "os_version", "base", "python_interpreter"]
         hardware = ["cpu_brand", "cpu_family", "cpu_model", "number_cpus"]
         runtime_environment = solver + hardware
 
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
 
-        return final_inspections_df[["identifier"] + performance_packages + runtime_environment + pi_info]
+        return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info]
 
 
 class AmunInspectionsStatistics:
