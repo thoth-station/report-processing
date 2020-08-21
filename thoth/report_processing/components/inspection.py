@@ -625,12 +625,6 @@ class AmunInspections:
 
         final_df["standardized_identifier"] = standardized_identifiers
 
-        final_df["solver+cpu"] = final_df["solver_string"] + "-ncpu" + final_df["number_cpus"]
-
-        final_df["standardized_identifier+solver+cpu"] = (
-            final_df["standardized_identifier"] + "-" + final_df["solver_string"] + "-ncpu" + final_df["number_cpus"]
-        )
-
         return final_df
 
     @staticmethod
