@@ -640,6 +640,7 @@ class AmunInspections:
             else identifier
             for identifier in inspections_df["inspection_document_id"].values
         ]
+        final_df["inspection_document_id"] = inspections_df["inspection_document_id"]
         final_df["identifier"] = inspection_identifiers
 
         if not filters_for_identifiers:
@@ -654,6 +655,8 @@ class AmunInspections:
 
         final_df["standardized_identifier"] = standardized_identifiers
 
+        final_df["start_datetime"] = inspections_df["inspection_start"]
+        final_df["end_datetime"] = inspections_df["inspection_end"]
         final_df["total_duration"] = inspections_df["inspection_duration"]
 
         return final_df
