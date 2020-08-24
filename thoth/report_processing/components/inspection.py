@@ -195,10 +195,10 @@ class AmunInspections:
                         with open(f"{result_path}/build/specification", "r") as specification_file:
                             inspection_specification_document = json.load(specification_file)
 
-                            files[inspection_document_id]["specification"] = inspection_specification_document
-
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
+                                result["result"]["specification_base"] = inspection_specification_document["base"]
+                                result["result"]["batch_size"] = inspection_specification_document["batch_size"]
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
 
                                 requirements_locked = cls._parse_requirements_locked(
@@ -208,9 +208,12 @@ class AmunInspections:
                                 )
                                 result["result"]["requirements_locked"] = requirements_locked
 
+                                result["result"]["run"] = inspection_specification_document["run"]
+
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
+                            files[inspection_document_id]["specification"] = inspection_specification_document
 
                     if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
 
@@ -311,10 +314,11 @@ class AmunInspections:
                         if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
                             inspection_specification_document = inspection_store.retrieve_specification()
 
-                            files[inspection_document_id]["specification"] = inspection_specification_document
-
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
+
+                                result["result"]["specification_base"] = inspection_specification_document["base"]
+                                result["result"]["batch_size"] = inspection_specification_document["batch_size"]
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
 
                                 requirements_locked = cls._parse_requirements_locked(
@@ -324,9 +328,12 @@ class AmunInspections:
                                 )
                                 result["result"]["requirements_locked"] = requirements_locked
 
+                                result["result"]["run"] = inspection_specification_document["run"]
+
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
+                            files[inspection_document_id]["specification"] = inspection_specification_document
 
                         if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
                             inspection_build_logs = inspection_store.build.retrieve_log()
@@ -412,16 +419,32 @@ class AmunInspections:
         return final_df
 
     @staticmethod
-    def evaluate_statistics_on_inspection_df(inspection_df: pd.DataFrame, column_names: List[str]) -> pd.DataFrame:
+    def evaluate_statistics_on_inspection_df(
+        inspection_df: pd.DataFrame, column_names: List[str], extra_columns: List[str]
+    ) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
             lambda x: x == True  # noqa
         ]
         new_data = {}
+        inspection_start = None
+        inspection_end = None
+        inspection_duration = None
         for c_name in inspection_df.columns.values:
 
             if c_name in column_names:
                 new_data[c_name] = [inspection_df[c_name].median()]
+
+            if c_name == "end_datetime":
+
+                if "start_datetime" in inspection_df.columns.values:
+                    inspection_start = pd.to_datetime(inspection_df["start_datetime"]).min()
+
+                if "end_datetime" in inspection_df.columns.values:
+                    inspection_end = pd.to_datetime(inspection_df["end_datetime"]).max()
+
+                if inspection_start and inspection_end:
+                    inspection_duration = inspection_end - inspection_start
 
             elif c_name in unashable_columns.index.values:
                 values_column = inspection_df[c_name].apply(str).value_counts()
@@ -432,7 +455,15 @@ class AmunInspections:
                 else:
                     _LOGGER.debug(f"Skipped multiple values column: {c_name}")
 
-        return pd.DataFrame(new_data, index=[0], columns=inspection_df.columns.values)
+        if inspection_duration:
+            inspection_duration = inspection_duration.seconds
+
+        new_data["inspection_start"] = [inspection_start]
+        new_data["inspection_end"] = [inspection_end]
+        new_data["inspection_duration"] = [inspection_duration]
+
+        columns = [c for c in inspection_df.columns.values] + extra_columns
+        return pd.DataFrame(new_data, index=[0], columns=columns)
 
     @classmethod
     def create_inspections_dataframe(cls, processed_inspection_runs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
@@ -451,13 +482,19 @@ class AmunInspections:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
 
+        extra_columns = ["inspection_start", "inspection_end", "inspection_duration"]
+        for extra_column in extra_columns:
+            extracted_columns.append(extra_column)
+
         inspections_df = pd.DataFrame(columns=extracted_columns)
 
         column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
 
         for dataframe in processed_inspection_runs.values():
 
-            new_df = cls.evaluate_statistics_on_inspection_df(inspection_df=dataframe, column_names=column_names)
+            new_df = cls.evaluate_statistics_on_inspection_df(
+                inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
+            )
             inspections_df.loc[index] = new_df.iloc[0]
             index += 1
 
@@ -493,21 +530,24 @@ class AmunInspections:
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
 
-                    python_packages_versions[package].append(("", "", ""))
+                    python_packages_versions[package].append("")
 
                 else:
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
 
-                    python_packages_versions[package].append((package, version, index))
+                    python_packages_versions[package].append(f"{package}-{version.replace('==', '')}-{index}")
 
         return pd.DataFrame(python_packages_versions), python_packages_versions
 
     @classmethod
-    def create_final_dataframe(cls, inspections_df: pd.DataFrame) -> pd.DataFrame:
+    def create_final_dataframe(
+        cls, inspections_df: pd.DataFrame, filters_for_identifiers: Optional[List[str]] = None
+    ) -> pd.DataFrame:
         """Create final dataframe with all information required for plots.
 
         :param inspection_df: df of inspections results provided by `create_inspections_dataframe`.
+        :param filters_for_identifiers: list of words to standardize identifiers.
         """
         if inspections_df.empty:
             _LOGGER.exception("Inspections dataframe is empty!")
@@ -521,7 +561,7 @@ class AmunInspections:
 
         sws_encoded = []
         for index, row in python_packages_dataframe.iterrows():
-            sws_string = "<br>".join(["".join(pkg) for pkg in row.values if pkg != ("", "", "")])
+            sws_string = "<br>".join(["".join(pkg) for pkg in row.values if pkg != ""])
             hash_object = hashlib.sha256(bytes(sws_string, "raw_unicode_escape"))
             hex_dig = hash_object.hexdigest()
             sws_encoded.append([row.values, sws_string, hex_dig])
@@ -551,14 +591,34 @@ class AmunInspections:
         # Runtime Environment:
         # Solver: OSName-OSVersion-PythonInterpreterVersion
         processed_string_result["solver"] = [pp[0] for pp in re_encoded]
+
         processed_string_result["os_name"] = [solver[0] for solver in processed_string_result["solver"]]
         processed_string_result["os_version"] = [solver[1] for solver in processed_string_result["solver"]]
         processed_string_result["python_interpreter"] = [solver[2] for solver in processed_string_result["solver"]]
         processed_string_result["solver_string"] = [pp[1] for pp in re_encoded]
         processed_string_result["solver_hash_id"] = [pp[2] for pp in re_encoded]
+
+        processed_string_result["base"] = [
+            cpu_family[0] for cpu_family in inspections_df[["specification_base"]].values
+        ]
+
         # Hardware:
+        # CPU
         processed_string_result["cpu_brand"] = [
             cpu_brand[0] for cpu_brand in inspections_df[["hwinfo__cpu_info__brand_raw"]].values
+        ]
+        processed_string_result["cpu_family"] = [
+            cpu_family[0] for cpu_family in inspections_df[["runtime_environment__hardware__cpu_family"]].values
+        ]
+        processed_string_result["cpu_model"] = [
+            cpu_model[0] for cpu_model in inspections_df[["runtime_environment__hardware__cpu_model"]].values
+        ]
+        processed_string_result["number_cpus"] = [
+            number_cpus[0] for number_cpus in inspections_df[["run__requests__cpu"]].values
+        ]
+        # GPU
+        processed_string_result["cuda_version"] = [
+            cuda_version[0] for cuda_version in inspections_df[["runtime_environment__cuda_version"]].values
         ]
 
         # PI
@@ -574,63 +634,145 @@ class AmunInspections:
 
         final_df = pd.DataFrame(processed_string_result)
 
-        final_df["inspection_id"] = inspections_df["inspection_document_id"]
-        inspection_identifiers = [identifier.split("-")[1] for identifier in final_df["inspection_id"].values]
+        inspection_identifiers = [
+            "-".join(identifier.split("-")[1 : len(identifier.split("-")) - 1])
+            if len(identifier.split("-")) > 2
+            else identifier
+            for identifier in inspections_df["inspection_document_id"].values
+        ]
+        final_df["inspection_document_id"] = inspections_df["inspection_document_id"]
         final_df["identifier"] = inspection_identifiers
+
+        if not filters_for_identifiers:
+            filters_for_identifiers = []
+
+        standardized_identifiers = []
+        for identifier_id in final_df["identifier"]:
+            identifier_filter = "-".join(
+                [word for word in identifier_id.split("-") if word not in filters_for_identifiers]
+            )
+            standardized_identifiers.append(identifier_filter)
+
+        final_df["standardized_identifier"] = standardized_identifiers
+
+        final_df["start_datetime"] = inspections_df["inspection_start"]
+        final_df["end_datetime"] = inspections_df["inspection_end"]
+        final_df["total_duration"] = inspections_df["inspection_duration"]
 
         return final_df
 
     @staticmethod
-    def _filter_df(df: pd.DataFrame, *args: List[Any]) -> pd.DataFrame:
-        """Filter Dataframe."""
-        for f in args:
-            for k, v in f:
-                df = df[df[k] == v]
-        return df
+    def _convert_package_list_to_string(packages_version: List[str]) -> str:
+        """Convert package list to str."""
+        package_query = "["
+        package_n = 1
+
+        for package_name in packages_version:
+            if package_n == 1:
+                package_query += f'"{package_name}"'
+            else:
+                package_query += f', "{package_name}"'
+            package_n += 1
+        package_query += "]"
+
+        return package_query
 
     @classmethod
     def filter_final_inspections_dataframe(
         cls,
         final_inspections_df: pd.DataFrame,
-        pi_name: Optional[str] = None,
-        pi_component: Optional[str] = None,
-        solver: Optional[str] = None,
-        packages: Optional[List[Tuple[str, str, str]]] = None,
+        inspection_document_ids: Optional[List[str]] = None,
+        standardized_ids: Optional[List[str]] = None,
+        pi_name: Optional[List[str]] = None,
+        pi_component: Optional[List[str]] = None,
+        base: Optional[List[str]] = None,
+        os_name: Optional[List[str]] = None,
+        os_version: Optional[List[str]] = None,
+        python_interpreter: Optional[List[str]] = None,
+        cpu_family: Optional[List[str]] = None,
+        cpu_model: Optional[List[str]] = None,
+        cpus_number: Optional[List[str]] = None,
+        packages: Optional[Dict[str, Any]] = None,
     ) -> pd.DataFrame:
         """Filter final inspections dataframe for plots.
 
-        :param final_inspections_df: df for plots provided by `create_final_dataframe`.
-        :param pi_name: fiter by performance indicator name (e.g PIMatmul)
-        :param pi_component: filter by performance indicator component (e.g. tensorflow)
-        :param solver: filter by solver (rhel-8-py36)
-        :param packages: filter by list of packages [(name, version, index)] in software stack.
+        :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
+        :param inspection_document_ids: fiter by inspection ids
+        :param standardized_ids: filter by standardized ids
+        :param pi_name: fiter by performance indicator names (e.g PIMatmul)
+        :param pi_component: filter by performance indicator components (e.g. tensorflow)
+        :param base: filter by base images used e.g. quay.io/thoth-station/s2i-thoth-ubi8-py36
+        :param os_name: filter by Operating System names e.g rhel
+        :param os_version: filter by Operatin System versions e.g 8
+        :param python_interpreter: filter by Python interpreters e.g 3.6
+        :param cpu_family: filter by CPU family e.g 6
+        :param cpu_model: filter by CPU model e.g. 85
+        :param cpus_number: filter by number of CPUs e.g. 2
+        :param packages: filter by packages in software stack: for each package {"name": ["name-version-index"]}.
         """
         if not final_inspections_df.shape[0]:
             _LOGGER.info("DataFrame provided is empty, nothing can be filtered.")
 
-        filters: List[Tuple[str, Any]] = []
+        filtered_df = final_inspections_df.copy()
+        # Inspection IDs
+        if inspection_document_ids:
+            filtered_df.query(f"`inspection_document_id` == @inspection_document_ids", inplace=True)
 
+        if standardized_ids:
+            filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
+
+        # Software stack
+        if packages:
+            counter = 1
+            for package in packages:
+                packages_version = packages[package]
+                package_query = cls._convert_package_list_to_string(packages_version=packages_version)
+                if counter == 1:
+                    dynamic_query = f"`{package}` == {package_query}"
+                else:
+                    dynamic_query += f" and `{package}` == {package_query}"
+
+                counter += 1
+            filtered_df.query(dynamic_query, inplace=True)
+
+        # Runtime Environment
+        if base:
+            filtered_df.query(f"base == @base", inplace=True)
+
+        # Operating System
+        if os_name:
+            filtered_df.query(f"os_name == @os_name", inplace=True)
+
+        if os_version:
+            filtered_df.query(f"os_version == @os_version", inplace=True)
+
+        # Python Interpreter
+        if python_interpreter:
+            filtered_df.query(f"python_interpreter == @python_interpreter", inplace=True)
+
+        # Hardware
+        if cpu_family:
+            filtered_df.query(f"cpu_family == @cpu_family", inplace=True)
+
+        if cpu_model:
+            filtered_df.query(f"cpu_model == @cpu_model", inplace=True)
+
+        if cpus_number:
+            filtered_df.query(f"number_cpus == @cpus_number", inplace=True)
+
+        # Performance Indicator (PI)
         if pi_name:
-            filters.append(("pi_name", pi_name))
+            filtered_df.query(f"pi_name == @pi_name", inplace=True)
 
         if pi_component:
-            filters.append(("pi_component", pi_component))
+            filtered_df.query(f"pi_component == @pi_component", inplace=True)
 
-        if solver:
-            filters.append(("solver_string", solver))
-
-        if packages:
-            for package in packages:
-                filters.append((package[0], package))
-
-        filtered_final_df = cls._filter_df(final_inspections_df, filters)
-
-        if not filtered_final_df.shape[0]:
+        if not filtered_df.shape[0]:
             _LOGGER.info("There are no results for the filters selected. Please change filters.")
 
-        _LOGGER.info(f"Number of software stacks identified: {filtered_final_df.shape[0]}")
+        _LOGGER.info(f"Number of software stacks identified: {filtered_df.shape[0]}")
 
-        return filtered_final_df
+        return filtered_df
 
     @staticmethod
     def create_performance_results_summary(
@@ -641,11 +783,14 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
-        hardware = ["cpu_brand"]
-        solver = ["os_name", "os_version", "python_interpreter"]
-        runtime_environment = hardware + solver
+        identifier = ["inspection_document_id", "identifier", "standardized_identifier"]
+        solver = ["os_name", "os_version", "base", "python_interpreter"]
+        hardware = ["cpu_brand", "cpu_family", "cpu_model", "number_cpus"]
+        runtime_environment = solver + hardware
+
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
-        return final_inspections_df[["identifier"] + performance_packages + runtime_environment + pi_info]
+
+        return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info]
 
 
 class AmunInspectionsStatistics:
@@ -663,7 +808,7 @@ class AmunInspectionsStatistics:
     @classmethod
     def _create_inspection_parameters_dataframes(
         cls, processed_inspection_runs: Dict[str, Any], parameters: List[str]
-    ) -> pd.DataFrame:
+    ) -> Dict[str, pd.DataFrame]:
         """Create pd.DataFrame of selected parameters from inspections results to be used for statistics and error analysis.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
@@ -678,8 +823,8 @@ class AmunInspectionsStatistics:
         filters = ["inspection_number", "inspection_document_id", "stdout__name"] + [
             cls._INSPECTION_MAPPING_PARAMETERS[parameter] for parameter in parameters
         ]
-        for inspection_id in processed_inspection_runs:
-            inspection_id_results_df = processed_inspection_runs[inspection_id]
+        for inspection_document_id in processed_inspection_runs:
+            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
             subset_df = inspection_id_results_df[filters]
             subset_df.rename(columns=renamed_columns, inplace=True)
@@ -704,41 +849,41 @@ class AmunInspectionsStatistics:
             processed_inspection_runs=processed_inspection_runs, parameters=parameters
         )
 
-        for inspection_id, inspection_parameters_df in inspection_parameters_dfs.items():
+        for inspection_document_id, inspection_parameters_df in inspection_parameters_dfs.items():
             for inspection_parameter in parameters:
                 std_error = inspection_parameters_df[inspection_parameter].std() / np.sqrt(
                     inspection_parameters_df[inspection_parameter].shape[0]
                 )
                 std = inspection_parameters_df[inspection_parameter].std()
                 median = inspection_parameters_df[inspection_parameter].median()
-                q = inspection_parameters_df[inspection_parameter].quantile([0.25, 0.75])
-                q1 = q.iloc[[0.25]].values[0]
-                q3 = q.iloc[[0.75]].values[0]
+                q1 = inspection_parameters_df[inspection_parameter].quantile([0.25])
+                q3 = inspection_parameters_df[inspection_parameter].quantile([0.75])
+                q1 = q1.iloc[[0.25]].values[0]
+                q3 = q3.iloc[[0.75]].values[0]
                 iqr = q3 - q1
-                cv_mean = (
-                    inspection_parameters_df[inspection_parameter].std()
-                    / inspection_parameters_df[inspection_parameter].mean()
-                    * 100
-                )
-                cv_median = (
-                    inspection_parameters_df[inspection_parameter].std()
-                    / inspection_parameters_df[inspection_parameter].median()
-                    * 100
-                )
-                cv_q1 = inspection_parameters_df[inspection_parameter].std() / q1 * 100
-                cv_q3 = inspection_parameters_df[inspection_parameter].std() / q3 * 100
                 maxr = inspection_parameters_df[inspection_parameter].max()
                 minr = inspection_parameters_df[inspection_parameter].min()
 
+                duration = None
+                if "end_datetime" in processed_inspection_runs[inspection_document_id].columns.values:
+
+                    inspection_start = pd.to_datetime(
+                        processed_inspection_runs[inspection_document_id]["start_datetime"]
+                    ).min()
+                    inspection_end = pd.to_datetime(
+                        processed_inspection_runs[inspection_document_id]["end_datetime"]
+                    ).max()
+                    inspection_duration = inspection_end - inspection_start
+
+                    duration = inspection_duration.seconds
+
                 results.append(
                     {
-                        "inspection_id": inspection_id,
+                        "inspection_document_id": inspection_document_id,
+                        "inspection_batch": inspection_parameters_df.shape[0],
+                        "inspection_duration": duration,
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
                         "parameter": inspection_parameter,
-                        "cv_mean": cv_mean,
-                        "cv_median": cv_median,
-                        "cv_q1": cv_q1,
-                        "cv_q3": cv_q3,
                         "std_error": std_error,
                         "std": std,
                         "median": median,
@@ -759,9 +904,9 @@ class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": ["platform", "processor", "ncpus", "family"],
+        "hardware": ["platform", "processor", "ncpus", "info"],
         "software_stack": ["requirements_locked"],
-        "base_image": ["base_image"],
+        "base_image": ["base_image", "number_cpus_run"],
         "pi": ["script"],
         "exit_codes": ["exit_code"],
     }
@@ -770,10 +915,16 @@ class AmunInspectionsSummary:
         "platform": ["hwinfo__platform"],
         "processor": ["cpu_type__is", "cpu_type__has"],
         "ncpus": ["hwinfo__cpu_type__ncpus"],
-        "family": ["runtime_environment__hardware__cpu_family", "hwinfo__cpu_info__brand_raw"],
+        "info": [
+            "runtime_environment__hardware__cpu_family",
+            "runtime_environment__hardware__cpu_model",
+            "hwinfo__cpu_info__brand_raw",
+            "runtime_environment__cuda_version",
+        ],
         "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
-        "base_image": ["os_release__name", "os_release__version"],
-        "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component"],
+        "base_image": ["os_release__name", "os_release__version", "specification_base"],
+        "number_cpus_run": ["run__requests__cpu"],
+        "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component", "batch_size"],
         "exit_code": ["exit_code"],
     }
 

@@ -29,18 +29,18 @@ class TestAdviser(ReportProcessingTestCase):
 
     def test_get_inspection_runs(self) -> None:
         """Test retrieving adviser results from local path."""
-        inspections_runs = AmunInspections.aggregate_thoth_inspections_results(
+        inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
-        assert inspections_runs
+        assert inspection_runs
 
     def test_create_inspection_summary(self) -> None:
         """Test retrieving adviser results from local path."""
-        inspections_runs = AmunInspections.aggregate_thoth_inspections_results(
+        inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
 
-        processed_inspection_runs = AmunInspections.process_inspection_runs(inspections_runs)
+        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
         inspections_df = AmunInspections.create_inspections_dataframe(
             processed_inspection_runs=processed_inspection_runs
         )
@@ -50,3 +50,42 @@ class TestAdviser(ReportProcessingTestCase):
         )
 
         assert dfs_unique_inspection_classes
+
+    def test_final_dataframe(self) -> None:
+        """Test retrieving adviser results from local path."""
+        inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+        )
+        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
+
+        inspections_df = AmunInspections.create_inspections_dataframe(
+            processed_inspection_runs=processed_inspection_runs
+        )
+
+        final_dataframe = AmunInspections.create_final_dataframe(inspections_df=inspections_df)
+        assert not final_dataframe.empty
+
+    def test_filter_final_dataframe(self) -> None:
+        """Test retrieving adviser results from local path."""
+        inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+        )
+        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
+
+        inspections_df = AmunInspections.create_inspections_dataframe(
+            processed_inspection_runs=processed_inspection_runs
+        )
+
+        final_dataframe = AmunInspections.create_final_dataframe(inspections_df=inspections_df)
+
+        filtered_df = AmunInspections.filter_final_inspections_dataframe(
+            final_inspections_df=final_dataframe,
+            pi_name=["PiMatmul"],
+            cpus_number=["2"],
+            packages={
+                "absl-py": ["absl-py-0.9.0-pypi", "absl-py-0.9.0-pypi"],
+                "tensorflow-cpu": ["tensorflow-cpu-2.2.0-pypi"],
+            },
+        )
+
+        assert not filtered_df.empty
