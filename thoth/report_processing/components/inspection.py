@@ -425,10 +425,22 @@ class AmunInspections:
             lambda x: x == True  # noqa
         ]
         new_data = {}
+        duration = None
         for c_name in inspection_df.columns.values:
 
             if c_name in column_names:
                 new_data[c_name] = [inspection_df[c_name].median()]
+
+            if c_name == 'end_datetime':
+
+                if "start_datetime" in inspection_df.columns.values:
+                    start_datetime = pd.to_datetime(inspection_df["start_datetime"]).min()
+
+                if "end_datetime" in inspection_df.columns.values:
+                    end_datetime = pd.to_datetime(inspection_df["end_datetime"]).max()
+
+                if start_datetime and end_datetime:
+                    duration = end_datetime - start_datetime
 
             elif c_name in unashable_columns.index.values:
                 values_column = inspection_df[c_name].apply(str).value_counts()
@@ -439,7 +451,13 @@ class AmunInspections:
                 else:
                     _LOGGER.debug(f"Skipped multiple values column: {c_name}")
 
-        return pd.DataFrame(new_data, index=[0], columns=inspection_df.columns.values)
+        if duration:
+            duration = duration.seconds
+
+        new_data['total_duration'] = [duration]
+
+        columns = [c for c  in inspection_df.columns.values] + ['total_duration']
+        return pd.DataFrame(new_data, index=[0], columns=columns)
 
     @classmethod
     def create_inspections_dataframe(cls, processed_inspection_runs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
@@ -457,6 +475,8 @@ class AmunInspections:
             for column in dataframe.columns.values:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
+
+        extracted_columns.append("total_duration")
 
         inspections_df = pd.DataFrame(columns=extracted_columns)
 
@@ -604,12 +624,11 @@ class AmunInspections:
 
         final_df = pd.DataFrame(processed_string_result)
 
-        final_df["inspection_id"] = inspections_df["inspection_document_id"]
         inspection_identifiers = [
             "-".join(identifier.split("-")[1 : len(identifier.split("-")) - 1])
             if len(identifier.split("-")) > 2
             else identifier
-            for identifier in final_df["inspection_id"].values
+            for identifier in inspections_df["inspection_document_id"].values
         ]
         final_df["identifier"] = inspection_identifiers
 
@@ -624,6 +643,8 @@ class AmunInspections:
             standardized_identifiers.append(identifier_filter)
 
         final_df["standardized_identifier"] = standardized_identifiers
+
+        final_df["total_duration"] = inspections_df["total_duration"]
 
         return final_df
 
@@ -647,7 +668,7 @@ class AmunInspections:
     def filter_final_inspections_dataframe(
         cls,
         final_inspections_df: pd.DataFrame,
-        inspection_ids: Optional[List[str]] = None,
+        inspection_document_ids: Optional[List[str]] = None,
         standardized_ids: Optional[List[str]] = None,
         pi_name: Optional[List[str]] = None,
         pi_component: Optional[List[str]] = None,
@@ -663,7 +684,7 @@ class AmunInspections:
         """Filter final inspections dataframe for plots.
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
-        :param inspection_ids: fiter by inspection ids
+        :param inspection_document_ids: fiter by inspection ids
         :param standardized_ids: filter by standardized ids
         :param pi_name: fiter by performance indicator names (e.g PIMatmul)
         :param pi_component: filter by performance indicator components (e.g. tensorflow)
@@ -681,8 +702,8 @@ class AmunInspections:
 
         filtered_df = final_inspections_df.copy()
         # Inspection IDs
-        if inspection_ids:
-            filtered_df.query(f"`inspection_id` == @inspection_ids", inplace=True)
+        if inspection_document_ids:
+            filtered_df.query(f"`inspection_document_id` == @inspection_document_ids", inplace=True)
 
         if standardized_ids:
             filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
@@ -749,7 +770,7 @@ class AmunInspections:
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
         """
-        identifier = ["inspection_id", "identifier", "standardized_identifier"]
+        identifier = ["inspection_document_id", "identifier", "standardized_identifier"]
         solver = ["os_name", "os_version", "base", "python_interpreter"]
         hardware = ["cpu_brand", "cpu_family", "cpu_model", "number_cpus"]
         runtime_environment = solver + hardware
@@ -789,8 +810,8 @@ class AmunInspectionsStatistics:
         filters = ["inspection_number", "inspection_document_id", "stdout__name"] + [
             cls._INSPECTION_MAPPING_PARAMETERS[parameter] for parameter in parameters
         ]
-        for inspection_id in processed_inspection_runs:
-            inspection_id_results_df = processed_inspection_runs[inspection_id]
+        for inspection_document_id in processed_inspection_runs:
+            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
             subset_df = inspection_id_results_df[filters]
             subset_df.rename(columns=renamed_columns, inplace=True)
@@ -815,7 +836,7 @@ class AmunInspectionsStatistics:
             processed_inspection_runs=processed_inspection_runs, parameters=parameters
         )
 
-        for inspection_id, inspection_parameters_df in inspection_parameters_dfs.items():
+        for inspection_document_id, inspection_parameters_df in inspection_parameters_dfs.items():
             for inspection_parameter in parameters:
                 std_error = inspection_parameters_df[inspection_parameter].std() / np.sqrt(
                     inspection_parameters_df[inspection_parameter].shape[0]
@@ -832,7 +853,7 @@ class AmunInspectionsStatistics:
 
                 results.append(
                     {
-                        "inspection_id": inspection_id,
+                        "inspection_document_id": inspection_document_id,
                         "inspection_batch": inspection_parameters_df.shape[0],
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
                         "parameter": inspection_parameter,
