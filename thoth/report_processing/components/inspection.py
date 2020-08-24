@@ -419,28 +419,32 @@ class AmunInspections:
         return final_df
 
     @staticmethod
-    def evaluate_statistics_on_inspection_df(inspection_df: pd.DataFrame, column_names: List[str]) -> pd.DataFrame:
+    def evaluate_statistics_on_inspection_df(
+        inspection_df: pd.DataFrame, column_names: List[str], extra_columns: List[str]
+    ) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
             lambda x: x == True  # noqa
         ]
         new_data = {}
-        duration = None
+        inspection_start = None
+        inspection_end = None
+        inspection_duration = None
         for c_name in inspection_df.columns.values:
 
             if c_name in column_names:
                 new_data[c_name] = [inspection_df[c_name].median()]
 
-            if c_name == 'end_datetime':
+            if c_name == "end_datetime":
 
                 if "start_datetime" in inspection_df.columns.values:
-                    start_datetime = pd.to_datetime(inspection_df["start_datetime"]).min()
+                    inspection_start = pd.to_datetime(inspection_df["start_datetime"]).min()
 
                 if "end_datetime" in inspection_df.columns.values:
-                    end_datetime = pd.to_datetime(inspection_df["end_datetime"]).max()
+                    inspection_end = pd.to_datetime(inspection_df["end_datetime"]).max()
 
-                if start_datetime and end_datetime:
-                    duration = end_datetime - start_datetime
+                if inspection_start and inspection_end:
+                    inspection_duration = inspection_end - inspection_start
 
             elif c_name in unashable_columns.index.values:
                 values_column = inspection_df[c_name].apply(str).value_counts()
@@ -451,12 +455,14 @@ class AmunInspections:
                 else:
                     _LOGGER.debug(f"Skipped multiple values column: {c_name}")
 
-        if duration:
-            duration = duration.seconds
+        if inspection_duration:
+            inspection_duration = inspection_duration.seconds
 
-        new_data['total_duration'] = [duration]
+        new_data["inspection_start"] = [inspection_start]
+        new_data["inspection_end"] = [inspection_end]
+        new_data["inspection_duration"] = [inspection_duration]
 
-        columns = [c for c  in inspection_df.columns.values] + ['total_duration']
+        columns = [c for c in inspection_df.columns.values] + extra_columns
         return pd.DataFrame(new_data, index=[0], columns=columns)
 
     @classmethod
@@ -476,7 +482,9 @@ class AmunInspections:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
 
-        extracted_columns.append("total_duration")
+        extra_columns = ["inspection_start", "inspection_end", "inspection_duration"]
+        for extra_column in extra_columns:
+            extracted_columns.append(extra_column)
 
         inspections_df = pd.DataFrame(columns=extracted_columns)
 
@@ -484,7 +492,9 @@ class AmunInspections:
 
         for dataframe in processed_inspection_runs.values():
 
-            new_df = cls.evaluate_statistics_on_inspection_df(inspection_df=dataframe, column_names=column_names)
+            new_df = cls.evaluate_statistics_on_inspection_df(
+                inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
+            )
             inspections_df.loc[index] = new_df.iloc[0]
             index += 1
 
@@ -644,7 +654,7 @@ class AmunInspections:
 
         final_df["standardized_identifier"] = standardized_identifiers
 
-        final_df["total_duration"] = inspections_df["total_duration"]
+        final_df["total_duration"] = inspections_df["inspection_duration"]
 
         return final_df
 
@@ -795,7 +805,7 @@ class AmunInspectionsStatistics:
     @classmethod
     def _create_inspection_parameters_dataframes(
         cls, processed_inspection_runs: Dict[str, Any], parameters: List[str]
-    ) -> pd.DataFrame:
+    ) -> Dict[str, pd.DataFrame]:
         """Create pd.DataFrame of selected parameters from inspections results to be used for statistics and error analysis.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
@@ -851,10 +861,24 @@ class AmunInspectionsStatistics:
                 maxr = inspection_parameters_df[inspection_parameter].max()
                 minr = inspection_parameters_df[inspection_parameter].min()
 
+                duration = None
+                if "end_datetime" in processed_inspection_runs[inspection_document_id].columns.values:
+
+                    inspection_start = pd.to_datetime(
+                        processed_inspection_runs[inspection_document_id]["start_datetime"]
+                    ).min()
+                    inspection_end = pd.to_datetime(
+                        processed_inspection_runs[inspection_document_id]["end_datetime"]
+                    ).max()
+                    inspection_duration = inspection_end - inspection_start
+
+                    duration = inspection_duration.seconds
+
                 results.append(
                     {
                         "inspection_document_id": inspection_document_id,
                         "inspection_batch": inspection_parameters_df.shape[0],
+                        "inspection_duration": duration,
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
                         "parameter": inspection_parameter,
                         "std_error": std_error,
