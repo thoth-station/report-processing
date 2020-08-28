@@ -375,10 +375,13 @@ class AmunInspections:
         return requirements_locked
 
     @classmethod
-    def process_inspection_runs(cls, inspection_runs: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
+    def process_inspection_runs(
+        cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1
+    ) -> Dict[str, pd.DataFrame]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
         :param inspection_runs: aggregated data provided by `aggregate_thoth_inspections_runs`.
+        :param filter_by_batch_size: filter inspection to guarantee all have same batch size.
         """
         processed_inspection_runs: Dict[str, pd.DataFrame] = {}
 
@@ -390,8 +393,13 @@ class AmunInspections:
 
             inspection_run_df = cls.process_inspection_run(inspection_run=inspection_run)
 
-            if inspection_run_df.shape[0] > 1:
+            if inspection_run_df.shape[0] >= filter_by_batch_size:
                 processed_inspection_runs[inspection_id] = inspection_run_df
+            else:
+                _LOGGER.warning(
+                    f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
+                    f"... discarding due to filter set to: {filter_by_batch_size}"
+                )
 
         return processed_inspection_runs
 
@@ -427,9 +435,11 @@ class AmunInspections:
             lambda x: x == True  # noqa
         ]
         new_data = {}
+
         inspection_start = None
         inspection_end = None
         inspection_duration = None
+
         for c_name in inspection_df.columns.values:
 
             if c_name in column_names:
@@ -461,19 +471,27 @@ class AmunInspections:
         new_data["inspection_start"] = [inspection_start]
         new_data["inspection_end"] = [inspection_end]
         new_data["inspection_duration"] = [inspection_duration]
+        new_data["inspection_batch"] = [inspection_df.shape[0]]
 
         columns = [c for c in inspection_df.columns.values] + extra_columns
         return pd.DataFrame(new_data, index=[0], columns=columns)
 
     @classmethod
-    def create_inspections_dataframe(cls, processed_inspection_runs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    def create_inspections_dataframe(
+        cls,
+        processed_inspection_runs: Dict[str, pd.DataFrame],
+        include_statistics: bool = False,
+        parameter_for_statistics: str = "elapsed_time",
+    ) -> pd.DataFrame:
         """Create final pd.DataFrame from processed inspections runs after evaluating statistics.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
         provided by `process_inspection_runs`.
+        :param include_statistics: bool to decide if statistics are included in the dataframe
+        :param parameter_for_statistics: parameter on which statistics are applied
+        (it is used only when include_statistics=True)
         """
         index = 0
-
         extracted_columns = []
 
         for dataframe in processed_inspection_runs.values():
@@ -482,11 +500,11 @@ class AmunInspections:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
 
-        extra_columns = ["inspection_start", "inspection_end", "inspection_duration"]
+        extra_columns = ["inspection_start", "inspection_end", "inspection_duration", "inspection_batch"]
         for extra_column in extra_columns:
             extracted_columns.append(extra_column)
 
-        inspections_df = pd.DataFrame(columns=extracted_columns)
+        main_inspection_df = pd.DataFrame(columns=extracted_columns)
 
         column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
 
@@ -495,10 +513,16 @@ class AmunInspections:
             new_df = cls.evaluate_statistics_on_inspection_df(
                 inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
             )
-            inspections_df.loc[index] = new_df.iloc[0]
+            main_inspection_df.loc[index] = new_df.iloc[0]
             index += 1
 
-        return inspections_df
+        if include_statistics:
+            inspections_statistics_dataframe = AmunInspectionsStatistics.create_inspections_statistics_dataframe(
+                processed_inspection_runs=processed_inspection_runs, parameters=[parameter_for_statistics]
+            )
+            return pd.merge(main_inspection_df, inspections_statistics_dataframe, on="inspection_document_id")
+
+        return main_inspection_df
 
     @staticmethod
     def create_python_package_df(inspections_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
@@ -542,7 +566,10 @@ class AmunInspections:
 
     @classmethod
     def create_final_dataframe(
-        cls, inspections_df: pd.DataFrame, filters_for_identifiers: Optional[List[str]] = None
+        cls,
+        inspections_df: pd.DataFrame,
+        filters_for_identifiers: Optional[List[str]] = None,
+        include_statistics: bool = False,
     ) -> pd.DataFrame:
         """Create final dataframe with all information required for plots.
 
@@ -632,32 +659,57 @@ class AmunInspections:
         ]
         processed_string_result["rate"] = [r_r[0] for r_r in inspections_df[["stdout__@result__rate"]].values]
 
+        processed_string_result["inspection_document_id"] = [
+            i[0] for i in inspections_df[["inspection_document_id"]].values
+        ]
+
         final_df = pd.DataFrame(processed_string_result)
 
-        inspection_identifiers = [
-            "-".join(identifier.split("-")[1 : len(identifier.split("-")) - 1])
-            if len(identifier.split("-")) > 2
-            else identifier
-            for identifier in inspections_df["inspection_document_id"].values
-        ]
-        final_df["inspection_document_id"] = inspections_df["inspection_document_id"]
-        final_df["identifier"] = inspection_identifiers
+        inspection_identifiers = []
+        standardized_identifiers = []
 
         if not filters_for_identifiers:
             filters_for_identifiers = []
 
-        standardized_identifiers = []
-        for identifier_id in final_df["identifier"]:
+        for inspection_document_id in inspections_df["inspection_document_id"].values:
+            if len(inspection_document_id.split("-")) > 2:
+                extracted_identifer_ = "-".join(
+                    inspection_document_id.split("-")[1 : len(inspection_document_id.split("-")) - 1]
+                )
+            else:
+                extracted_identifer_ = inspection_document_id
+
+            inspection_identifiers.append(extracted_identifer_)
+
             identifier_filter = "-".join(
-                [word for word in identifier_id.split("-") if word not in filters_for_identifiers]
+                [word for word in extracted_identifer_.split("-") if word not in filters_for_identifiers]
             )
+
             standardized_identifiers.append(identifier_filter)
 
+        final_df["identifier"] = inspection_identifiers
         final_df["standardized_identifier"] = standardized_identifiers
 
         final_df["start_datetime"] = inspections_df["inspection_start"]
         final_df["end_datetime"] = inspections_df["inspection_end"]
+
         final_df["total_duration"] = inspections_df["inspection_duration"]
+        final_df["inspection_batch"] = inspections_df["inspection_batch"]
+
+        if include_statistics:
+            final_df["statistical_parameter"] = inspections_df["statistical_parameter"]
+            final_df["std"] = inspections_df["std"]
+            final_df["std_error"] = inspections_df["std_error"]
+            final_df["mean"] = inspections_df["mean"]
+            final_df["median"] = inspections_df["median"]
+            final_df["q1"] = inspections_df["q1"]
+            final_df["q3"] = inspections_df["q3"]
+            final_df["iqr"] = inspections_df["iqr"]
+            final_df["min"] = inspections_df["min"]
+            final_df["max"] = inspections_df["max"]
+            final_df["cov"] = inspections_df["cov"]
+            final_df["covm"] = inspections_df["covm"]
+            final_df["skew"] = inspections_df["skew"]
 
         return final_df
 
@@ -682,6 +734,7 @@ class AmunInspections:
         cls,
         final_inspections_df: pd.DataFrame,
         inspection_document_ids: Optional[List[str]] = None,
+        r_inspection_document_ids: Optional[List[str]] = None,
         standardized_ids: Optional[List[str]] = None,
         pi_name: Optional[List[str]] = None,
         pi_component: Optional[List[str]] = None,
@@ -698,6 +751,7 @@ class AmunInspections:
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
         :param inspection_document_ids: fiter by inspection ids
+        :param r_inspection_document_ids: remove by inspection ids
         :param standardized_ids: filter by standardized ids
         :param pi_name: fiter by performance indicator names (e.g PIMatmul)
         :param pi_component: filter by performance indicator components (e.g. tensorflow)
@@ -717,6 +771,9 @@ class AmunInspections:
         # Inspection IDs
         if inspection_document_ids:
             filtered_df.query(f"`inspection_document_id` == @inspection_document_ids", inplace=True)
+
+        if r_inspection_document_ids:
+            filtered_df.query(f"`inspection_document_id` != @r_inspection_document_ids", inplace=True)
 
         if standardized_ids:
             filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
@@ -775,13 +832,14 @@ class AmunInspections:
         return filtered_df
 
     @staticmethod
-    def create_performance_results_summary(
-        final_inspections_df: pd.DataFrame, performance_packages: List[str]
+    def create_plot_results_summary(
+        final_inspections_df: pd.DataFrame, performance_packages: List[str], include_statistics: bool = False,
     ) -> pd.DataFrame:
-        """Show performance results summary for python packages.
+        """Show performance results summary.
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
+        :param include_statistics: include statistics in summary
         """
         identifier = ["inspection_document_id", "identifier", "standardized_identifier"]
         solver = ["os_name", "os_version", "base", "python_interpreter"]
@@ -789,6 +847,24 @@ class AmunInspections:
         runtime_environment = solver + hardware
 
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
+
+        if include_statistics:
+            statistics = [
+                "statistical_parameter",
+                "std",
+                "std_error",
+                "mean",
+                "median",
+                "q1",
+                "q3",
+                "iqr",
+                "max",
+                "min",
+                "cov",
+                "covm",
+                "skew",
+            ]
+            return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info + statistics]
 
         return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info]
 
@@ -806,32 +882,25 @@ class AmunInspectionsStatistics:
     }
 
     @classmethod
-    def _create_inspection_parameters_dataframes(
-        cls, processed_inspection_runs: Dict[str, Any], parameters: List[str]
-    ) -> Dict[str, pd.DataFrame]:
-        """Create pd.DataFrame of selected parameters from inspections results to be used for statistics and error analysis.
+    def _create_inspection_parameters_dataframe(
+        cls, inspections_df: pd.DataFrame, parameters: List[str]
+    ) -> pd.DataFrame:
+        """Create pd.DataFrame of selected parameters from inspections_df.
 
-        :param processed_inspection_runs: dict with inspection results per inspection ID
-        provided by `Inspection.process_inspection_runs`.
-        :param parameters: inspection parameters used in the analysis
+        :param inspections_df: single inspection results  dataframe
+        taken by `Inspection.process_inspection_runs` dictionary.
+        :param parameters: inspection parameters used in the statistical analysis
         """
-        inspection_parameters_df_dict = {}
-
         renamed_columns = {cls._INSPECTION_MAPPING_PARAMETERS[parameter]: parameter for parameter in parameters}
         renamed_columns["stdout__name"] = "pi_name"
 
         filters = ["inspection_number", "inspection_document_id", "stdout__name"] + [
             cls._INSPECTION_MAPPING_PARAMETERS[parameter] for parameter in parameters
         ]
-        for inspection_document_id in processed_inspection_runs:
-            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
+        subset_df = inspections_df[filters]
+        subset_df.rename(columns=renamed_columns, inplace=True)
 
-            subset_df = inspection_id_results_df[filters]
-            subset_df.rename(columns=renamed_columns, inplace=True)
-
-            inspection_parameters_df_dict[subset_df["inspection_document_id"].unique()[0]] = subset_df
-
-        return inspection_parameters_df_dict
+        return subset_df
 
     @classmethod
     def create_inspections_statistics_dataframe(
@@ -845,16 +914,17 @@ class AmunInspectionsStatistics:
         """
         results: List[Dict[str, Any]] = []
 
-        inspection_parameters_dfs = cls._create_inspection_parameters_dataframes(
-            processed_inspection_runs=processed_inspection_runs, parameters=parameters
-        )
+        for inspection_document_id in processed_inspection_runs:
+            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
-        for inspection_document_id, inspection_parameters_df in inspection_parameters_dfs.items():
+            inspection_parameters_df = cls._create_inspection_parameters_dataframe(
+                inspections_df=inspection_id_results_df, parameters=parameters
+            )
+
             for inspection_parameter in parameters:
-                std_error = inspection_parameters_df[inspection_parameter].std() / np.sqrt(
-                    inspection_parameters_df[inspection_parameter].shape[0]
-                )
                 std = inspection_parameters_df[inspection_parameter].std()
+                std_error = std / np.sqrt(inspection_parameters_df[inspection_parameter].shape[0])
+                mean = inspection_parameters_df[inspection_parameter].mean()
                 median = inspection_parameters_df[inspection_parameter].median()
                 q1 = inspection_parameters_df[inspection_parameter].quantile([0.25])
                 q3 = inspection_parameters_df[inspection_parameter].quantile([0.75])
@@ -863,35 +933,27 @@ class AmunInspectionsStatistics:
                 iqr = q3 - q1
                 maxr = inspection_parameters_df[inspection_parameter].max()
                 minr = inspection_parameters_df[inspection_parameter].min()
-
-                duration = None
-                if "end_datetime" in processed_inspection_runs[inspection_document_id].columns.values:
-
-                    inspection_start = pd.to_datetime(
-                        processed_inspection_runs[inspection_document_id]["start_datetime"]
-                    ).min()
-                    inspection_end = pd.to_datetime(
-                        processed_inspection_runs[inspection_document_id]["end_datetime"]
-                    ).max()
-                    inspection_duration = inspection_end - inspection_start
-
-                    duration = inspection_duration.seconds
+                cov = std / mean
+                covm = iqr / median
+                skew = inspection_parameters_df[inspection_parameter].skew()
 
                 results.append(
                     {
                         "inspection_document_id": inspection_document_id,
-                        "inspection_batch": inspection_parameters_df.shape[0],
-                        "inspection_duration": duration,
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
-                        "parameter": inspection_parameter,
-                        "std_error": std_error,
+                        "statistical_parameter": inspection_parameter,
                         "std": std,
+                        "std_error": std_error,
+                        "mean": mean,
                         "median": median,
                         "q1": q1,
                         "q3": q3,
                         "iqr": iqr,
                         "max": maxr,
                         "min": minr,
+                        "cov": cov,
+                        "covm": covm,
+                        "skew": skew,
                     }
                 )
 
