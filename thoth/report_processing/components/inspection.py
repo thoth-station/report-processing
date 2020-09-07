@@ -154,75 +154,82 @@ class AmunInspections:
                 _LOGGER.info(f"Considering inspection ID... {inspection_document_id}")
 
                 retrieved_files: List[Dict[str, Any]] = []
+                try:
+                    # Iterate through inspection results number
+                    for inspection_number_path in Path(f"{result_path}/results").iterdir():
+                        _LOGGER.info(
+                            f"Considering inspection ID {inspection_document_id}."
+                            f"Number {inspection_number_path.name}"
+                        )
 
-                # Iterate through inspection results number
-                for inspection_number_path in Path(f"{result_path}/results").iterdir():
+                        file_info: Dict[str, Any] = {}
+
+                        if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
+
+                            with open(f"{inspection_number_path}/result", "r") as result_file:
+                                inspection_result_document = json.load(result_file)
+
+                                file_info["result"] = inspection_result_document
+                                file_info["result"]["inspection_document_id"] = inspection_document_id
+
+                            if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
+
+                                with open(f"{inspection_number_path}/hwinfo", "r") as hwinfo_file:
+                                    inspection_hw_info = json.load(hwinfo_file)
+
+                                    file_info["hwinfo"] = inspection_hw_info
+
+                            if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
+
+                                with open(f"{inspection_number_path}/log", "r") as job_log_file:
+                                    inspection_job_logs = job_log_file.read()
+
+                                    file_info["job_logs"] = inspection_job_logs
+
+                        retrieved_files.append(file_info)
+
+                    files[inspection_document_id] = {"results": retrieved_files}
+
+                    if retrieved_files:
+                        if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
+
+                            with open(f"{result_path}/build/specification", "r") as specification_file:
+                                inspection_specification_document = json.load(specification_file)
+
+                                modified_results = []
+                                for result in files[inspection_document_id]["results"]:
+                                    result["result"]["identifier"] = inspection_specification_document["identifier"]
+                                    result["result"]["specification_base"] = inspection_specification_document["base"]
+                                    result["result"]["batch_size"] = inspection_specification_document["batch_size"]
+                                    result["requirements"] = inspection_specification_document["python"]["requirements"]
+
+                                    requirements_locked = cls._parse_requirements_locked(
+                                        requirements_locked=inspection_specification_document["python"][
+                                            "requirements_locked"
+                                        ]
+                                    )
+                                    result["result"]["requirements_locked"] = requirements_locked
+
+                                    result["result"]["run"] = inspection_specification_document["run"]
+
+                                    modified_results.append(result)
+
+                                files[inspection_document_id] = {"results": modified_results}
+                                files[inspection_document_id]["specification"] = inspection_specification_document
+
+                        if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
+
+                            with open(f"{result_path}/build/log", "r") as build_logs_type:
+                                inspection_build_logs = build_logs_type.read()
+
+                                files[inspection_document_id]["build_logs"] = inspection_build_logs
+
+                        counter += 1
+                except Exception as retrieval_error:
                     _LOGGER.info(
-                        f"Considering inspection ID {inspection_document_id} number... {inspection_number_path.name}"
+                        f"Considering inspection ID {inspection_document_id}."
+                        f"No files retrieved due to the following error: {retrieval_error}"
                     )
-
-                    file_info: Dict[str, Any] = {}
-
-                    if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
-
-                        with open(f"{inspection_number_path}/result", "r") as result_file:
-                            inspection_result_document = json.load(result_file)
-
-                            file_info["result"] = inspection_result_document
-                            file_info["result"]["inspection_document_id"] = inspection_document_id
-
-                        if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
-
-                            with open(f"{inspection_number_path}/hwinfo", "r") as hwinfo_file:
-                                inspection_hw_info = json.load(hwinfo_file)
-
-                                file_info["hwinfo"] = inspection_hw_info
-
-                        if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
-
-                            with open(f"{inspection_number_path}/log", "r") as job_log_file:
-                                inspection_job_logs = job_log_file.read()
-
-                                file_info["job_logs"] = inspection_job_logs
-
-                    retrieved_files.append(file_info)
-
-                files[inspection_document_id] = {"results": retrieved_files}
-
-                if retrieved_files:
-                    if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
-
-                        with open(f"{result_path}/build/specification", "r") as specification_file:
-                            inspection_specification_document = json.load(specification_file)
-
-                            modified_results = []
-                            for result in files[inspection_document_id]["results"]:
-                                result["result"]["specification_base"] = inspection_specification_document["base"]
-                                result["result"]["batch_size"] = inspection_specification_document["batch_size"]
-                                result["requirements"] = inspection_specification_document["python"]["requirements"]
-
-                                requirements_locked = cls._parse_requirements_locked(
-                                    requirements_locked=inspection_specification_document["python"][
-                                        "requirements_locked"
-                                    ]
-                                )
-                                result["result"]["requirements_locked"] = requirements_locked
-
-                                result["result"]["run"] = inspection_specification_document["run"]
-
-                                modified_results.append(result)
-
-                            files[inspection_document_id] = {"results": modified_results}
-                            files[inspection_document_id]["specification"] = inspection_specification_document
-
-                    if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
-
-                        with open(f"{result_path}/build/log", "r") as build_logs_type:
-                            inspection_build_logs = build_logs_type.read()
-
-                            files[inspection_document_id]["build_logs"] = inspection_build_logs
-
-                    counter += 1
 
                 if limit_results:
                     if counter == max_ids:
@@ -317,6 +324,7 @@ class AmunInspections:
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
 
+                                result["result"]["identifier"] = inspection_specification_document["identifier"]
                                 result["result"]["specification_base"] = inspection_specification_document["base"]
                                 result["result"]["batch_size"] = inspection_specification_document["batch_size"]
                                 result["requirements"] = inspection_specification_document["python"]["requirements"]
@@ -375,10 +383,13 @@ class AmunInspections:
         return requirements_locked
 
     @classmethod
-    def process_inspection_runs(cls, inspection_runs: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
+    def process_inspection_runs(
+        cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1
+    ) -> Dict[str, pd.DataFrame]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
         :param inspection_runs: aggregated data provided by `aggregate_thoth_inspections_runs`.
+        :param filter_by_batch_size: filter inspection to guarantee all have same batch size.
         """
         processed_inspection_runs: Dict[str, pd.DataFrame] = {}
 
@@ -390,8 +401,13 @@ class AmunInspections:
 
             inspection_run_df = cls.process_inspection_run(inspection_run=inspection_run)
 
-            if inspection_run_df.shape[0] > 1:
+            if inspection_run_df.shape[0] >= filter_by_batch_size:
                 processed_inspection_runs[inspection_id] = inspection_run_df
+            else:
+                _LOGGER.warning(
+                    f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
+                    f"... discarding due to filter set to: {filter_by_batch_size}"
+                )
 
         return processed_inspection_runs
 
@@ -427,12 +443,15 @@ class AmunInspections:
             lambda x: x == True  # noqa
         ]
         new_data = {}
+
         inspection_start = None
         inspection_end = None
         inspection_duration = None
+
         for c_name in inspection_df.columns.values:
 
             if c_name in column_names:
+                # TODO: Allow user to select another parameter, median used by default
                 new_data[c_name] = [inspection_df[c_name].median()]
 
             if c_name == "end_datetime":
@@ -449,11 +468,13 @@ class AmunInspections:
             elif c_name in unashable_columns.index.values:
                 values_column = inspection_df[c_name].apply(str).value_counts()
                 _LOGGER.debug(f"Skipped unashable column {c_name}: {values_column}")
+                new_data[c_name] = np.nan
             else:
                 if len(inspection_df[c_name].unique()) == 1:
                     new_data[c_name] = [inspection_df[c_name].iloc[0]]
                 else:
                     _LOGGER.debug(f"Skipped multiple values column: {c_name}")
+                    new_data[c_name] = np.nan
 
         if inspection_duration:
             inspection_duration = inspection_duration.seconds
@@ -461,19 +482,27 @@ class AmunInspections:
         new_data["inspection_start"] = [inspection_start]
         new_data["inspection_end"] = [inspection_end]
         new_data["inspection_duration"] = [inspection_duration]
+        new_data["inspection_batch"] = [inspection_df.shape[0]]
 
         columns = [c for c in inspection_df.columns.values] + extra_columns
-        return pd.DataFrame(new_data, index=[0], columns=columns)
+        return pd.DataFrame(new_data, columns=columns)
 
     @classmethod
-    def create_inspections_dataframe(cls, processed_inspection_runs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
+    def create_inspections_dataframe(
+        cls,
+        processed_inspection_runs: Dict[str, pd.DataFrame],
+        include_statistics: bool = False,
+        parameter_for_statistics: str = "elapsed_time",
+    ) -> pd.DataFrame:
         """Create final pd.DataFrame from processed inspections runs after evaluating statistics.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
         provided by `process_inspection_runs`.
+        :param include_statistics: bool to decide if statistics are included in the dataframe
+        :param parameter_for_statistics: parameter on which statistics are applied
+        (it is used only when include_statistics=True)
         """
-        index = 0
-
+        row_number = 0
         extracted_columns = []
 
         for dataframe in processed_inspection_runs.values():
@@ -482,11 +511,11 @@ class AmunInspections:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
 
-        extra_columns = ["inspection_start", "inspection_end", "inspection_duration"]
+        extra_columns = ["inspection_start", "inspection_end", "inspection_duration", "inspection_batch"]
         for extra_column in extra_columns:
             extracted_columns.append(extra_column)
 
-        inspections_df = pd.DataFrame(columns=extracted_columns)
+        main_inspection_df = pd.DataFrame(columns=extracted_columns)
 
         column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
 
@@ -495,10 +524,16 @@ class AmunInspections:
             new_df = cls.evaluate_statistics_on_inspection_df(
                 inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
             )
-            inspections_df.loc[index] = new_df.iloc[0]
-            index += 1
+            main_inspection_df.loc[row_number] = new_df.iloc[0]
+            row_number += 1
 
-        return inspections_df
+        if include_statistics:
+            inspections_statistics_dataframe = AmunInspectionsStatistics.create_inspections_statistics_dataframe(
+                processed_inspection_runs=processed_inspection_runs, parameters=[parameter_for_statistics]
+            )
+            return pd.merge(main_inspection_df, inspections_statistics_dataframe, on="inspection_document_id")
+
+        return main_inspection_df
 
     @staticmethod
     def create_python_package_df(inspections_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
@@ -542,7 +577,10 @@ class AmunInspections:
 
     @classmethod
     def create_final_dataframe(
-        cls, inspections_df: pd.DataFrame, filters_for_identifiers: Optional[List[str]] = None
+        cls,
+        inspections_df: pd.DataFrame,
+        filters_for_identifiers: Optional[List[str]] = None,
+        include_statistics: bool = False,
     ) -> pd.DataFrame:
         """Create final dataframe with all information required for plots.
 
@@ -632,32 +670,55 @@ class AmunInspections:
         ]
         processed_string_result["rate"] = [r_r[0] for r_r in inspections_df[["stdout__@result__rate"]].values]
 
+        processed_string_result["inspection_document_id"] = [
+            i[0] for i in inspections_df[["inspection_document_id"]].values
+        ]
+
         final_df = pd.DataFrame(processed_string_result)
 
-        inspection_identifiers = [
-            "-".join(identifier.split("-")[1 : len(identifier.split("-")) - 1])
-            if len(identifier.split("-")) > 2
-            else identifier
-            for identifier in inspections_df["inspection_document_id"].values
-        ]
-        final_df["inspection_document_id"] = inspections_df["inspection_document_id"]
-        final_df["identifier"] = inspection_identifiers
+        standardized_identifiers = []
 
         if not filters_for_identifiers:
             filters_for_identifiers = []
 
-        standardized_identifiers = []
-        for identifier_id in final_df["identifier"]:
+        for _, row in inspections_df[["inspection_document_id", "identifier"]].iterrows():
+            inspection_document_id = row["inspection_document_id"]
+            identifier = row["identifier"]
+
+            selected_identifer_ = identifier
+
+            if not identifier:
+                selected_identifer_ = inspection_document_id
+
             identifier_filter = "-".join(
-                [word for word in identifier_id.split("-") if word not in filters_for_identifiers]
+                [word for word in selected_identifer_.split("-") if word not in filters_for_identifiers]
             )
+
             standardized_identifiers.append(identifier_filter)
 
+        final_df["identifier"] = inspections_df["identifier"]
         final_df["standardized_identifier"] = standardized_identifiers
 
         final_df["start_datetime"] = inspections_df["inspection_start"]
         final_df["end_datetime"] = inspections_df["inspection_end"]
+
         final_df["total_duration"] = inspections_df["inspection_duration"]
+        final_df["inspection_batch"] = inspections_df["inspection_batch"]
+
+        if include_statistics:
+            final_df["statistical_parameter"] = inspections_df["statistical_parameter"]
+            final_df["std"] = inspections_df["std"]
+            final_df["std_error"] = inspections_df["std_error"]
+            final_df["mean"] = inspections_df["mean"]
+            final_df["median"] = inspections_df["median"]
+            final_df["q1"] = inspections_df["q1"]
+            final_df["q3"] = inspections_df["q3"]
+            final_df["iqr"] = inspections_df["iqr"]
+            final_df["min"] = inspections_df["min"]
+            final_df["max"] = inspections_df["max"]
+            final_df["cov"] = inspections_df["cov"]
+            final_df["covm"] = inspections_df["covm"]
+            final_df["skew"] = inspections_df["skew"]
 
         return final_df
 
@@ -682,6 +743,7 @@ class AmunInspections:
         cls,
         final_inspections_df: pd.DataFrame,
         inspection_document_ids: Optional[List[str]] = None,
+        r_inspection_document_ids: Optional[List[str]] = None,
         standardized_ids: Optional[List[str]] = None,
         pi_name: Optional[List[str]] = None,
         pi_component: Optional[List[str]] = None,
@@ -698,6 +760,7 @@ class AmunInspections:
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe` or its subset.
         :param inspection_document_ids: fiter by inspection ids
+        :param r_inspection_document_ids: remove by inspection ids
         :param standardized_ids: filter by standardized ids
         :param pi_name: fiter by performance indicator names (e.g PIMatmul)
         :param pi_component: filter by performance indicator components (e.g. tensorflow)
@@ -717,6 +780,9 @@ class AmunInspections:
         # Inspection IDs
         if inspection_document_ids:
             filtered_df.query(f"`inspection_document_id` == @inspection_document_ids", inplace=True)
+
+        if r_inspection_document_ids:
+            filtered_df.query(f"`inspection_document_id` != @r_inspection_document_ids", inplace=True)
 
         if standardized_ids:
             filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
@@ -775,13 +841,14 @@ class AmunInspections:
         return filtered_df
 
     @staticmethod
-    def create_performance_results_summary(
-        final_inspections_df: pd.DataFrame, performance_packages: List[str]
+    def create_plot_results_summary(
+        final_inspections_df: pd.DataFrame, performance_packages: List[str], include_statistics: bool = False,
     ) -> pd.DataFrame:
-        """Show performance results summary for python packages.
+        """Show performance results summary.
 
         :param final_inspections_df: df for plots provided by `create_final_dataframe`.
         :param performance_packages: list of packages names
+        :param include_statistics: include statistics in summary
         """
         identifier = ["inspection_document_id", "identifier", "standardized_identifier"]
         solver = ["os_name", "os_version", "base", "python_interpreter"]
@@ -789,6 +856,24 @@ class AmunInspections:
         runtime_environment = solver + hardware
 
         pi_info = ["pi_name"] + ["elapsed_time", "rate"]
+
+        if include_statistics:
+            statistics = [
+                "statistical_parameter",
+                "std",
+                "std_error",
+                "mean",
+                "median",
+                "q1",
+                "q3",
+                "iqr",
+                "max",
+                "min",
+                "cov",
+                "covm",
+                "skew",
+            ]
+            return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info + statistics]
 
         return final_inspections_df[identifier + performance_packages + runtime_environment + pi_info]
 
@@ -806,32 +891,25 @@ class AmunInspectionsStatistics:
     }
 
     @classmethod
-    def _create_inspection_parameters_dataframes(
-        cls, processed_inspection_runs: Dict[str, Any], parameters: List[str]
-    ) -> Dict[str, pd.DataFrame]:
-        """Create pd.DataFrame of selected parameters from inspections results to be used for statistics and error analysis.
+    def _create_inspection_parameters_dataframe(
+        cls, inspections_df: pd.DataFrame, parameters: List[str]
+    ) -> pd.DataFrame:
+        """Create pd.DataFrame of selected parameters from inspections_df.
 
-        :param processed_inspection_runs: dict with inspection results per inspection ID
-        provided by `Inspection.process_inspection_runs`.
-        :param parameters: inspection parameters used in the analysis
+        :param inspections_df: single inspection results  dataframe
+        taken by `Inspection.process_inspection_runs` dictionary.
+        :param parameters: inspection parameters used in the statistical analysis
         """
-        inspection_parameters_df_dict = {}
-
         renamed_columns = {cls._INSPECTION_MAPPING_PARAMETERS[parameter]: parameter for parameter in parameters}
         renamed_columns["stdout__name"] = "pi_name"
 
         filters = ["inspection_number", "inspection_document_id", "stdout__name"] + [
             cls._INSPECTION_MAPPING_PARAMETERS[parameter] for parameter in parameters
         ]
-        for inspection_document_id in processed_inspection_runs:
-            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
+        subset_df = inspections_df[filters]
+        subset_df.rename(columns=renamed_columns, inplace=True)
 
-            subset_df = inspection_id_results_df[filters]
-            subset_df.rename(columns=renamed_columns, inplace=True)
-
-            inspection_parameters_df_dict[subset_df["inspection_document_id"].unique()[0]] = subset_df
-
-        return inspection_parameters_df_dict
+        return subset_df
 
     @classmethod
     def create_inspections_statistics_dataframe(
@@ -845,16 +923,17 @@ class AmunInspectionsStatistics:
         """
         results: List[Dict[str, Any]] = []
 
-        inspection_parameters_dfs = cls._create_inspection_parameters_dataframes(
-            processed_inspection_runs=processed_inspection_runs, parameters=parameters
-        )
+        for inspection_document_id in processed_inspection_runs:
+            inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
-        for inspection_document_id, inspection_parameters_df in inspection_parameters_dfs.items():
+            inspection_parameters_df = cls._create_inspection_parameters_dataframe(
+                inspections_df=inspection_id_results_df, parameters=parameters
+            )
+
             for inspection_parameter in parameters:
-                std_error = inspection_parameters_df[inspection_parameter].std() / np.sqrt(
-                    inspection_parameters_df[inspection_parameter].shape[0]
-                )
                 std = inspection_parameters_df[inspection_parameter].std()
+                std_error = std / np.sqrt(inspection_parameters_df[inspection_parameter].shape[0])
+                mean = inspection_parameters_df[inspection_parameter].mean()
                 median = inspection_parameters_df[inspection_parameter].median()
                 q1 = inspection_parameters_df[inspection_parameter].quantile([0.25])
                 q3 = inspection_parameters_df[inspection_parameter].quantile([0.75])
@@ -863,35 +942,27 @@ class AmunInspectionsStatistics:
                 iqr = q3 - q1
                 maxr = inspection_parameters_df[inspection_parameter].max()
                 minr = inspection_parameters_df[inspection_parameter].min()
-
-                duration = None
-                if "end_datetime" in processed_inspection_runs[inspection_document_id].columns.values:
-
-                    inspection_start = pd.to_datetime(
-                        processed_inspection_runs[inspection_document_id]["start_datetime"]
-                    ).min()
-                    inspection_end = pd.to_datetime(
-                        processed_inspection_runs[inspection_document_id]["end_datetime"]
-                    ).max()
-                    inspection_duration = inspection_end - inspection_start
-
-                    duration = inspection_duration.seconds
+                cov = std / mean
+                covm = iqr / median
+                skew = inspection_parameters_df[inspection_parameter].skew()
 
                 results.append(
                     {
                         "inspection_document_id": inspection_document_id,
-                        "inspection_batch": inspection_parameters_df.shape[0],
-                        "inspection_duration": duration,
                         "pi_name": inspection_parameters_df["pi_name"].unique()[0],
-                        "parameter": inspection_parameter,
-                        "std_error": std_error,
+                        "statistical_parameter": inspection_parameter,
                         "std": std,
+                        "std_error": std_error,
+                        "mean": mean,
                         "median": median,
                         "q1": q1,
                         "q3": q3,
                         "iqr": iqr,
                         "max": maxr,
                         "min": minr,
+                        "cov": cov,
+                        "covm": covm,
+                        "skew": skew,
                     }
                 )
 
@@ -904,115 +975,93 @@ class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": ["platform", "processor", "ncpus", "info"],
-        "software_stack": ["requirements_locked"],
-        "base_image": ["base_image", "number_cpus_run"],
-        "pi": ["script"],
-        "exit_codes": ["exit_code"],
+        "hardware": {"title": "Hardware", "values": ["platform", "processor", "ncpus", "info"],},
+        "base_image": {"title": "Operating System", "values": ["base_image", "number_cpus_run"],},
+        "software_stack": {"title": "Software Stack", "values": ["requirements_locked"],},
+        "pi": {"title": "Performance Indicator", "values": ["pi"],},
+        "exit_codes": {"title": "Exit Code", "values": ["exit_code"],},
     }
 
     _INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING = {
-        "platform": ["hwinfo__platform"],
-        "processor": ["cpu_type__is", "cpu_type__has"],
-        "ncpus": ["hwinfo__cpu_type__ncpus"],
-        "info": [
-            "runtime_environment__hardware__cpu_family",
-            "runtime_environment__hardware__cpu_model",
-            "hwinfo__cpu_info__brand_raw",
-            "runtime_environment__cuda_version",
-        ],
-        "requirements_locked": ["requirements_locked__default", "requirements_locked___meta"],
-        "base_image": ["os_release__name", "os_release__version", "specification_base"],
-        "number_cpus_run": ["run__requests__cpu"],
-        "script": ["script", "script_sha256", "@parameters", "stdout__name", "stdout__component", "batch_size"],
-        "exit_code": ["exit_code"],
+        "platform": {"description": "Platform", "values": ["hwinfo__platform"]},
+        "processor": {"description": "Processor", "values": ["cpu_type__is", "cpu_type__has"]},
+        "ncpus": {"description": "Number of CPUs", "values": ["hwinfo__cpu_type__ncpus"]},
+        "info": {
+            "description": "General info",
+            "values": [
+                "runtime_environment__hardware__cpu_family",
+                "runtime_environment__hardware__cpu_model",
+                "hwinfo__cpu_info__brand_raw",
+                "runtime_environment__cuda_version",
+            ],
+        },
+        "requirements_locked": {
+            "description": "Packages",
+            "values": ["requirements_locked__default", "requirements_locked___meta"],
+        },
+        "base_image": {
+            "description": "Base Image",
+            "values": ["os_release__name", "os_release__version", "specification_base"],
+        },
+        "number_cpus_run": {"description": "CPUs during run", "values": ["run__requests__cpu"],},
+        "pi": {
+            "description": "",
+            "values": ["script_sha256", "@parameters", "stdout__name", "stdout__component", "batch_size"],
+        },
+        "exit_code": {"description": "", "values": ["exit_code"],},
     }
 
-    @staticmethod
-    def _create_df_report(df: pd.DataFrame) -> pd.DataFrame:
-        """Show unique values for each column in the dataframe."""
-        dataframe_report = {}
-        for column_name in df.columns.values:
-            try:
-                unique_values = [value for value in df[column_name].unique() if str(value) != "nan"]
-                dataframe_report[column_name] = [unique_values]
-            except Exception as exc:
-                _LOGGER.warning(f"Could not evaluate unique values in column {column_name}: {exc}")
-                dataframe_report[column_name] = [value for value in df[column_name].values if str(value) != "nan"]
-                pass
-        df_unique = pd.DataFrame(dataframe_report)
-        return df_unique
+    @classmethod
+    def _discover_unique_values(cls, objects: pd.DataFrame) -> pd.DataFrame:
+        """Discover unique objects per context."""
+        from deepdiff import DeepDiff  # For Deep Difference of 2 objects
+
+        unique_objects = []
+        unique_objects.append(objects.iloc[0].to_dict())
+
+        for unique in unique_objects:
+
+            if len(unique_objects) == objects.shape[0]:
+                return pd.DataFrame(unique_objects)
+
+            for number in range(0, objects.shape[0]):
+
+                new = objects.iloc[number].to_dict()
+                ddiff = DeepDiff(unique, new, ignore_order=True)
+
+                if ddiff and all(DeepDiff(obj, new, ignore_order=True) for obj in unique_objects):
+                    unique_objects.append(new)
+
+        return pd.DataFrame(unique_objects)
 
     @classmethod
-    def create_dfs_inspection_classes(
-        cls, inspection_df: pd.DataFrame
-    ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
-        """Create all inspection dataframes per class with unique values and complete values.
+    def produce_summary_report(cls, inspections_df: pd.DataFrame) -> str:
+        """Create summary report of the difference in the layers identified.
 
         :param inspection_df: df of inspections results provided by `Inspection.create_inspections_dataframe`.
         """
-        class_inspection_dfs: Dict[str, Any] = {}
-        class_inspection_dfs_unique: Dict[str, Any] = {}
+        md_report_complete = ""
 
-        for class_inspection, class_features in cls._INSPECTION_REPORT_FEATURES.items():
+        for feature in cls._INSPECTION_REPORT_FEATURES:
+            md_report_complete += f"\n\n {cls._INSPECTION_REPORT_FEATURES[feature]['title']}"
 
-            class_inspection_dfs[class_inspection] = {}
-            class_inspection_dfs_unique[class_inspection] = {}
+            for report_part in cls._INSPECTION_REPORT_FEATURES[feature]["values"]:
+                md_report_complete += (
+                    f"\n\n {cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[report_part]['description']}"
+                )
+                cols = cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[report_part]["values"]
+                extracted = inspections_df[[col for col in inspections_df.columns if any(c in col for c in cols)]]
+                unique_extracted = cls._discover_unique_values(extracted)
 
-            if len(class_features) > 1:
-
-                for feature in class_features:
-
-                    if len(feature) > 1:
-                        class_df = inspection_df[
-                            [
-                                col
-                                for col in inspection_df.columns.values
-                                if any(c in col for c in cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[feature])
-                            ]
+                if feature == "software_stack":
+                    unique_extracted = unique_extracted[
+                        [
+                            col
+                            for col in unique_extracted.columns.values
+                            if any(s in col for s in ["__version", "__index"])
                         ]
-                        class_inspection_dfs[class_inspection][feature] = class_df
-
-                        class_df_unique = cls._create_df_report(class_df)
-                        class_inspection_dfs_unique[class_inspection][feature] = class_df_unique
-                    else:
-                        class_df = inspection_df[
-                            [
-                                col
-                                for col in inspection_df.columns.values
-                                if cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[feature] in col
-                            ]
-                        ]
-                        class_inspection_dfs[class_inspection][feature] = class_df
-
-                        class_df_unique = cls._create_df_report(class_df)
-                        class_inspection_dfs_unique[class_inspection][feature] = class_df_unique
-
-            elif len(cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[class_features[0]]) > 1:
-
-                class_df = inspection_df[
-                    [
-                        col
-                        for col in inspection_df.columns.values
-                        if any(c in col for c in cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[class_features[0]])
                     ]
-                ]
-                class_inspection_dfs[class_inspection] = class_df
 
-                class_df_unique = cls._create_df_report(class_df)
-                class_inspection_dfs_unique[class_inspection] = class_df_unique
+                md_report_complete += "\n\n" + unique_extracted.transpose().to_markdown()
 
-            else:
-                class_df = inspection_df[
-                    [
-                        col
-                        for col in inspection_df.columns.values
-                        if cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[class_features[0]][0] in col
-                    ]
-                ]
-                class_inspection_dfs[class_inspection] = class_df
-
-                class_df_unique = cls._create_df_report(class_df)
-                class_inspection_dfs_unique[class_inspection] = class_df_unique
-
-        return class_inspection_dfs, class_inspection_dfs_unique
+        return md_report_complete
