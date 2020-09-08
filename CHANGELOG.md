@@ -67,3 +67,25 @@ all the things that you see...
 ## Release 0.3.0 (2020-08-12T15:42:30)
 * Add solver class (#37)
 * Feature: add AmunInspectionStatistics class (#38)
+
+## Release 0.3.1 (2020-09-08T13:12:53)
+### Features
+* Adjust retrieval check of identifier
+* Refactor summary report and introduce CPU flags
+* Adjust tests
+* Modify method for report
+* Add new package
+* Add filters for runtime environment (#43)
+* Default to Ceph (#42)
+### Improvements
+* Add AmunInspectionsFailedSummary class
+* Merge statistics and results
+### Non-functional
+* Add parameter to performance results (#41)
+### Automatic Updates
+* :pushpin: Automatic update of dependency pylint from 2.5.3 to 2.6.0 (#50)
+* :pushpin: Automatic update of dependency pylint from 2.5.3 to 2.6.0 (#47)
+* :pushpin: Automatic update of dependency pytest-mypy from 0.6.2 to 0.7.0 (#48)
+* :pushpin: Automatic update of dependency pytest-cov from 2.10.0 to 2.10.1 (#46)
+* :pushpin: Automatic update of dependency pandas from 1.1.0 to 1.1.1 (#45)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.0 to 0.25.5 (#44)
