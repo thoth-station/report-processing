@@ -22,7 +22,7 @@ import logging
 import json
 
 from pathlib import Path
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict, Any, Union
 
 import pandas as pd
 
@@ -253,7 +253,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         return security_indicator_bandit_reports
 
     @staticmethod
-    def extract_data_from_si_bandit_metadata(si_bandit_report: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_data_from_si_bandit_metadata(si_bandit_report: Dict[str, Any]) -> Dict[str, Any]:
         """Extract data from si-bandit report metadata.
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
@@ -274,14 +274,25 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         return extracted_metadata
 
-    def create_si_bandit_metadata_dataframe(self, si_bandit_report: Dict[str, Any]) -> pd.DataFrame:
+    def create_si_bandit_metadata_dataframe(
+        self, si_bandit_report: Dict[str, Any], analyzer_version: Optional[str] = None
+    ) -> pd.DataFrame:
         """Create si-bandit report metadata dataframe.
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
+        :param analyzer_version: analyzer version filter
 
         :output metadata_df: pandas.DataFrame with metadata obtained from `extract_data_from_si_bandit_metadata`.
         """
-        metadata_si_bandit = self.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
+        if analyzer_version:
+            document_id = si_bandit_report["metadata"]["document_id"]
+            version = si_bandit_report["metadata"]["analyzer_version"]
+
+            if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
+                _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
+                return pd.Dataframe()
+
+        metadata_si_bandit = self._extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_df = pd.DataFrame([metadata_si_bandit])
 
         return metadata_df
@@ -420,19 +431,38 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         return report_summary_df
 
     def create_si_bandit_final_dataframe(
-        self, si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None
+        self,
+        si_bandit_report: Dict[str, Any],
+        filters_files: Optional[List[str]] = None,
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Create final si-bandit dataframe.
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param filters_files: List of strings of files to be filtered from analysis
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+        :param analyzer_version: analyzer version filter
 
         :output report_summary_df: pandas.DataFrame summary for a single si bandit report.
         """
-        # Create metadata dataframe
-        metadata_df = self.create_si_bandit_metadata_dataframe(si_bandit_report=si_bandit_report)
+        if analyzer_version:
+            document_id = si_bandit_report["metadata"]["document_id"]
+            version = si_bandit_report["metadata"]["analyzer_version"]
 
+            if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
+                _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
+                return pd.Dataframe()
+
+        # Create metadata dataframe
+        metadata_df = self.create_si_bandit_metadata_dataframe(
+            si_bandit_report=si_bandit_report, analyzer_version=analyzer_version
+        )
+
+        if analyzer_version and metadata_df.empty:
+            _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
+            return pd.Dataframe()
+
+        # Create metadata dataframe
         package_name = metadata_df["package_name"][0]
         package_version = metadata_df["package_version"][0]
         package_index = metadata_df["package_index"][0]
@@ -454,13 +484,17 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         return si_bandit_report_summary_df
 
     def aggregate_si_bandit_final_dataframe(
-        self, si_bandit_reports: List[Dict[str, Any]], filters_files: Optional[List[str]] = None
+        self,
+        si_bandit_reports: List[Dict[str, Any]],
+        filters_files: Optional[List[str]] = None,
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Aggregate si-bandit dataframes into final dataframe.
 
         :param si_bandit_reports: list of SI bandit report provided by Thoth SI bandit analyzer.
         :param filters_files: List of strings of files to be filtered from analysis
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+        :param analyzer_version: analyzer version filter
 
         :output final_df: pandas.DataFrame aggregating all SI bandit reports provided.
         """
@@ -470,15 +504,18 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         for si_bandit_report in si_bandit_reports:
 
+            document_id = si_bandit_report["metadata"]["document_id"]
             _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
 
             si_bandit_report_summary_df = self.create_si_bandit_final_dataframe(
                 si_bandit_report=si_bandit_report, filters_files=filters_files
             )
+            if not si_bandit_report_summary_df.empty:
+                final_df = pd.concat([final_df, si_bandit_report_summary_df], axis=0)
 
-            final_df = pd.concat([final_df, si_bandit_report_summary_df], axis=0)
-
-            counter += 1
+                counter += 1
+            else:
+                _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has different version")
 
         final_df.reset_index(inplace=True, drop=True)
 
@@ -576,7 +613,7 @@ class SecurityIndicatorsCloc:
         return security_indicator_cloc_reports
 
     @staticmethod
-    def extract_data_from_si_cloc_metadata(si_cloc_report: Dict[str, Any]) -> Dict[str, Any]:
+    def _extract_data_from_si_cloc_metadata(si_cloc_report: Dict[str, Any]) -> Dict[str, Any]:
         """Extract data from si-cloc report metadata.
 
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
@@ -596,14 +633,25 @@ class SecurityIndicatorsCloc:
 
         return extracted_metadata
 
-    def create_si_cloc_metadata_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
+    def create_si_cloc_metadata_dataframe(
+        self, si_cloc_report: Dict[str, Any], analyzer_version: Optional[str] = None
+    ) -> pd.DataFrame:
         """Create si-cloc report metadata dataframe.
 
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+        :param analyzer_version: analyzer version filter
 
         :output metadata_df: pandas.DataFrame with metadata obtained from `extract_data_from_si_cloc_metadata`.
         """
-        metadata_si_cloc = self.extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
+        if analyzer_version:
+            document_id = si_cloc_report["metadata"]["document_id"]
+            version = si_cloc_report["metadata"]["analyzer_version"]
+
+            if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
+                _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
+                return pd.Dataframe()
+
+        metadata_si_cloc = self._extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_df = pd.DataFrame([metadata_si_cloc])
 
         return metadata_df
@@ -631,15 +679,30 @@ class SecurityIndicatorsCloc:
 
         return report_summary_df
 
-    def create_si_cloc_final_dataframe(self, si_cloc_report: Dict[str, Any]) -> pd.DataFrame:
+    def create_si_cloc_final_dataframe(
+        self, si_cloc_report: Dict[str, Any], analyzer_version: Optional[str] = None
+    ) -> pd.DataFrame:
         """Create final si-cloc final dataframe.
 
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
+        :param analyzer_version: analyzer version filter
 
         :output report_summary_df: pandas.DataFrame summary for a single si cloc report.
         """
+        if analyzer_version:
+            document_id = si_cloc_report["metadata"]["document_id"]
+            version = si_cloc_report["metadata"]["analyzer_version"]
+
+            if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
+                _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
+                return pd.Dataframe()
+
         # Create metadata dataframe
-        metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report)
+        metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report, analyzer_version=analyzer_version)
+
+        if analyzer_version and metadata_df.empty:
+            _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
+            return pd.Dataframe()
 
         package_name = metadata_df["package_name"][0]
         package_version = metadata_df["package_version"][0]
@@ -658,10 +721,13 @@ class SecurityIndicatorsCloc:
 
         return report_summary_df
 
-    def aggregate_si_cloc_final_dataframes(self, si_cloc_reports: List[Dict[str, Any]]) -> pd.DataFrame:
+    def aggregate_si_cloc_final_dataframes(
+        self, si_cloc_reports: List[Dict[str, Any]], analyzer_version: Optional[str] = None
+    ) -> pd.DataFrame:
         """Aggregate si-cloc dataframes into final dataframe.
 
         :param si_cloc_reports: list of SI cloc report provided by Thoth SI cloc analyzer.
+        :param analyzer_version: analyzer version filter
 
         :output final_df: pandas.DataFrame aggregating all SI cloc reports provided.
         """
@@ -672,12 +738,19 @@ class SecurityIndicatorsCloc:
 
         for si_cloc_report in si_cloc_reports:
 
+            document_id = si_cloc_report["metadata"]["document_id"]
             _LOGGER.info(f"Analyzing SI-cloc report: {counter}/{total_reports}")
-            si_cloc_report_summary_df = self.create_si_cloc_final_dataframe(si_cloc_report=si_cloc_report)
 
-            final_df = pd.concat([final_df, si_cloc_report_summary_df], axis=0)
+            si_cloc_report_summary_df = self.create_si_cloc_final_dataframe(
+                si_cloc_report=si_cloc_report, analyzer_version=analyzer_version
+            )
 
-            counter += 1
+            if not si_cloc_report_summary_df.empty:
+                final_df = pd.concat([final_df, si_cloc_report_summary_df], axis=0)
+
+                counter += 1
+            else:
+                _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has different version")
 
         final_df.reset_index(inplace=True, drop=True)
 
@@ -723,26 +796,37 @@ class SecurityIndicatorsAggregator:
 
         return security_indicator_aggregated_reports
 
-    def create_si_aggregated_dataframe(
+    def create_si_aggregated_results(
         self,
         si_bandit_report: Dict[str, Any],
         si_cloc_report: Dict[str, Any],
         filters_files: Optional[List[str]] = None,
-    ) -> pd.DataFrame:
-        """Create dataframe with aggregated data from SI analyzers.
+        si_bandit_version: Optional[str] = None,
+        si_cloc_version: Optional[str] = None,
+        output_json: bool = False,
+    ) -> Union[pd.DataFrame, Dict[str, Any]]:
+        """Create dataframe or json with aggregated data from SI analyzers.
 
         :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
         :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
         :param filters_files: List of strings of files to be filtered from analysis
         e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
+        :param si_bandit_version: filter for si bandit analyzer version
+        :param si_cloc_version: filter for si cloc analyzer version
+        :param output_json: if json output is required
 
         :output aggregated_df: pandas.DataFrame aggregating all SI analyzers reports provided.
+        :output aggregated_json: pandas.DataFrame aggregating all SI analyzers reports provided.
         """
         aggregated_df = pd.DataFrame()
         si_bandit_df = self.si_bandit.create_si_bandit_final_dataframe(
-            si_bandit_report=si_bandit_report, filters_files=filters_files
+            si_bandit_report=si_bandit_report, filters_files=filters_files, analyzer_version=si_bandit_version
         )
-        si_cloc_df = self.si_cloc.create_si_cloc_final_dataframe(si_cloc_report=si_cloc_report)
+        si_cloc_df = self.si_cloc.create_si_cloc_final_dataframe(
+            si_cloc_report=si_cloc_report, analyzer_version=si_cloc_version
+        )
+        if si_bandit_df.empty or si_cloc_df.empty:
+            _LOGGER.exception("One of the analyzer results is empty!")
 
         package_info = ["package_name", "package_version", "package_index"]
         si_bandit_package = set(str(v) for v in si_bandit_df[package_info].values)
@@ -764,28 +848,11 @@ class SecurityIndicatorsAggregator:
 
         aggregated_df.reset_index(inplace=True, drop=True)
 
+        if output_json:
+            aggregated_si = aggregated_df.to_json(orient="records")  # string
+
+            aggregated_json: Dict[str, Any] = json.loads(aggregated_si)[0]
+
+            return aggregated_json
+
         return aggregated_df
-
-    def create_si_aggregated_json(
-        self,
-        si_bandit_report: Dict[str, Any],
-        si_cloc_report: Dict[str, Any],
-        filters_files: Optional[List[str]] = None,
-    ) -> Dict[str, Any]:
-        """Create json with aggregated data from SI analyzers.
-
-        :param si_bandit_report: SI bandit report provided by Thoth SI bandit analyzer.
-        :param si_cloc_report: SI cloc report provided by Thoth SI cloc analyzer.
-        :param filters_files: List of strings of files to be filtered from analysis
-        e.g. filter_files = ['/tests'] where /tests is filtered in the file path.
-
-        :output: json file with aggregated SI analyzers reports provided.
-        """
-        aggregated_df = self.create_si_aggregated_dataframe(
-            si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report, filters_files=filters_files
-        )
-        aggregated_si = aggregated_df.to_json(orient="records")  # string
-
-        aggregated_json: Dict[str, Any] = json.loads(aggregated_si)[0]
-
-        return aggregated_json

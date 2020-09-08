@@ -162,7 +162,11 @@ class Adviser:
 
     @classmethod
     def create_adviser_dataframe(cls, adviser_version: str, adviser_files: Dict[str, Any]) -> pd.DataFrame:
-        """Create adviser dataframe."""
+        """Create adviser dataframe.
+
+        :param adviser_version: adviser version filter
+        :param adviser_files: adviser documents
+        """
         adviser_dict = {}
 
         for document_id, document in adviser_files.items():
