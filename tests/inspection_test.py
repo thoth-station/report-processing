@@ -45,9 +45,8 @@ class TestAdviser(ReportProcessingTestCase):
             processed_inspection_runs=processed_inspection_runs
         )
 
-        results, md_report_complete  = AmunInspectionsSummary.produce_summary_report(
-            inspections_df=inspections_df,
-            is_markdown=True
+        results, md_report_complete = AmunInspectionsSummary.produce_summary_report(
+            inspections_df=inspections_df, is_markdown=True
         )
 
         assert md_report_complete
