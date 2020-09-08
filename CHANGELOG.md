@@ -89,3 +89,7 @@ all the things that you see...
 * :pushpin: Automatic update of dependency pytest-cov from 2.10.0 to 2.10.1 (#46)
 * :pushpin: Automatic update of dependency pandas from 1.1.0 to 1.1.1 (#45)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.0 to 0.25.5 (#44)
+
+## Release 0.3.2 (2020-09-08T14:08:23)
+### Features
+* Update requirements (#57)
