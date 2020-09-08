@@ -508,7 +508,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
 
             si_bandit_report_summary_df = self.create_si_bandit_final_dataframe(
-                si_bandit_report=si_bandit_report, filters_files=filters_files
+                si_bandit_report=si_bandit_report, filters_files=filters_files, analyzer_version=analyzer_version
             )
             if not si_bandit_report_summary_df.empty:
                 final_df = pd.concat([final_df, si_bandit_report_summary_df], axis=0)
