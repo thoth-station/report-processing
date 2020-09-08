@@ -290,7 +290,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
             if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
                 _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
-                return pd.Dataframe()
+                return pd.DataFrame()
 
         metadata_si_bandit = self._extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_df = pd.DataFrame([metadata_si_bandit])
@@ -451,7 +451,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
             if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
                 _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
-                return pd.Dataframe()
+                return pd.DataFrame()
 
         # Create metadata dataframe
         metadata_df = self.create_si_bandit_metadata_dataframe(
@@ -460,7 +460,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         if analyzer_version and metadata_df.empty:
             _LOGGER.info(f"Skipping SI-bandit report: {document_id} because has version: {version}")
-            return pd.Dataframe()
+            return pd.DataFrame()
 
         # Create metadata dataframe
         package_name = metadata_df["package_name"][0]
@@ -524,7 +524,7 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
     def create_security_indicators_scores(self, si_bandit_df: pd.DataFrame) -> pd.DataFrame:
         """Create Security Indicators (SI) scores from si bandit outputs.
 
-        :param si_bandit_df: pandas.Dataframe as given by `aggregate_si_bandit_final_dataframe`.
+        :param si_bandit_df: pandas.DataFrame as given by `aggregate_si_bandit_final_dataframe`.
 
         :output si_bandit_df: Extend `si_bandit_df` with SI scores created using all rows (aka all packages).
         """
@@ -649,7 +649,7 @@ class SecurityIndicatorsCloc:
 
             if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
                 _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
-                return pd.Dataframe()
+                return pd.DataFrame()
 
         metadata_si_cloc = self._extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)
         metadata_df = pd.DataFrame([metadata_si_cloc])
@@ -695,14 +695,14 @@ class SecurityIndicatorsCloc:
 
             if not int("".join(version.split("."))) >= int("".join(analyzer_version.split("."))):
                 _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
-                return pd.Dataframe()
+                return pd.DataFrame()
 
         # Create metadata dataframe
         metadata_df = self.create_si_cloc_metadata_dataframe(si_cloc_report, analyzer_version=analyzer_version)
 
         if analyzer_version and metadata_df.empty:
             _LOGGER.info(f"Skipping SI-cloc report: {document_id} because has version: {version}")
-            return pd.Dataframe()
+            return pd.DataFrame()
 
         package_name = metadata_df["package_name"][0]
         package_version = metadata_df["package_version"][0]
