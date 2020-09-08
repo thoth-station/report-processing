@@ -24,7 +24,7 @@ import copy
 import hashlib
 
 from pathlib import Path
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict, Any, Iterable
 
 from sklearn.preprocessing import LabelEncoder
 
@@ -934,7 +934,7 @@ class AmunInspectionsStatistics:
         """Create pd.DataFrame of selected parameters from inspections_df.
 
         :param inspections_df: single inspection results  dataframe
-        taken by `Inspection.process_inspection_runs` dictionary.
+        taken by `AmunInspections.process_inspection_runs` dictionary.
         :param parameters: inspection parameters used in the statistical analysis
         """
         renamed_columns = {cls._INSPECTION_MAPPING_PARAMETERS[parameter]: parameter for parameter in parameters}
@@ -955,7 +955,7 @@ class AmunInspectionsStatistics:
         """Evaluate statistical quantities of each parameter selected for inspection results.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
-        provided by `Inspection.process_inspection_runs`.
+        provided by `AmunInspections.process_inspection_runs`.
         :param parameters: inspection parameters used in the statistical analysis
         """
         results: List[Dict[str, Any]] = []
@@ -1006,6 +1006,65 @@ class AmunInspectionsStatistics:
         inspections_statistics_dataframe = pd.DataFrame(results)
 
         return inspections_statistics_dataframe
+
+
+class AmunInspectionsFailedSummary:
+    """Class of methods used to compare failed with successfull inspections from Amun Inspections Runs."""
+
+    @staticmethod
+    def show_software_stack_differences(inspections_df: pd.DataFrame, inspections_failed_df: pd.DataFrame) -> str:
+        """Create summary report of the difference in the layers identified.
+
+        :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
+        """
+        md_report_complete = ""
+
+        python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
+        packages = set(python_packages_dataframe.columns.values)
+
+        python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
+            inspections_df=inspections_failed_df
+        )
+        packages_from_failed = set(python_packages_dataframe_failed.columns.values)
+
+        total_packages = packages.union(packages_from_failed)
+
+        for package in sorted(list(total_packages)):
+
+            evaluated = 0
+
+            success: Iterable[Any] = set()
+            if package in python_packages_dataframe.columns.values:
+                success = python_packages_dataframe[package].unique()
+                evaluated += 1
+
+            failed: Iterable[Any] = set()
+            if package in python_packages_dataframe.columns.values:
+                failed = python_packages_dataframe_failed[package].unique()
+                evaluated += 1
+
+            if evaluated == 2:
+                difference: Iterable[Any] = set(failed) - set(success)
+                common = set(failed) & set(success)
+
+            md_report_complete += "\n\n============================================="
+            md_report_complete += f"\n\n {str(package)}"
+            md_report_complete += "\n\n============================================="
+
+            md_report_complete += "\n\nIn successfull inspections:"
+            md_report_complete += "\n\n" + str(success)
+
+            md_report_complete += "\n\nIn failed inspections:"
+            md_report_complete += "\n\n" + str(failed)
+
+            if evaluated == 2:
+                md_report_complete += "\n\nIn failed inspections but not in successfull:"
+                md_report_complete += "\n\n" + str(difference)
+
+                md_report_complete += "\n\nIn failed inspections and in successfull:"
+                md_report_complete += "\n\n" + str(common)
+
+        return md_report_complete
 
 
 class AmunInspectionsSummary:
@@ -1080,7 +1139,7 @@ class AmunInspectionsSummary:
     ) -> Tuple[Dict[str, Any], Optional[str]]:
         """Create summary report of the difference in the layers identified.
 
-        :param inspection_df: df of inspections results provided by `Inspection.create_inspections_dataframe`.
+        :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
         """
         report_results: Dict[str, Any] = {}
         md_report_complete = ""
