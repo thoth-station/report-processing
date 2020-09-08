@@ -40,23 +40,24 @@ class TestAdviser(ReportProcessingTestCase):
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
 
-        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
+        processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
         inspections_df = AmunInspections.create_inspections_dataframe(
             processed_inspection_runs=processed_inspection_runs
         )
 
-        dfs_inspection_classes, dfs_unique_inspection_classes = AmunInspectionsSummary.create_dfs_inspection_classes(
-            inspection_df=inspections_df
+        results, md_report_complete  = AmunInspectionsSummary.produce_summary_report(
+            inspections_df=inspections_df,
+            is_markdown=True
         )
 
-        assert dfs_unique_inspection_classes
+        assert md_report_complete
 
     def test_final_dataframe(self) -> None:
         """Test retrieving adviser results from local path."""
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
-        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
+        processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
 
         inspections_df = AmunInspections.create_inspections_dataframe(
             processed_inspection_runs=processed_inspection_runs
@@ -70,7 +71,7 @@ class TestAdviser(ReportProcessingTestCase):
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
             repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
         )
-        processed_inspection_runs = AmunInspections.process_inspection_runs(inspection_runs)
+        processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
 
         inspections_df = AmunInspections.create_inspections_dataframe(
             processed_inspection_runs=processed_inspection_runs
