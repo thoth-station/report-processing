@@ -93,3 +93,13 @@ all the things that you see...
 ## Release 0.3.2 (2020-09-08T14:08:23)
 ### Features
 * Update requirements (#57)
+
+## Release 0.3.3 (2020-09-08T18:23:01)
+### Features
+* Add missing parameter
+* Default to app.py as in version 0.1.2 for si bandit
+* Update tests
+* Add filter for analyzer-version
+### Improvements
+* Correct typo
+* Use singular for consistency (#60)
