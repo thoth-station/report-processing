@@ -41,7 +41,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         )
         si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
-        metadata_retrieved = si_bandit.extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
+        metadata_retrieved = si_bandit._extract_data_from_si_bandit_metadata(si_bandit_report=si_bandit_report)
         metadata_retrieved_keys = [k for k in metadata_retrieved]
         metadata_test_keys = [
             "datetime_si_bandit",
