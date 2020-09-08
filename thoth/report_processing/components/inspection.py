@@ -148,9 +148,20 @@ class AmunInspections:
         for result_path in repo_path.iterdir():
             inspection_document_id = result_path.name
 
-            if not inspections_identifiers or any(
-                identifier in inspection_document_id for identifier in inspections_identifiers
-            ):
+            inspection_id_pieces = inspection_document_id.split("-")
+
+            identifier_check = False
+
+            if inspections_identifiers:
+
+                for identifier in inspections_identifiers:
+                    identifier_pieces = identifier.split("-")
+                    if not set(identifier_pieces) - set(inspection_id_pieces):
+                        # The inspection id has the correct identifier requested
+                        identifier_check = True
+                        break
+
+            if not inspections_identifiers or identifier_check:
                 _LOGGER.info(f"Considering inspection ID... {inspection_document_id}")
 
                 retrieved_files: List[Dict[str, Any]] = []
@@ -235,6 +246,9 @@ class AmunInspections:
                     if counter == max_ids:
                         return files, counter
 
+            else:
+                _LOGGER.info(f"Skipping inspection ID... {inspection_document_id}")
+
         return files, counter
 
     @classmethod
@@ -254,9 +268,20 @@ class AmunInspections:
 
         for inspection_document_id in store_class_type.iter_inspections():
 
-            if not inspections_identifiers or any(
-                identifier in inspection_document_id for identifier in inspections_identifiers
-            ):
+            inspection_id_pieces = inspection_document_id.split("-")
+
+            identifier_check = False
+
+            if inspections_identifiers:
+
+                for identifier in inspections_identifiers:
+                    identifier_pieces = identifier.split("-")
+                    if not set(identifier_pieces) - set(inspection_id_pieces):
+                        # The inspection id has the correct identifier requested
+                        identifier_check = True
+                        break
+
+            if not inspections_identifiers or identifier_check:
                 inspection_store = InspectionStore(inspection_id=inspection_document_id)
                 inspection_store.connect()
 
@@ -395,7 +420,7 @@ class AmunInspections:
         failed_inspection_runs: Dict[str, pd.DataFrame] = {}
 
         if not inspection_runs:
-            _LOGGER.warning("Empty iterable provided.")
+            _LOGGER.exception("Empty iterable provided.")
             return processed_inspection_runs, failed_inspection_runs
 
         for inspection_id, inspection_run in inspection_runs.items():
@@ -525,6 +550,10 @@ class AmunInspections:
         :param parameter_for_statistics: parameter on which statistics are applied
         (it is used only when include_statistics=True)
         """
+        if not processed_inspection_runs:
+            _LOGGER.warning("No inspections runs have been received, no analysis can be performed.")
+            return pd.DataFrame()
+
         row_number = 0
         extracted_columns = []
         flags_columns = []
@@ -1012,18 +1041,23 @@ class AmunInspectionsFailedSummary:
     """Class of methods used to compare failed with successfull inspections from Amun Inspections Runs."""
 
     @staticmethod
-    def show_software_stack_differences(inspections_df: pd.DataFrame, inspections_failed_df: pd.DataFrame) -> str:
+    def show_software_stack_differences(inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame) -> str:
         """Create summary report of the difference in the layers identified.
 
         :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
+        :param failed_inspections_df: df of failed inspections results
+        provided by `AmunInspections.create_inspections_dataframe`.
         """
         md_report_complete = ""
+        if inspections_df.empty or failed_inspections_df.empty:
+            _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
+            return md_report_complete
 
         python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
         packages = set(python_packages_dataframe.columns.values)
 
         python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
-            inspections_df=inspections_failed_df
+            inspections_df=failed_inspections_df
         )
         packages_from_failed = set(python_packages_dataframe_failed.columns.values)
 
@@ -1144,6 +1178,10 @@ class AmunInspectionsSummary:
         report_results: Dict[str, Any] = {}
         md_report_complete = ""
 
+        if inspections_df.empty:
+            _LOGGER.warning("No inspections runs have been received, no report summary can be produced.")
+            return report_results, md_report_complete
+
         for feature in cls._INSPECTION_REPORT_FEATURES:
             md_report_complete += f"\n\n {cls._INSPECTION_REPORT_FEATURES[feature]['title']}"
             report_results[feature] = {}
@@ -1169,6 +1207,6 @@ class AmunInspectionsSummary:
                 md_report_complete += "\n\n" + unique_extracted.transpose().to_markdown()
 
         if not is_markdown:
-            return report_results, None
+            return report_results, md_report_complete
 
         return report_results, md_report_complete
