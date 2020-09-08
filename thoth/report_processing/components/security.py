@@ -243,8 +243,13 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             repo_path=security_indicator_bandit_repo_path,
         )
         security_indicator_bandit_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_bandit_reports))
+
         return security_indicator_bandit_reports
 
     @staticmethod
@@ -561,8 +566,13 @@ class SecurityIndicatorsCloc:
             repo_path=security_indicator_cloc_repo_path,
         )
         security_indicator_cloc_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_cloc_reports))
+
         return security_indicator_cloc_reports
 
     @staticmethod
@@ -704,8 +714,13 @@ class SecurityIndicatorsAggregator:
             repo_path=security_indicator_aggregated_repo_path,
         )
         security_indicator_aggregated_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_aggregated_reports))
+
         return security_indicator_aggregated_reports
 
     def create_si_aggregated_dataframe(
