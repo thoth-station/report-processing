@@ -30,9 +30,9 @@ from thoth.report_processing.exceptions import ThothSIPackageNotMatchingExceptio
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_REPORT_NAME = "security-indicators-54c6daf9"
+    _SI_REPORT_NAME = "security-indicator-54c6daf9"
 
-    _SI_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
+    _SI_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicator"
 
     _SI_AGGREGATOR_REPORTS_FILE = ReportProcessingTestCase.DATA / "results" / "security-aggregated.json"
 
@@ -78,5 +78,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         with open(self._SI_AGGREGATOR_REPORTS_FILE) as json_file:
             aggregated_json_test = json.load(json_file)
         keys_tests = sorted([k for k in aggregated_json_test.keys()])
+        print(keys)
+        print(keys_tests)
 
         assert keys == keys_tests

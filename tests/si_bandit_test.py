@@ -24,8 +24,8 @@ from thoth.report_processing.components.security import SecurityIndicatorsBandit
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_REPORT_NAME = "security-indicators-54c6daf9"
-    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
+    _SI_REPORT_NAME = "security-indicator-54c6daf9"
+    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicator"
 
     def test_get_security_indicator_bandit_report(self) -> None:
         """Test retrieving report from local path."""
