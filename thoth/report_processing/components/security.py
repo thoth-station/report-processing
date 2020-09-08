@@ -115,8 +115,8 @@ class _SecurityIndicators:
         for result_path in repo_path.iterdir():
             _LOGGER.info(f"Considering... {result_path}")
 
-            if "security-indicators" not in result_path.name:
-                raise Exception(f"This repo is not part of security-indicators! {result_path}")
+            if "security-indicator" not in result_path.name:
+                raise Exception(f"This repo is not part of security-indicator! {result_path}")
 
             retrieved_files: Dict[str, Any] = {result_path.name: {}}
 
@@ -243,8 +243,13 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             repo_path=security_indicator_bandit_repo_path,
         )
         security_indicator_bandit_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_bandit_reports))
+
         return security_indicator_bandit_reports
 
     @staticmethod
@@ -561,8 +566,13 @@ class SecurityIndicatorsCloc:
             repo_path=security_indicator_cloc_repo_path,
         )
         security_indicator_cloc_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_cloc_reports))
+
         return security_indicator_cloc_reports
 
     @staticmethod
@@ -704,8 +714,13 @@ class SecurityIndicatorsAggregator:
             repo_path=security_indicator_aggregated_repo_path,
         )
         security_indicator_aggregated_reports = [
-            document_results[document_name] for document_id, document_results in si_reports.items()
+            document_results[document_name]
+            for document_id, document_results in si_reports.items()
+            if document_name in document_results
         ]
+
+        _LOGGER.info("Number of files that can be used is: %r" % len(security_indicator_aggregated_reports))
+
         return security_indicator_aggregated_reports
 
     def create_si_aggregated_dataframe(
