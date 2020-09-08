@@ -24,7 +24,7 @@ import copy
 import hashlib
 
 from pathlib import Path
-from typing import List, Optional, Tuple, Dict, Any
+from typing import List, Optional, Tuple, Dict, Any, Iterable
 
 from sklearn.preprocessing import LabelEncoder
 
@@ -148,9 +148,20 @@ class AmunInspections:
         for result_path in repo_path.iterdir():
             inspection_document_id = result_path.name
 
-            if not inspections_identifiers or any(
-                identifier in inspection_document_id for identifier in inspections_identifiers
-            ):
+            inspection_id_pieces = inspection_document_id.split("-")
+
+            identifier_check = False
+
+            if inspections_identifiers:
+
+                for identifier in inspections_identifiers:
+                    identifier_pieces = identifier.split("-")
+                    if not set(identifier_pieces) - set(inspection_id_pieces):
+                        # The inspection id has the correct identifier requested
+                        identifier_check = True
+                        break
+
+            if not inspections_identifiers or identifier_check:
                 _LOGGER.info(f"Considering inspection ID... {inspection_document_id}")
 
                 retrieved_files: List[Dict[str, Any]] = []
@@ -235,6 +246,9 @@ class AmunInspections:
                     if counter == max_ids:
                         return files, counter
 
+            else:
+                _LOGGER.info(f"Skipping inspection ID... {inspection_document_id}")
+
         return files, counter
 
     @classmethod
@@ -254,9 +268,20 @@ class AmunInspections:
 
         for inspection_document_id in store_class_type.iter_inspections():
 
-            if not inspections_identifiers or any(
-                identifier in inspection_document_id for identifier in inspections_identifiers
-            ):
+            inspection_id_pieces = inspection_document_id.split("-")
+
+            identifier_check = False
+
+            if inspections_identifiers:
+
+                for identifier in inspections_identifiers:
+                    identifier_pieces = identifier.split("-")
+                    if not set(identifier_pieces) - set(inspection_id_pieces):
+                        # The inspection id has the correct identifier requested
+                        identifier_check = True
+                        break
+
+            if not inspections_identifiers or identifier_check:
                 inspection_store = InspectionStore(inspection_id=inspection_document_id)
                 inspection_store.connect()
 
@@ -385,31 +410,40 @@ class AmunInspections:
     @classmethod
     def process_inspection_runs(
         cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1
-    ) -> Dict[str, pd.DataFrame]:
+    ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
         :param inspection_runs: aggregated data provided by `aggregate_thoth_inspections_runs`.
         :param filter_by_batch_size: filter inspection to guarantee all have same batch size.
         """
         processed_inspection_runs: Dict[str, pd.DataFrame] = {}
+        failed_inspection_runs: Dict[str, pd.DataFrame] = {}
 
         if not inspection_runs:
-            _LOGGER.warning("Empty iterable provided.")
-            return processed_inspection_runs
+            _LOGGER.exception("Empty iterable provided.")
+            return processed_inspection_runs, failed_inspection_runs
 
         for inspection_id, inspection_run in inspection_runs.items():
 
             inspection_run_df = cls.process_inspection_run(inspection_run=inspection_run)
 
-            if inspection_run_df.shape[0] >= filter_by_batch_size:
+            if any(exit_code != 0 for exit_code in inspection_run_df["exit_code"].values):
+                _LOGGER.warning(
+                    f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
+                    f" but some of them are failed."
+                )
+                failed_inspection_runs[inspection_id] = inspection_run_df
+
+            elif inspection_run_df.shape[0] >= filter_by_batch_size:
                 processed_inspection_runs[inspection_id] = inspection_run_df
+
             else:
                 _LOGGER.warning(
                     f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
                     f"... discarding due to filter set to: {filter_by_batch_size}"
                 )
 
-        return processed_inspection_runs
+        return processed_inspection_runs, failed_inspection_runs
 
     @staticmethod
     def process_inspection_run(inspection_run: Dict[str, Any]) -> pd.DataFrame:
@@ -425,6 +459,7 @@ class AmunInspections:
 
         for inspection in results:
             inspection_result_df = pd.json_normalize(inspection["result"], sep="__")
+
             final_df = pd.concat([final_df, inspection_result_df], axis=0)
             inspection_numbers.append(inspection_number)
             inspection_number += 1
@@ -454,7 +489,7 @@ class AmunInspections:
                 # TODO: Allow user to select another parameter, median used by default
                 new_data[c_name] = [inspection_df[c_name].median()]
 
-            if c_name == "end_datetime":
+            elif c_name == "end_datetime":
 
                 if "start_datetime" in inspection_df.columns.values:
                     inspection_start = pd.to_datetime(inspection_df["start_datetime"]).min()
@@ -466,9 +501,22 @@ class AmunInspections:
                     inspection_duration = inspection_end - inspection_start
 
             elif c_name in unashable_columns.index.values:
-                values_column = inspection_df[c_name].apply(str).value_counts()
-                _LOGGER.debug(f"Skipped unashable column {c_name}: {values_column}")
-                new_data[c_name] = np.nan
+                if c_name == "hwinfo__cpu_features__flags":
+                    initial_set = set(inspection_df[c_name][0])
+                    difference = False
+                    for flags_counter in range(1, len(inspection_df[c_name])):
+                        if initial_set - set(inspection_df[c_name][flags_counter]):
+                            difference = True
+
+                    if not difference:
+                        new_data[c_name] = [inspection_df[c_name][0]]
+                    else:
+                        new_data[c_name] = np.nan
+
+                else:
+                    values_column = inspection_df[c_name].apply(str).value_counts()
+                    _LOGGER.debug(f"Skipped unashable column {c_name}: {values_column}")
+                    new_data[c_name] = np.nan
             else:
                 if len(inspection_df[c_name].unique()) == 1:
                     new_data[c_name] = [inspection_df[c_name].iloc[0]]
@@ -502,14 +550,27 @@ class AmunInspections:
         :param parameter_for_statistics: parameter on which statistics are applied
         (it is used only when include_statistics=True)
         """
+        if not processed_inspection_runs:
+            _LOGGER.warning("No inspections runs have been received, no analysis can be performed.")
+            return pd.DataFrame()
+
         row_number = 0
         extracted_columns = []
+        flags_columns = []
 
         for dataframe in processed_inspection_runs.values():
 
             for column in dataframe.columns.values:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
+
+            for flags in dataframe["hwinfo__cpu_features__flags"].values:
+                for flag in flags:
+                    if f"flag__{flag}" not in flags_columns:
+                        flags_columns.append(f"flag__{flag}")
+
+        for flag_column in flags_columns:
+            extracted_columns.append(flag_column)
 
         extra_columns = ["inspection_start", "inspection_end", "inspection_duration", "inspection_batch"]
         for extra_column in extra_columns:
@@ -524,6 +585,11 @@ class AmunInspections:
             new_df = cls.evaluate_statistics_on_inspection_df(
                 inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
             )
+
+            for flags_ in dataframe["hwinfo__cpu_features__flags"].values:
+                for flag_ in flags_:
+                    new_df[f"flag__{flag_}"] = True
+
             main_inspection_df.loc[row_number] = new_df.iloc[0]
             row_number += 1
 
@@ -897,7 +963,7 @@ class AmunInspectionsStatistics:
         """Create pd.DataFrame of selected parameters from inspections_df.
 
         :param inspections_df: single inspection results  dataframe
-        taken by `Inspection.process_inspection_runs` dictionary.
+        taken by `AmunInspections.process_inspection_runs` dictionary.
         :param parameters: inspection parameters used in the statistical analysis
         """
         renamed_columns = {cls._INSPECTION_MAPPING_PARAMETERS[parameter]: parameter for parameter in parameters}
@@ -918,7 +984,7 @@ class AmunInspectionsStatistics:
         """Evaluate statistical quantities of each parameter selected for inspection results.
 
         :param processed_inspection_runs: dict with inspection results per inspection ID
-        provided by `Inspection.process_inspection_runs`.
+        provided by `AmunInspections.process_inspection_runs`.
         :param parameters: inspection parameters used in the statistical analysis
         """
         results: List[Dict[str, Any]] = []
@@ -971,11 +1037,75 @@ class AmunInspectionsStatistics:
         return inspections_statistics_dataframe
 
 
+class AmunInspectionsFailedSummary:
+    """Class of methods used to compare failed with successfull inspections from Amun Inspections Runs."""
+
+    @staticmethod
+    def show_software_stack_differences(inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame) -> str:
+        """Create summary report of the difference in the layers identified.
+
+        :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
+        :param failed_inspections_df: df of failed inspections results
+        provided by `AmunInspections.create_inspections_dataframe`.
+        """
+        md_report_complete = ""
+        if inspections_df.empty or failed_inspections_df.empty:
+            _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
+            return md_report_complete
+
+        python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
+        packages = set(python_packages_dataframe.columns.values)
+
+        python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
+            inspections_df=failed_inspections_df
+        )
+        packages_from_failed = set(python_packages_dataframe_failed.columns.values)
+
+        total_packages = packages.union(packages_from_failed)
+
+        for package in sorted(list(total_packages)):
+
+            evaluated = 0
+
+            success: Iterable[Any] = set()
+            if package in python_packages_dataframe.columns.values:
+                success = python_packages_dataframe[package].unique()
+                evaluated += 1
+
+            failed: Iterable[Any] = set()
+            if package in python_packages_dataframe.columns.values:
+                failed = python_packages_dataframe_failed[package].unique()
+                evaluated += 1
+
+            if evaluated == 2:
+                difference: Iterable[Any] = set(failed) - set(success)
+                common = set(failed) & set(success)
+
+            md_report_complete += "\n\n============================================="
+            md_report_complete += f"\n\n {str(package)}"
+            md_report_complete += "\n\n============================================="
+
+            md_report_complete += "\n\nIn successfull inspections:"
+            md_report_complete += "\n\n" + str(success)
+
+            md_report_complete += "\n\nIn failed inspections:"
+            md_report_complete += "\n\n" + str(failed)
+
+            if evaluated == 2:
+                md_report_complete += "\n\nIn failed inspections but not in successfull:"
+                md_report_complete += "\n\n" + str(difference)
+
+                md_report_complete += "\n\nIn failed inspections and in successfull:"
+                md_report_complete += "\n\n" + str(common)
+
+        return md_report_complete
+
+
 class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": {"title": "Hardware", "values": ["platform", "processor", "ncpus", "info"],},
+        "hardware": {"title": "Hardware", "values": ["platform", "processor", "flags", "ncpus", "info"],},
         "base_image": {"title": "Operating System", "values": ["base_image", "number_cpus_run"],},
         "software_stack": {"title": "Software Stack", "values": ["requirements_locked"],},
         "pi": {"title": "Performance Indicator", "values": ["pi"],},
@@ -985,6 +1115,7 @@ class AmunInspectionsSummary:
     _INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING = {
         "platform": {"description": "Platform", "values": ["hwinfo__platform"]},
         "processor": {"description": "Processor", "values": ["cpu_type__is", "cpu_type__has"]},
+        "flags": {"description": "Flags", "values": ["flag__"]},
         "ncpus": {"description": "Number of CPUs", "values": ["hwinfo__cpu_type__ncpus"]},
         "info": {
             "description": "General info",
@@ -1017,33 +1148,43 @@ class AmunInspectionsSummary:
         from deepdiff import DeepDiff  # For Deep Difference of 2 objects
 
         unique_objects = []
+        first = objects.iloc[0].to_dict()
         unique_objects.append(objects.iloc[0].to_dict())
 
-        for unique in unique_objects:
+        for number in range(1, objects.shape[0]):
+            new = objects.iloc[number].to_dict()
+            ddiff = DeepDiff(first, new, ignore_order=True,)
 
-            if len(unique_objects) == objects.shape[0]:
-                return pd.DataFrame(unique_objects)
+            if ddiff:
+                unique = True
+                for obj in unique_objects:
+                    sddiff = DeepDiff(obj, new, ignore_order=True,)
+                    if not sddiff:
+                        unique = False
 
-            for number in range(0, objects.shape[0]):
-
-                new = objects.iloc[number].to_dict()
-                ddiff = DeepDiff(unique, new, ignore_order=True)
-
-                if ddiff and all(DeepDiff(obj, new, ignore_order=True) for obj in unique_objects):
+                if unique:
                     unique_objects.append(new)
 
         return pd.DataFrame(unique_objects)
 
     @classmethod
-    def produce_summary_report(cls, inspections_df: pd.DataFrame) -> str:
+    def produce_summary_report(
+        cls, inspections_df: pd.DataFrame, is_markdown: Optional[bool] = False
+    ) -> Tuple[Dict[str, Any], Optional[str]]:
         """Create summary report of the difference in the layers identified.
 
-        :param inspection_df: df of inspections results provided by `Inspection.create_inspections_dataframe`.
+        :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
         """
+        report_results: Dict[str, Any] = {}
         md_report_complete = ""
+
+        if inspections_df.empty:
+            _LOGGER.warning("No inspections runs have been received, no report summary can be produced.")
+            return report_results, md_report_complete
 
         for feature in cls._INSPECTION_REPORT_FEATURES:
             md_report_complete += f"\n\n {cls._INSPECTION_REPORT_FEATURES[feature]['title']}"
+            report_results[feature] = {}
 
             for report_part in cls._INSPECTION_REPORT_FEATURES[feature]["values"]:
                 md_report_complete += (
@@ -1051,6 +1192,7 @@ class AmunInspectionsSummary:
                 )
                 cols = cls._INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING[report_part]["values"]
                 extracted = inspections_df[[col for col in inspections_df.columns if any(c in col for c in cols)]]
+                extracted = extracted.fillna("nan")
                 unique_extracted = cls._discover_unique_values(extracted)
 
                 if feature == "software_stack":
@@ -1058,10 +1200,13 @@ class AmunInspectionsSummary:
                         [
                             col
                             for col in unique_extracted.columns.values
-                            if any(s in col for s in ["__version", "__index"])
+                            if any(s in col for s in ["__version", "__index", "__meta"])
                         ]
                     ]
-
+                report_results[feature][report_part] = unique_extracted
                 md_report_complete += "\n\n" + unique_extracted.transpose().to_markdown()
 
-        return md_report_complete
+        if not is_markdown:
+            return report_results, md_report_complete
+
+        return report_results, md_report_complete
