@@ -555,6 +555,12 @@ class AmunInspections:
             _LOGGER.warning("No inspections runs have been received, no analysis can be performed.")
             return pd.DataFrame()
 
+        if any(p_check not in cls._INSPECTION_PERFORMANCE_VALUES for p_check in performance_values):
+            raise Exception(
+                f"Performance parameters selected {performance_values}"
+                f" are not all registered: {cls._INSPECTION_PERFORMANCE_VALUES}"
+            )
+
         row_number = 0
         extracted_columns = []
         flags_columns = []
