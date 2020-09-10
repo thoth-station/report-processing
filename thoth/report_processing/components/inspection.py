@@ -52,7 +52,7 @@ _LOGGER = logging.getLogger(__name__)
 class AmunInspections:
     """Class of methods used to process reports from Amun Inspections."""
 
-    _INSPECTION_PERFORMANCE_VALUES = ["stdout__@result__elapsed", "stdout__@result__rate"]
+    _INSPECTION_PERFORMANCE_VALUES = {"elapsed_time": "stdout__@result__elapsed", "rate": "stdout__@result__rate"}
 
     _INSPECTION_USAGE_VALUES = [
         "usage__ru_inblock",
@@ -540,6 +540,7 @@ class AmunInspections:
         cls,
         processed_inspection_runs: Dict[str, pd.DataFrame],
         include_statistics: bool = False,
+        performance_values: List[str] = ["elapsed_time", "rate"],
         parameter_for_statistics: str = "elapsed_time",
     ) -> pd.DataFrame:
         """Create final pd.DataFrame from processed inspections runs after evaluating statistics.
@@ -553,6 +554,12 @@ class AmunInspections:
         if not processed_inspection_runs:
             _LOGGER.warning("No inspections runs have been received, no analysis can be performed.")
             return pd.DataFrame()
+
+        if any(p_check not in cls._INSPECTION_PERFORMANCE_VALUES for p_check in performance_values):
+            raise Exception(
+                f"Performance parameters selected {performance_values}"
+                f" are not all registered: {cls._INSPECTION_PERFORMANCE_VALUES}"
+            )
 
         row_number = 0
         extracted_columns = []
@@ -578,7 +585,9 @@ class AmunInspections:
 
         main_inspection_df = pd.DataFrame(columns=extracted_columns)
 
-        column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
+        column_names = [
+            cls._INSPECTION_PERFORMANCE_VALUES[p_value] for p_value in performance_values
+        ] + cls._INSPECTION_USAGE_VALUES
 
         for dataframe in processed_inspection_runs.values():
 
@@ -1041,17 +1050,19 @@ class AmunInspectionsFailedSummary:
     """Class of methods used to compare failed with successfull inspections from Amun Inspections Runs."""
 
     @staticmethod
-    def show_software_stack_differences(inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame) -> str:
+    def show_software_stack_differences(
+        inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame
+    ) -> pd.DataFrame:
         """Create summary report of the difference in the layers identified.
 
         :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
         :param failed_inspections_df: df of failed inspections results
         provided by `AmunInspections.create_inspections_dataframe`.
         """
-        md_report_complete = ""
+        results: List[Dict[str, Any]] = []
         if inspections_df.empty or failed_inspections_df.empty:
             _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
-            return md_report_complete
+            return pd.DataFrame(results)
 
         python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
         packages = set(python_packages_dataframe.columns.values)
@@ -1081,24 +1092,17 @@ class AmunInspectionsFailedSummary:
                 difference: Iterable[Any] = set(failed) - set(success)
                 common = set(failed) & set(success)
 
-            md_report_complete += "\n\n============================================="
-            md_report_complete += f"\n\n {str(package)}"
-            md_report_complete += "\n\n============================================="
+            results.append(
+                {
+                    "package": package,
+                    "versions_in_successfull": sorted(success),
+                    "versions_in_failed": sorted(failed),
+                    "versions_in_failed_only": sorted(difference),
+                    "versions_common": sorted(common),
+                }
+            )
 
-            md_report_complete += "\n\nIn successfull inspections:"
-            md_report_complete += "\n\n" + str(success)
-
-            md_report_complete += "\n\nIn failed inspections:"
-            md_report_complete += "\n\n" + str(failed)
-
-            if evaluated == 2:
-                md_report_complete += "\n\nIn failed inspections but not in successfull:"
-                md_report_complete += "\n\n" + str(difference)
-
-                md_report_complete += "\n\nIn failed inspections and in successfull:"
-                md_report_complete += "\n\n" + str(common)
-
-        return md_report_complete
+        return pd.DataFrame(results)
 
 
 class AmunInspectionsSummary:
