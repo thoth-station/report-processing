@@ -1041,7 +1041,9 @@ class AmunInspectionsFailedSummary:
     """Class of methods used to compare failed with successfull inspections from Amun Inspections Runs."""
 
     @staticmethod
-    def show_software_stack_differences(inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame) -> str:
+    def show_software_stack_differences(
+        inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame
+    ) -> pd.DataFrame:
         """Create summary report of the difference in the layers identified.
 
         :param inspection_df: df of inspections results provided by `AmunInspections.create_inspections_dataframe`.
@@ -1063,6 +1065,7 @@ class AmunInspectionsFailedSummary:
 
         total_packages = packages.union(packages_from_failed)
 
+        results = []
         for package in sorted(list(total_packages)):
 
             evaluated = 0
@@ -1081,24 +1084,17 @@ class AmunInspectionsFailedSummary:
                 difference: Iterable[Any] = set(failed) - set(success)
                 common = set(failed) & set(success)
 
-            md_report_complete += "\n\n============================================="
-            md_report_complete += f"\n\n {str(package)}"
-            md_report_complete += "\n\n============================================="
+            results.append(
+                {
+                    "package": package,
+                    "versions_in_successfull": sorted(success),
+                    "versions_in_failed": sorted(failed),
+                    "versions_in_failed_only": sorted(difference),
+                    "versions_common": sorted(common),
+                }
+            )
 
-            md_report_complete += "\n\nIn successfull inspections:"
-            md_report_complete += "\n\n" + str(success)
-
-            md_report_complete += "\n\nIn failed inspections:"
-            md_report_complete += "\n\n" + str(failed)
-
-            if evaluated == 2:
-                md_report_complete += "\n\nIn failed inspections but not in successfull:"
-                md_report_complete += "\n\n" + str(difference)
-
-                md_report_complete += "\n\nIn failed inspections and in successfull:"
-                md_report_complete += "\n\n" + str(common)
-
-        return md_report_complete
+        return pd.DataFrame(results)
 
 
 class AmunInspectionsSummary:
