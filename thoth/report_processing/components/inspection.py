@@ -1054,10 +1054,10 @@ class AmunInspectionsFailedSummary:
         :param failed_inspections_df: df of failed inspections results
         provided by `AmunInspections.create_inspections_dataframe`.
         """
-        md_report_complete = ""
+        results = []
         if inspections_df.empty or failed_inspections_df.empty:
             _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
-            return md_report_complete
+            return pd.DataFrame(results)
 
         python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
         packages = set(python_packages_dataframe.columns.values)
@@ -1069,7 +1069,6 @@ class AmunInspectionsFailedSummary:
 
         total_packages = packages.union(packages_from_failed)
 
-        results = []
         for package in sorted(list(total_packages)):
 
             evaluated = 0
