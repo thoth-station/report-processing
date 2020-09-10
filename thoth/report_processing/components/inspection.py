@@ -52,10 +52,7 @@ _LOGGER = logging.getLogger(__name__)
 class AmunInspections:
     """Class of methods used to process reports from Amun Inspections."""
 
-    _INSPECTION_PERFORMANCE_VALUES = {
-        "elapsed_time": "stdout__@result__elapsed",
-        "rate": "stdout__@result__rate"
-        }
+    _INSPECTION_PERFORMANCE_VALUES = {"elapsed_time": "stdout__@result__elapsed", "rate": "stdout__@result__rate"}
 
     _INSPECTION_USAGE_VALUES = [
         "usage__ru_inblock",
@@ -582,7 +579,9 @@ class AmunInspections:
 
         main_inspection_df = pd.DataFrame(columns=extracted_columns)
 
-        column_names = [cls._INSPECTION_PERFORMANCE_VALUES[p_value] for p_value in performance_values] + cls._INSPECTION_USAGE_VALUES
+        column_names = [
+            cls._INSPECTION_PERFORMANCE_VALUES[p_value] for p_value in performance_values
+        ] + cls._INSPECTION_USAGE_VALUES
 
         for dataframe in processed_inspection_runs.values():
 
@@ -1054,7 +1053,7 @@ class AmunInspectionsFailedSummary:
         :param failed_inspections_df: df of failed inspections results
         provided by `AmunInspections.create_inspections_dataframe`.
         """
-        results = []
+        results: List[Dict[str, Any]] = []
         if inspections_df.empty or failed_inspections_df.empty:
             _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
             return pd.DataFrame(results)
