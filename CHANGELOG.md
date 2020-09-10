@@ -103,3 +103,10 @@ all the things that you see...
 ### Improvements
 * Correct typo
 * Use singular for consistency (#60)
+
+## Release 0.3.4 (2020-09-10T13:54:18)
+### Non-functional
+* Output df for comparison of results and make performance parameters optional (#64)
+### Automatic Updates
+* :pushpin: Automatic update of dependency pandas from 1.1.1 to 1.1.2 (#67)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.5 to 0.25.6 (#66)
