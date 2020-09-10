@@ -52,7 +52,10 @@ _LOGGER = logging.getLogger(__name__)
 class AmunInspections:
     """Class of methods used to process reports from Amun Inspections."""
 
-    _INSPECTION_PERFORMANCE_VALUES = ["stdout__@result__elapsed", "stdout__@result__rate"]
+    _INSPECTION_PERFORMANCE_VALUES = {
+        "elapsed_time": "stdout__@result__elapsed",
+        "rate": "stdout__@result__rate"
+        }
 
     _INSPECTION_USAGE_VALUES = [
         "usage__ru_inblock",
@@ -540,6 +543,7 @@ class AmunInspections:
         cls,
         processed_inspection_runs: Dict[str, pd.DataFrame],
         include_statistics: bool = False,
+        performance_values: List[str] = ["elapsed_time", "rate"],
         parameter_for_statistics: str = "elapsed_time",
     ) -> pd.DataFrame:
         """Create final pd.DataFrame from processed inspections runs after evaluating statistics.
@@ -578,7 +582,7 @@ class AmunInspections:
 
         main_inspection_df = pd.DataFrame(columns=extracted_columns)
 
-        column_names = cls._INSPECTION_PERFORMANCE_VALUES + cls._INSPECTION_USAGE_VALUES
+        column_names = [cls._INSPECTION_PERFORMANCE_VALUES[p_value] for p_value in performance_values] + cls._INSPECTION_USAGE_VALUES
 
         for dataframe in processed_inspection_runs.values():
 
