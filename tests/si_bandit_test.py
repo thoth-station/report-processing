@@ -64,18 +64,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         severity_confidence_info, summary = si_bandit.extract_severity_confidence_info(
             si_bandit_report=si_bandit_report
         )
-        severity_confidence_info_keys = [k for k in severity_confidence_info[0]]
-        severity_confidence_info_test_keys = ["name", "SEVERITY.LOW", "SEVERITY.MEDIUM", "SEVERITY.HIGH"]
-        assert severity_confidence_info
-
-        assert severity_confidence_info_keys == severity_confidence_info_test_keys
-
-        summary_keys = [k for k in summary]
-        summary_test_keys = ["number_of_analyzed_files", "number_of_files_with_severities", "number_of_filtered_files"]
-
-        assert summary
-
-        assert summary_keys == summary_test_keys
+        assert not severity_confidence_info
 
     def test_get_severity_confidence_info_df_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info DataFrame from si bandit report."""
@@ -92,18 +81,6 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
 
         severity_confidence_info_keys = [k for k in severity_confidence_info]
         severity_confidence_info_test_keys = [
-            "SEVERITY.LOW__CONFIDENCE.LOW",
-            "SEVERITY.LOW__CONFIDENCE.MEDIUM",
-            "SEVERITY.LOW__CONFIDENCE.HIGH",
-            "SEVERITY.LOW__CONFIDENCE.UNDEFINED",
-            "SEVERITY.MEDIUM__CONFIDENCE.LOW",
-            "SEVERITY.MEDIUM__CONFIDENCE.MEDIUM",
-            "SEVERITY.MEDIUM__CONFIDENCE.HIGH",
-            "SEVERITY.MEDIUM__CONFIDENCE.UNDEFINED",
-            "SEVERITY.HIGH__CONFIDENCE.LOW",
-            "SEVERITY.HIGH__CONFIDENCE.MEDIUM",
-            "SEVERITY.HIGH__CONFIDENCE.HIGH",
-            "SEVERITY.HIGH__CONFIDENCE.UNDEFINED",
             "_total_severity",
         ]
         assert severity_confidence_info_keys == severity_confidence_info_test_keys

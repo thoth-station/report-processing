@@ -50,7 +50,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         )
         si_cloc_report = si_cloc_reports[0]
 
-        si_cloc_report["metadata"]["arguments"]["app.py"]["package_name"] = "thoth-test-2"
+        si_cloc_report["metadata"]["arguments"]["si-cloc"]["package_name"] = "thoth-test-2"
         with pytest.raises(ThothSIPackageNotMatchingException):
             assert security_aggregator.create_si_aggregated_results(
                 si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report
@@ -73,6 +73,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         aggregated_json = security_aggregator.create_si_aggregated_results(
             si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report, output_json=True
         )
+
         keys = sorted([k for k in aggregated_json.keys()])
 
         with open(self._SI_AGGREGATOR_REPORTS_FILE) as json_file:

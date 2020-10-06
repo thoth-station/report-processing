@@ -1,0 +1,83 @@
+{
+  "metadata": {
+    "analyzer": "si-cloc",
+    "analyzer_version": "0.1.3",
+    "arguments": {
+      "si-cloc": {
+        "from_directory": null,
+        "no_pretty": false,
+        "output": "/mnt/workdir/cloc_results",
+        "package_index": "https://pypi.org/simple",
+        "package_name": "websocket-client",
+        "package_version": "0.32.0"
+      }
+    },
+    "datetime": "2020-07-03T07:17:42.800734",
+    "distribution": {
+      "codename": "",
+      "id": "fedora",
+      "like": "",
+      "version": "32",
+      "version_parts": {
+        "build_number": "",
+        "major": "32",
+        "minor": ""
+      }
+    },
+    "document_id": "security-indicator-0a1b0355",
+    "duration": null,
+    "hostname": "security-indicator-0a1b0355-2360646128",
+    "os_release": {
+      "id": "fedora",
+      "name": "Fedora",
+      "platform_id": "platform:f32",
+      "redhat_bugzilla_product": "Fedora",
+      "redhat_bugzilla_product_version": "32",
+      "redhat_support_product": "Fedora",
+      "redhat_support_product_version": "32",
+      "variant_id": "container",
+      "version": "32 (Container Image)",
+      "version_id": "32"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 3,
+      "minor": 8,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": null,
+    "timestamp": 1593760662
+  },
+  "result": {
+    "Python": {
+      "blank": 558,
+      "code": 1789,
+      "comment": 605,
+      "nFiles": 17
+    },
+    "SUM": {
+      "blank": 637,
+      "code": 1922,
+      "comment": 607,
+      "nFiles": 18
+    },
+    "header": {
+      "cloc_url": "github.com/AlDanial/cloc",
+      "cloc_version": "1.82",
+      "elapsed_seconds": 0.304886102676392,
+      "files_per_second": 59.0384403945933,
+      "lines_per_second": 10384.2056827379,
+      "n_files": 18,
+      "n_lines": 3166
+    },
+    "reStructuredText": {
+      "blank": 79,
+      "code": 133,
+      "comment": 2,
+      "nFiles": 1
+    }
+  }
+}

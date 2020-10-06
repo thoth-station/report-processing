@@ -47,7 +47,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        adviser_version = "0.9.3"
+        adviser_version = "0.9.4"
         adviser_dataframe = Adviser.create_adviser_dataframe(
             adviser_version=adviser_version, adviser_files=adviser_files
         )
@@ -58,7 +58,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe for histogram plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        adviser_version = "0.9.3"
+        adviser_version = "0.9.4"
         adviser_dataframe = Adviser.create_adviser_dataframe(
             adviser_version=adviser_version, adviser_files=adviser_files
         )
@@ -75,7 +75,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe for heatmap plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        adviser_version = "0.9.3"
+        adviser_version = "0.9.4"
         adviser_dataframe = Adviser.create_adviser_dataframe(
             adviser_version=adviser_version, adviser_files=adviser_files
         )
