@@ -110,3 +110,15 @@ all the things that you see...
 ### Automatic Updates
 * :pushpin: Automatic update of dependency pandas from 1.1.1 to 1.1.2 (#67)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.5 to 0.25.6 (#66)
+
+## Release 0.3.5 (2020-10-06T10:53:28)
+### Features
+* Select adviser-version (#70)
+### Automatic Updates
+* :pushpin: Automatic update of dependency numpy from 1.19.1 to 1.19.2 (#78)
+* :pushpin: Automatic update of dependency numpy from 1.19.1 to 1.19.2 (#77)
+* :pushpin: Automatic update of dependency numpy from 1.19.1 to 1.19.2 (#76)
+* :pushpin: Automatic update of dependency pandas from 1.1.2 to 1.1.3 (#75)
+* :pushpin: Automatic update of dependency pandas from 1.1.2 to 1.1.3 (#74)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.6 to 0.25.15 (#73)
+* :pushpin: Automatic update of dependency thoth-storages from 0.25.6 to 0.25.15 (#72)
