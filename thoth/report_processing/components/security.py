@@ -267,9 +267,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             "analyzer_si_bandit": report_metadata["analyzer"],
             "analyzer_version_si_bandit": report_metadata["analyzer_version"],
             "document_id_si_bandit": report_metadata["document_id"],
-            "package_name": report_metadata["arguments"]["app.py"]["package_name"],
-            "package_version": report_metadata["arguments"]["app.py"]["package_version"],
-            "package_index": report_metadata["arguments"]["app.py"]["package_index"],
+            "package_name": report_metadata["arguments"]["si-bandit"]["package_name"],
+            "package_version": report_metadata["arguments"]["si-bandit"]["package_version"],
+            "package_index": report_metadata["arguments"]["si-bandit"]["package_index"],
         }
 
         return extracted_metadata
@@ -626,9 +626,9 @@ class SecurityIndicatorsCloc:
             "analyzer_si_cloc": report_metadata["analyzer"],
             "analyzer_version_si_cloc": report_metadata["analyzer_version"],
             "document_id_si_cloc": report_metadata["document_id"],
-            "package_name": report_metadata["arguments"]["app.py"]["package_name"],
-            "package_version": report_metadata["arguments"]["app.py"]["package_version"],
-            "package_index": report_metadata["arguments"]["app.py"]["package_index"],
+            "package_name": report_metadata["arguments"]["si-cloc"]["package_name"],
+            "package_version": report_metadata["arguments"]["si-cloc"]["package_version"],
+            "package_index": report_metadata["arguments"]["si-cloc"]["package_index"],
         }
 
         return extracted_metadata

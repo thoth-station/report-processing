@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "analyzer": "thoth-si-bandit",
+    "analyzer_version": "0.1.5",
+    "arguments": {
+      "si-bandit": {
+        "from_directory": "/mnt/workdir/package",
+        "no_pretty": false,
+        "output": "/mnt/workdir/bandit_results",
+        "package_index": "https://pypi.org/simple",
+        "package_name": "websocket-client",
+        "package_version": "0.32.0"
+      }
+    },
+    "datetime": "2020-07-03T07:17:38.403064",
+    "distribution": {
+      "codename": "Ootpa",
+      "id": "rhel",
+      "like": "fedora",
+      "version": "8.2",
+      "version_parts": {
+        "build_number": "",
+        "major": "8",
+        "minor": "2"
+      }
+    },
+    "document_id": "security-indicator-0a1b0355",
+    "duration": null,
+    "hostname": "security-indicator-0a1b0355-626430415",
+    "os_release": {
+      "id": "rhel",
+      "name": "Red Hat Enterprise Linux",
+      "platform_id": "platform:el8",
+      "redhat_bugzilla_product": "Red Hat Enterprise Linux 8",
+      "redhat_bugzilla_product_version": "8.2",
+      "redhat_support_product": "Red Hat Enterprise Linux",
+      "redhat_support_product_version": "8.2",
+      "version": "8.2 (Ootpa)",
+      "version_id": "8.2"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 8,
+      "minor": 6,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": null,
+    "timestamp": 1593760658
+  },
+  "result": {
+    "errors": [
+      {
+        "filename": "/mnt/workdir/package",
+        "reason": "No such file or directory"
+      }
+    ],
+    "generated_at": "2020-07-03T07:17:38Z",
+    "metrics": {
+      "_totals": {
+        "CONFIDENCE.HIGH": 0,
+        "CONFIDENCE.LOW": 0,
+        "CONFIDENCE.MEDIUM": 0,
+        "CONFIDENCE.UNDEFINED": 0,
+        "SEVERITY.HIGH": 0,
+        "SEVERITY.LOW": 0,
+        "SEVERITY.MEDIUM": 0,
+        "SEVERITY.UNDEFINED": 0,
+        "loc": 0,
+        "nosec": 0
+      }
+    },
+    "results": []
+  }
+}
