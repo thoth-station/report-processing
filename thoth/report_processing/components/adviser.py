@@ -168,6 +168,7 @@ class Adviser:
         :param adviser_files: adviser documents
         """
         adviser_dict = {}
+        _LOGGER.warning(f"Considering adviser version: {adviser_version}")
 
         for document_id, document in adviser_files.items():
             datetime_advise_run = document["metadata"].get("datetime")
@@ -175,7 +176,8 @@ class Adviser:
 
             result = document["result"]
 
-            if int("".join(analyzer_version.split("."))) >= int("".join(adviser_version.split("."))):
+            if str(analyzer_version) == str(adviser_version):
+
                 report = result.get("report")
                 error = result["error"]
 
