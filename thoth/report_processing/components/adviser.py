@@ -20,8 +20,6 @@
 import logging
 import os
 import json
-import hashlib
-import copy
 
 from datetime import datetime
 from pathlib import Path
@@ -29,8 +27,6 @@ from typing import List, Optional, Dict, Any, Tuple
 
 import pandas as pd
 import numpy as np
-from numpy import array
-from sklearn.preprocessing import LabelEncoder
 
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
 
@@ -168,7 +164,9 @@ class Adviser:
         return files, counter
 
     @classmethod
-    def create_adviser_dataframe(cls, adviser_version: str, adviser_files: Dict[str, Any], justifications_collected: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def create_adviser_dataframe(
+        cls, adviser_version: str, adviser_files: Dict[str, Any], justifications_collected: List[Dict[str, Any]]
+    ) -> List[Dict[str, Any]]:
         """Create adviser dataframe.
 
         :param adviser_version: adviser version filter
@@ -324,7 +322,7 @@ class Adviser:
                                 "type": "INFO",
                             }
                         )
-                    elif 'link' in justification:
+                    elif "link" in justification:
 
                         justifications_collected.append(
                             {
