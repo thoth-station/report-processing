@@ -326,12 +326,12 @@ class Adviser:
         """
         histogram_data: Dict[str, Any] = {}
 
-        for index, row in adviser_type_dataframe[["message", "type"]].iterrows():
-            message = row["message"]
+        for pair in pd.unique(adviser_type_dataframe["message", "type"]):
+            message = pair[0]
             if message not in histogram_data.keys():
                 histogram_data[message] = {
-                    "message": row["message"],
-                    "type": row["type"],
+                    "message": message,
+                    "type": pair[1],
                     "count": adviser_type_dataframe["message"].value_counts()[message],
                 }
 
