@@ -30,7 +30,7 @@ import numpy as np
 
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
 
-from thoth.storages import CephStore
+from thoth.storages import CephStore, GraphDatabase
 from thoth.storages.advisers import AdvisersResultsStore
 
 # set up logging
@@ -49,7 +49,12 @@ class Adviser:
 
     @classmethod
     def aggregate_adviser_results(
-        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = False, repo_path: Optional[Path] = None
+        cls,
+        initial_date: datetime = datetime.today(),
+        limit_results: bool = False,
+        max_ids: int = 5,
+        is_local: bool = False,
+        repo_path: Optional[Path] = None,
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
@@ -65,7 +70,7 @@ class Adviser:
 
         if not is_local:
             files, counter = cls._aggregate_thoth_results_from_ceph(
-                files=files, limit_results=limit_results, max_ids=max_ids
+                files=files, initial_date=initial_date, limit_results=limit_results, max_ids=max_ids
             )
             _LOGGER.info("Number of files retrieved is: %r" % counter)
 
@@ -80,11 +85,7 @@ class Adviser:
 
     @staticmethod
     def _aggregate_thoth_results_from_local(
-        files: Dict[str, Any],
-        store_files: Optional[List[str]] = None,
-        repo_path: Optional[Path] = None,
-        limit_results: bool = False,
-        max_ids: int = 5,
+        files: Dict[str, Any], repo_path: Optional[Path] = None, limit_results: bool = False, max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
@@ -118,17 +119,20 @@ class Adviser:
 
     @staticmethod
     def _aggregate_thoth_results_from_ceph(
-        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5
+        files: Dict[str, Any], initial_date: datetime, limit_results: bool = False, max_ids: int = 5
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         adviser_store = AdvisersResultsStore()
         adviser_store.connect()
 
-        adviser_ids = list(adviser_store.get_document_listing())
+        graph_db = GraphDatabase()
+        graph_db.connect()
 
-        _LOGGER.info("Number of Adviser reports identified is: %r" % len(adviser_ids))
+        adviser_ids = graph_db.get_adviser_run_document_ids_all(initial_date=initial_date, count=None)
 
         number_adviser_results = len(adviser_ids)
+
+        _LOGGER.info("Number of Adviser reports identified is: %r" % number_adviser_results)
 
         counter = 0
 
@@ -138,16 +142,9 @@ class Adviser:
         for n, document_id in enumerate(adviser_ids):
             _LOGGER.debug(f"Analysis {document_id} n.{counter + 1}/{number_adviser_results}")
 
-            retrieved = False
             try:
                 document = adviser_store.retrieve_document(document_id)
-                retrieved = True
 
-            except Exception as exception:
-                _LOGGER.exception(f"Exception during retrieval of adviser result {document_id}: {exception}")
-                continue
-
-            if retrieved:
                 if "metadata" in document.keys():
                     files[document_id] = document
 
@@ -160,6 +157,10 @@ class Adviser:
                             return files, counter
                 else:
                     _LOGGER.warning(f"'metadata' is not present in {document_id} keys!")
+
+            except Exception as exception:
+                _LOGGER.exception(f"Exception during retrieval of adviser result {document_id}: {exception}")
+                continue
 
         return files, counter
 
@@ -178,7 +179,7 @@ class Adviser:
         for document_id, document in adviser_files.items():
 
             report = {}
-            error = ""
+            general_error = ""
 
             try:
                 datetime_advise_run = document["metadata"].get("datetime")
@@ -189,59 +190,33 @@ class Adviser:
                 if str(analyzer_version) == str(adviser_version):
 
                     report = result.get("report")
-                    error = result["error"]
+                    general_error = result["error"]
+
                     for info in report["stack_info"]:
 
+                        justification = {"message": info["message"], "type": info["type"]}
+
                         if "link" in info:
-                            if info["type"] == "ERROR":
-                                justifications_collected.append(
-                                    {
-                                        "document_id": document_id,
-                                        "date": datetime_object,
-                                        "analyzer_version": analyzer_version,
-                                        "justification": {"message": info["message"], "type": info["type"]},
-                                        "error": True,
-                                        "message": info["link"],
-                                        "type": info["type"],
-                                    }
-                                )
-                            else:
-                                justifications_collected.append(
-                                    {
-                                        "document_id": document_id,
-                                        "date": datetime_object,
-                                        "analyzer_version": analyzer_version,
-                                        "justification": {"message": info["message"], "type": info["type"]},
-                                        "error": False,
-                                        "message": info["link"],
-                                        "type": info["type"],
-                                    }
-                                )
+                            message = info["link"]
                         else:
-                            if info["type"] == "ERROR":
-                                justifications_collected.append(
-                                    {
-                                        "document_id": document_id,
-                                        "date": datetime_object,
-                                        "analyzer_version": analyzer_version,
-                                        "justification": {"message": info["message"], "type": info["type"]},
-                                        "error": True,
-                                        "message": info["message"],
-                                        "type": info["type"],
-                                    }
-                                )
-                            else:
-                                justifications_collected.append(
-                                    {
-                                        "document_id": document_id,
-                                        "date": datetime_object,
-                                        "analyzer_version": analyzer_version,
-                                        "justification": {"message": info["message"], "type": info["type"]},
-                                        "error": False,
-                                        "message": info["message"],
-                                        "type": info["type"],
-                                    }
-                                )
+                            message = info["message"]
+
+                        error = False
+
+                        if info["type"] == "ERROR":
+                            error = True
+
+                        justifications_collected.append(
+                            {
+                                "document_id": document_id,
+                                "date": datetime_object,
+                                "analyzer_version": analyzer_version,
+                                "justification": justification,
+                                "error": error,
+                                "message": message,
+                                "type": info["type"],
+                            }
+                        )
 
                     justifications_collected = cls.extract_adviser_justifications(
                         report=report,
@@ -253,8 +228,8 @@ class Adviser:
 
             except Exception as e:
                 _LOGGER.error(f"Error analyzing adviser document {document_id}: {e}")
-                _LOGGER.error(f"Adviser document {document_id} report: {report}")
-                _LOGGER.error(f"Adviser document {document_id} error: {error}")
+                _LOGGER.error("Adviser document %s report: %s", document_id, report)
+                _LOGGER.error("Adviser document %s report: %s", document_id, general_error)
                 pass
 
         return justifications_collected
@@ -311,42 +286,33 @@ class Adviser:
                 for justification in justifications:
 
                     if "advisory" in justification:
-                        justifications_collected.append(
-                            {
-                                "document_id": document_id,
-                                "date": datetime_object,
-                                "analyzer_version": analyzer_version,
-                                "justification": justification,
-                                "error": True,
-                                "message": justification["advisory"],
-                                "type": "INFO",
-                            }
-                        )
+
+                        error = True
+                        message = justification["advisory"]
+                        justification_type = justification["type"]
+
                     elif "link" in justification:
 
-                        justifications_collected.append(
-                            {
-                                "document_id": document_id,
-                                "date": datetime_object,
-                                "analyzer_version": analyzer_version,
-                                "justification": justification,
-                                "error": False,
-                                "message": justification["link"],
-                                "type": justification["type"],
-                            }
-                        )
+                        error = False
+                        message = justification["link"]
+                        justification_type = justification["type"]
+
                     else:
-                        justifications_collected.append(
-                            {
-                                "document_id": document_id,
-                                "date": datetime_object,
-                                "analyzer_version": analyzer_version,
-                                "justification": justification,
-                                "error": False,
-                                "message": justification["message"],
-                                "type": justification["type"],
-                            }
-                        )
+                        error = False
+                        message = justification["message"]
+                        justification_type = justification["type"]
+
+                    justifications_collected.append(
+                        {
+                            "document_id": document_id,
+                            "date": datetime_object,
+                            "analyzer_version": analyzer_version,
+                            "justification": justification,
+                            "error": error,
+                            "message": message,
+                            "type": justification_type,
+                        }
+                    )
             else:
                 _LOGGER.warning(f"No justifications identified for adviser report: {document_id}")
 
@@ -399,6 +365,7 @@ class Adviser:
 
         aggregated_data: Dict[str, Any] = {}
 
+        # Iterate over all intervals
         for l in range(0, len(timestamps)):
             low = timestamps[l - 1]
             high = timestamps[l]
@@ -406,15 +373,14 @@ class Adviser:
             subset_df = adviser_type_dataframe[
                 (adviser_type_dataframe["date"] >= low) & (adviser_type_dataframe["date"] <= high)
             ]
+            messages = pd.unique(subset_df["message"])
 
-            for index, row in subset_df[["message", "date"]].iterrows():
-                message = row["message"]
+            for message in messages:
                 if message not in aggregated_data[high].keys():
                     aggregated_data[high][message] = {
-                        "message": row["message"],
+                        "message": message,
                         "count": subset_df["message"].value_counts()[message],
                     }
-
         return aggregated_data
 
     @staticmethod
@@ -456,17 +422,12 @@ class Adviser:
         df_heatmap = df_heatmap.set_index(["interval"])
         df_heatmap = df_heatmap.transpose()
 
-        adviser_justifications_map: Dict[str, Any] = {}
-        for index, row in adviser_type_dataframe[["message"]].iterrows():
-            if row["message"] not in adviser_justifications_map.keys():
-                adviser_justifications_map[str(row["message"])] = row["message"]
-
         justifications_ordered = []
-        for index, row in df_heatmap.iterrows():
-
-            justifications_ordered.append(adviser_justifications_map[index])
+        for message in pd.unique(adviser_type_dataframe["message"]):
+            justifications_ordered.append(message)
 
         df_heatmap["advise_type"] = justifications_ordered
+
         df_heatmap = df_heatmap.set_index(["advise_type"])
 
         return df_heatmap
