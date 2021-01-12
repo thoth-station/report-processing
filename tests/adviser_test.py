@@ -40,7 +40,9 @@ class TestAdviser(ReportProcessingTestCase):
         adviser_version = "0.21.1"
         justifications_collected = []
         justifications_collected = Adviser.create_adviser_dataframe(
-            adviser_version=adviser_version, adviser_files=adviser_files,justifications_collected=justifications_collected
+            adviser_version=adviser_version,
+            adviser_files=adviser_files,
+            justifications_collected=justifications_collected,
         )
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
@@ -54,7 +56,9 @@ class TestAdviser(ReportProcessingTestCase):
         adviser_version = "0.21.1"
         justifications_collected = []
         justifications_collected = Adviser.create_adviser_dataframe(
-            adviser_version=adviser_version, adviser_files=adviser_files,justifications_collected=justifications_collected
+            adviser_version=adviser_version,
+            adviser_files=adviser_files,
+            justifications_collected=justifications_collected,
         )
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
@@ -72,7 +76,9 @@ class TestAdviser(ReportProcessingTestCase):
         adviser_version = "0.21.1"
         justifications_collected = []
         justifications_collected = Adviser.create_adviser_dataframe(
-            adviser_version=adviser_version, adviser_files=adviser_files,justifications_collected=justifications_collected
+            adviser_version=adviser_version,
+            adviser_files=adviser_files,
+            justifications_collected=justifications_collected,
         )
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
