@@ -122,3 +122,14 @@ all the things that you see...
 * :pushpin: Automatic update of dependency pandas from 1.1.2 to 1.1.3 (#74)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.6 to 0.25.15 (#73)
 * :pushpin: Automatic update of dependency thoth-storages from 0.25.6 to 0.25.15 (#72)
+
+## Release 0.4.0 (2021-01-14T15:34:12)
+### Features
+* :arrow_up: Automatic update of dependencies by kebechet. (#91)
+* :arrow_up: Automatic update of dependencies by kebechet. (#85)
+### Improvements
+* Adjust processing (#86)
+### Automatic Updates
+* :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#83)
+* :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#82)
+* :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#81)
