@@ -192,6 +192,9 @@ class Adviser:
                     report = result.get("report")
                     general_error = result["error"]
 
+                    if not report:
+                        continue
+
                     for info in report["stack_info"]:
 
                         justification = {"message": info["message"], "type": info["type"]}
