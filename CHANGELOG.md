@@ -133,3 +133,8 @@ all the things that you see...
 * :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#83)
 * :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#82)
 * :pushpin: Automatic update of dependency pytest from 6.0.1 to 6.1.1 (#81)
+
+## Release 0.4.1 (2021-01-19T17:49:26)
+### Features
+* :arrow_up: Automatic update of dependencies by kebechet. (#98)
+* Continue if report is missing (#96)
