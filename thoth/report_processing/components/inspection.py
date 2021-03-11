@@ -70,6 +70,7 @@ class AmunInspections:
         cls,
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
+        inspection_ids_list: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = False,
@@ -79,6 +80,7 @@ class AmunInspections:
 
         :param store_files: files to be retrieved from the Store for each result, if None all files are retrieved.
         :param inspections_identifiers: Inspection identifiers in inspection IDs.
+        :param inspection_ids_list: Inspection IDs list.
         :param limit_results: reduce the number of reports ids considered to `max_ids`.
         :param max_ids: maximum number of reports ids considered.
         :param is_local: flag to retrieve the dataset locally (if not uses Ceph S3 (credentials are required)).
@@ -113,6 +115,7 @@ class AmunInspections:
             files, counter = cls._aggregate_thoth_results_from_ceph(
                 store_files=store_files,
                 inspections_identifiers=inspections_identifiers,
+                inspection_ids_list=inspection_ids_list,
                 files=files,
                 limit_results=limit_results,
                 max_ids=max_ids,
@@ -257,6 +260,7 @@ class AmunInspections:
         files: Dict[str, Any],
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
+        inspection_ids_list: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
@@ -266,7 +270,7 @@ class AmunInspections:
         # Inspection ID counter
         inspection_counter = 0
 
-        for inspection_document_id in store_class_type.iter_inspections():
+        for inspection_document_id in inspection_ids_list or store_class_type.iter_inspections():
 
             inspection_id_pieces = inspection_document_id.split("-")
 
