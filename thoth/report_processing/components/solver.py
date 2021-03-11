@@ -84,7 +84,7 @@ class Solver:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
-            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
+            _LOGGER.warning("No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():
@@ -155,7 +155,13 @@ class Solver:
     def construct_solver_from_metadata(solver_report_metadata: Dict[str, Any]) -> str:
         """Construct solver from solver report metadata."""
         os_name = solver_report_metadata["os_release"]["name"].lower()
-        os_version = "".join([l for l in solver_report_metadata["os_release"]["version"] if l.isdigit()])
+        os_version = "".join(
+            [
+                release_version
+                for release_version in solver_report_metadata["os_release"]["version"]
+                if release_version.isdigit()
+            ]
+        )
         python_interpreter = f'{solver_report_metadata["python"]["major"]}{solver_report_metadata["python"]["minor"]}'
         solver = f"{os_name}-{os_version}-py{python_interpreter}"
 

@@ -136,7 +136,7 @@ class AmunInspections:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
-            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
+            _LOGGER.warning("No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():
@@ -854,13 +854,13 @@ class AmunInspections:
         filtered_df = final_inspections_df.copy()
         # Inspection IDs
         if inspection_document_ids:
-            filtered_df.query(f"`inspection_document_id` == @inspection_document_ids", inplace=True)
+            filtered_df.query("`inspection_document_id` == @inspection_document_ids", inplace=True)
 
         if r_inspection_document_ids:
-            filtered_df.query(f"`inspection_document_id` != @r_inspection_document_ids", inplace=True)
+            filtered_df.query("`inspection_document_id` != @r_inspection_document_ids", inplace=True)
 
         if standardized_ids:
-            filtered_df.query(f"`standardized_identifier` == @standardized_ids", inplace=True)
+            filtered_df.query("`standardized_identifier` == @standardized_ids", inplace=True)
 
         # Software stack
         if packages:
@@ -878,35 +878,35 @@ class AmunInspections:
 
         # Runtime Environment
         if base:
-            filtered_df.query(f"base == @base", inplace=True)
+            filtered_df.query("base == @base", inplace=True)
 
         # Operating System
         if os_name:
-            filtered_df.query(f"os_name == @os_name", inplace=True)
+            filtered_df.query("os_name == @os_name", inplace=True)
 
         if os_version:
-            filtered_df.query(f"os_version == @os_version", inplace=True)
+            filtered_df.query("os_version == @os_version", inplace=True)
 
         # Python Interpreter
         if python_interpreter:
-            filtered_df.query(f"python_interpreter == @python_interpreter", inplace=True)
+            filtered_df.query("python_interpreter == @python_interpreter", inplace=True)
 
         # Hardware
         if cpu_family:
-            filtered_df.query(f"cpu_family == @cpu_family", inplace=True)
+            filtered_df.query("cpu_family == @cpu_family", inplace=True)
 
         if cpu_model:
-            filtered_df.query(f"cpu_model == @cpu_model", inplace=True)
+            filtered_df.query("cpu_model == @cpu_model", inplace=True)
 
         if cpus_number:
-            filtered_df.query(f"number_cpus == @cpus_number", inplace=True)
+            filtered_df.query("number_cpus == @cpus_number", inplace=True)
 
         # Performance Indicator (PI)
         if pi_name:
-            filtered_df.query(f"pi_name == @pi_name", inplace=True)
+            filtered_df.query("pi_name == @pi_name", inplace=True)
 
         if pi_component:
-            filtered_df.query(f"pi_component == @pi_component", inplace=True)
+            filtered_df.query("pi_component == @pi_component", inplace=True)
 
         if not filtered_df.shape[0]:
             _LOGGER.info("There are no results for the filters selected. Please change filters.")
@@ -917,7 +917,9 @@ class AmunInspections:
 
     @staticmethod
     def create_plot_results_summary(
-        final_inspections_df: pd.DataFrame, performance_packages: List[str], include_statistics: bool = False,
+        final_inspections_df: pd.DataFrame,
+        performance_packages: List[str],
+        include_statistics: bool = False,
     ) -> pd.DataFrame:
         """Show performance results summary.
 
@@ -1109,11 +1111,26 @@ class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": {"title": "Hardware", "values": ["platform", "processor", "flags", "ncpus", "info"],},
-        "base_image": {"title": "Operating System", "values": ["base_image", "number_cpus_run"],},
-        "software_stack": {"title": "Software Stack", "values": ["requirements_locked"],},
-        "pi": {"title": "Performance Indicator", "values": ["pi"],},
-        "exit_codes": {"title": "Exit Code", "values": ["exit_code"],},
+        "hardware": {
+            "title": "Hardware",
+            "values": ["platform", "processor", "flags", "ncpus", "info"],
+        },
+        "base_image": {
+            "title": "Operating System",
+            "values": ["base_image", "number_cpus_run"],
+        },
+        "software_stack": {
+            "title": "Software Stack",
+            "values": ["requirements_locked"],
+        },
+        "pi": {
+            "title": "Performance Indicator",
+            "values": ["pi"],
+        },
+        "exit_codes": {
+            "title": "Exit Code",
+            "values": ["exit_code"],
+        },
     }
 
     _INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING = {
@@ -1138,12 +1155,18 @@ class AmunInspectionsSummary:
             "description": "Base Image",
             "values": ["os_release__name", "os_release__version", "specification_base"],
         },
-        "number_cpus_run": {"description": "CPUs during run", "values": ["run__requests__cpu"],},
+        "number_cpus_run": {
+            "description": "CPUs during run",
+            "values": ["run__requests__cpu"],
+        },
         "pi": {
             "description": "",
             "values": ["script_sha256", "@parameters", "stdout__name", "stdout__component", "batch_size"],
         },
-        "exit_code": {"description": "", "values": ["exit_code"],},
+        "exit_code": {
+            "description": "",
+            "values": ["exit_code"],
+        },
     }
 
     @classmethod
@@ -1157,12 +1180,20 @@ class AmunInspectionsSummary:
 
         for number in range(1, objects.shape[0]):
             new = objects.iloc[number].to_dict()
-            ddiff = DeepDiff(first, new, ignore_order=True,)
+            ddiff = DeepDiff(
+                first,
+                new,
+                ignore_order=True,
+            )
 
             if ddiff:
                 unique = True
                 for obj in unique_objects:
-                    sddiff = DeepDiff(obj, new, ignore_order=True,)
+                    sddiff = DeepDiff(
+                        obj,
+                        new,
+                        ignore_order=True,
+                    )
                     if not sddiff:
                         unique = False
 
