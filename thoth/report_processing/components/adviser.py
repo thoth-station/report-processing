@@ -85,12 +85,15 @@ class Adviser:
 
     @staticmethod
     def _aggregate_thoth_results_from_local(
-        files: Dict[str, Any], repo_path: Optional[Path] = None, limit_results: bool = False, max_ids: int = 5,
+        files: Dict[str, Any],
+        repo_path: Optional[Path] = None,
+        limit_results: bool = False,
+        max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
-            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
+            _LOGGER.warning("No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():
@@ -370,9 +373,9 @@ class Adviser:
         aggregated_data: Dict[str, Any] = {}
 
         # Iterate over all intervals
-        for l in range(0, len(timestamps)):
-            low = timestamps[l - 1]
-            high = timestamps[l]
+        for intrerval in range(0, len(timestamps)):
+            low = timestamps[intrerval - 1]
+            high = timestamps[intrerval]
             aggregated_data[high] = {}
             subset_df = adviser_type_dataframe[
                 (adviser_type_dataframe["date"] >= low) & (adviser_type_dataframe["date"] <= high)

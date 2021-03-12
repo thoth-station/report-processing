@@ -104,7 +104,7 @@ class _SecurityIndicators:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
         if not repo_path:
-            _LOGGER.warning(f"No Path has been provided to retrieve data locally.")
+            _LOGGER.warning("No Path has been provided to retrieve data locally.")
             return files, 0
 
         if not repo_path.exists():
