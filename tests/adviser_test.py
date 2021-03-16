@@ -64,7 +64,7 @@ class TestAdviser(ReportProcessingTestCase):
         adviser_dataframe = pd.DataFrame(justifications_collected)
 
         sorted_justifications_df = Adviser.create_adviser_results_dataframe_histogram(
-            adviser_type_dataframe=adviser_dataframe
+            adviser_type_dataframe=adviser_dataframe,
         )
 
         assert sorted_justifications_df.shape[0] == 3
@@ -84,7 +84,7 @@ class TestAdviser(ReportProcessingTestCase):
         adviser_dataframe = pd.DataFrame(justifications_collected)
 
         adviser_heatmap_df = Adviser.create_adviser_results_dataframe_heatmap(
-            adviser_type_dataframe=adviser_dataframe, number_days=1
+            adviser_type_dataframe=adviser_dataframe, number_days=1,
         )
 
         last_date = [column for column in adviser_heatmap_df.columns][-1]

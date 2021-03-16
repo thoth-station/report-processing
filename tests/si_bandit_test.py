@@ -30,14 +30,14 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
     def test_get_security_indicator_bandit_report(self) -> None:
         """Test retrieving report from local path."""
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True,
         )
         assert si_bandit_reports[0]
 
     def test_get_metadata_df_from_bandit_report(self) -> None:
         """Test obtaining metadata from si bandit report."""
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True,
         )
         si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
@@ -57,24 +57,24 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
     def test_get_severity_confidence_info_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info from si bandit report."""
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True,
         )
         si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info, summary = si_bandit.extract_severity_confidence_info(
-            si_bandit_report=si_bandit_report
+            si_bandit_report=si_bandit_report,
         )
         assert not severity_confidence_info
 
     def test_get_severity_confidence_info_df_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info DataFrame from si bandit report."""
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True
+            security_indicator_bandit_repo_path=self._SI_BANDIT_FOLDER_PATH, is_local=True,
         )
         si_bandit_report = si_bandit_reports[0]
         si_bandit = SecurityIndicatorsBandit()
         severity_confidence_info_df, summary = si_bandit.create_security_confidence_dataframe(
-            si_bandit_report=si_bandit_report
+            si_bandit_report=si_bandit_report,
         )
 
         severity_confidence_info = severity_confidence_info_df["_total"].to_dict()

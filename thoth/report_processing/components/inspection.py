@@ -70,6 +70,7 @@ class AmunInspections:
         cls,
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
+        inspection_ids_list: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = False,
@@ -79,6 +80,7 @@ class AmunInspections:
 
         :param store_files: files to be retrieved from the Store for each result, if None all files are retrieved.
         :param inspections_identifiers: Inspection identifiers in inspection IDs.
+        :param inspection_ids_list: Inspection IDs list.
         :param limit_results: reduce the number of reports ids considered to `max_ids`.
         :param max_ids: maximum number of reports ids considered.
         :param is_local: flag to retrieve the dataset locally (if not uses Ceph S3 (credentials are required)).
@@ -88,7 +90,7 @@ class AmunInspections:
             if any(store_file not in ThothAmunInspectionFileStoreEnum.__members__ for store_file in store_files):
                 raise ThothNotKnownResultStore(
                     f"InspectionStore does not contain some of the files listed: {store_files}."
-                    f"InspectionStore: {ThothAmunInspectionFileStoreEnum.__members__.keys()}"
+                    f"InspectionStore: {ThothAmunInspectionFileStoreEnum.__members__.keys()}",
                 )
 
         if limit_results:
@@ -113,6 +115,7 @@ class AmunInspections:
             files, counter = cls._aggregate_thoth_results_from_ceph(
                 store_files=store_files,
                 inspections_identifiers=inspections_identifiers,
+                inspection_ids_list=inspection_ids_list,
                 files=files,
                 limit_results=limit_results,
                 max_ids=max_ids,
@@ -170,7 +173,7 @@ class AmunInspections:
                     for inspection_number_path in Path(f"{result_path}/results").iterdir():
                         _LOGGER.info(
                             f"Considering inspection ID {inspection_document_id}."
-                            f"Number {inspection_number_path.name}"
+                            f"Number {inspection_number_path.name}",
                         )
 
                         file_info: Dict[str, Any] = {}
@@ -217,7 +220,7 @@ class AmunInspections:
                                     requirements_locked = cls._parse_requirements_locked(
                                         requirements_locked=inspection_specification_document["python"][
                                             "requirements_locked"
-                                        ]
+                                        ],
                                     )
                                     result["result"]["requirements_locked"] = requirements_locked
 
@@ -239,7 +242,7 @@ class AmunInspections:
                 except Exception as retrieval_error:
                     _LOGGER.info(
                         f"Considering inspection ID {inspection_document_id}."
-                        f"No files retrieved due to the following error: {retrieval_error}"
+                        f"No files retrieved due to the following error: {retrieval_error}",
                     )
 
                 if limit_results:
@@ -257,6 +260,7 @@ class AmunInspections:
         files: Dict[str, Any],
         store_files: Optional[List[str]] = None,
         inspections_identifiers: Optional[List[str]] = None,
+        inspection_ids_list: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
@@ -266,7 +270,7 @@ class AmunInspections:
         # Inspection ID counter
         inspection_counter = 0
 
-        for inspection_document_id in store_class_type.iter_inspections():
+        for inspection_document_id in inspection_ids_list or store_class_type.iter_inspections():
 
             inspection_id_pieces = inspection_document_id.split("-")
 
@@ -303,7 +307,7 @@ class AmunInspections:
 
                             if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
                                 inspection_result_document = inspection_store.results.retrieve_result(
-                                    inspection_result_number
+                                    inspection_result_number,
                                 )
 
                                 file_info["result"] = inspection_result_document
@@ -311,7 +315,7 @@ class AmunInspections:
 
                             if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
                                 inspection_hw_info = inspection_store.results.retrieve_hwinfo(
-                                    item=inspection_result_number
+                                    item=inspection_result_number,
                                 )
 
                                 file_info["hwinfo"] = inspection_hw_info
@@ -332,7 +336,7 @@ class AmunInspections:
                         except Exception as inspection_exception:
                             _LOGGER.exception(
                                 f"Exception during retrieval of inspection id {inspection_document_id} results"
-                                f"n.{inspection_result_number}: {inspection_exception}"
+                                f"n.{inspection_result_number}: {inspection_exception}",
                             )
                             pass
 
@@ -357,7 +361,7 @@ class AmunInspections:
                                 requirements_locked = cls._parse_requirements_locked(
                                     requirements_locked=inspection_specification_document["python"][
                                         "requirements_locked"
-                                    ]
+                                    ],
                                 )
                                 result["result"]["requirements_locked"] = requirements_locked
 
@@ -384,7 +388,7 @@ class AmunInspections:
                     except Exception as inspection_exception:
                         _LOGGER.exception(
                             f"Exception during retrieval of inspection info for"
-                            f"inspection id {inspection_document_id}: {inspection_exception}"
+                            f"inspection id {inspection_document_id}: {inspection_exception}",
                         )
                         pass
 
@@ -409,7 +413,7 @@ class AmunInspections:
 
     @classmethod
     def process_inspection_runs(
-        cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1
+        cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1,
     ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
@@ -430,7 +434,7 @@ class AmunInspections:
             if any(exit_code != 0 for exit_code in inspection_run_df["exit_code"].values):
                 _LOGGER.warning(
                     f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
-                    f" but some of them are failed."
+                    f" but some of them are failed.",
                 )
                 failed_inspection_runs[inspection_id] = inspection_run_df
 
@@ -440,7 +444,7 @@ class AmunInspections:
             else:
                 _LOGGER.warning(
                     f"Inspection ID {inspection_id} has batch size of: {inspection_run_df.shape[0]}"
-                    f"... discarding due to filter set to: {filter_by_batch_size}"
+                    f"... discarding due to filter set to: {filter_by_batch_size}",
                 )
 
         return processed_inspection_runs, failed_inspection_runs
@@ -471,7 +475,7 @@ class AmunInspections:
 
     @staticmethod
     def evaluate_statistics_on_inspection_df(
-        inspection_df: pd.DataFrame, column_names: List[str], extra_columns: List[str]
+        inspection_df: pd.DataFrame, column_names: List[str], extra_columns: List[str],
     ) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
@@ -558,7 +562,7 @@ class AmunInspections:
         if any(p_check not in cls._INSPECTION_PERFORMANCE_VALUES for p_check in performance_values):
             raise Exception(
                 f"Performance parameters selected {performance_values}"
-                f" are not all registered: {cls._INSPECTION_PERFORMANCE_VALUES}"
+                f" are not all registered: {cls._INSPECTION_PERFORMANCE_VALUES}",
             )
 
         row_number = 0
@@ -592,7 +596,7 @@ class AmunInspections:
         for dataframe in processed_inspection_runs.values():
 
             new_df = cls.evaluate_statistics_on_inspection_df(
-                inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns
+                inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns,
             )
 
             for flags_ in dataframe["hwinfo__cpu_features__flags"].values:
@@ -604,7 +608,7 @@ class AmunInspections:
 
         if include_statistics:
             inspections_statistics_dataframe = AmunInspectionsStatistics.create_inspections_statistics_dataframe(
-                processed_inspection_runs=processed_inspection_runs, parameters=[parameter_for_statistics]
+                processed_inspection_runs=processed_inspection_runs, parameters=[parameter_for_statistics],
             )
             return pd.merge(main_inspection_df, inspections_statistics_dataframe, on="inspection_document_id")
 
@@ -766,7 +770,7 @@ class AmunInspections:
                 selected_identifer_ = inspection_document_id
 
             identifier_filter = "-".join(
-                [word for word in selected_identifer_.split("-") if word not in filters_for_identifiers]
+                [word for word in selected_identifer_.split("-") if word not in filters_for_identifiers],
             )
 
             standardized_identifiers.append(identifier_filter)
@@ -969,7 +973,7 @@ class AmunInspectionsStatistics:
 
     @classmethod
     def _create_inspection_parameters_dataframe(
-        cls, inspections_df: pd.DataFrame, parameters: List[str]
+        cls, inspections_df: pd.DataFrame, parameters: List[str],
     ) -> pd.DataFrame:
         """Create pd.DataFrame of selected parameters from inspections_df.
 
@@ -990,7 +994,7 @@ class AmunInspectionsStatistics:
 
     @classmethod
     def create_inspections_statistics_dataframe(
-        cls, processed_inspection_runs: Dict[str, Any], parameters: List[str]
+        cls, processed_inspection_runs: Dict[str, Any], parameters: List[str],
     ) -> pd.DataFrame:
         """Evaluate statistical quantities of each parameter selected for inspection results.
 
@@ -1004,7 +1008,7 @@ class AmunInspectionsStatistics:
             inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
             inspection_parameters_df = cls._create_inspection_parameters_dataframe(
-                inspections_df=inspection_id_results_df, parameters=parameters
+                inspections_df=inspection_id_results_df, parameters=parameters,
             )
 
             for inspection_parameter in parameters:
@@ -1040,7 +1044,7 @@ class AmunInspectionsStatistics:
                         "cov": cov,
                         "covm": covm,
                         "skew": skew,
-                    }
+                    },
                 )
 
         inspections_statistics_dataframe = pd.DataFrame(results)
@@ -1053,7 +1057,7 @@ class AmunInspectionsFailedSummary:
 
     @staticmethod
     def show_software_stack_differences(
-        inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame
+        inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Create summary report of the difference in the layers identified.
 
@@ -1070,7 +1074,7 @@ class AmunInspectionsFailedSummary:
         packages = set(python_packages_dataframe.columns.values)
 
         python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
-            inspections_df=failed_inspections_df
+            inspections_df=failed_inspections_df,
         )
         packages_from_failed = set(python_packages_dataframe_failed.columns.values)
 
@@ -1101,7 +1105,7 @@ class AmunInspectionsFailedSummary:
                     "versions_in_failed": sorted(failed),
                     "versions_in_failed_only": sorted(difference),
                     "versions_common": sorted(common),
-                }
+                },
             )
 
         return pd.DataFrame(results)
@@ -1111,26 +1115,11 @@ class AmunInspectionsSummary:
     """Class of methods used to create summary from Amun Inspections Runs."""
 
     _INSPECTION_REPORT_FEATURES = {
-        "hardware": {
-            "title": "Hardware",
-            "values": ["platform", "processor", "flags", "ncpus", "info"],
-        },
-        "base_image": {
-            "title": "Operating System",
-            "values": ["base_image", "number_cpus_run"],
-        },
-        "software_stack": {
-            "title": "Software Stack",
-            "values": ["requirements_locked"],
-        },
-        "pi": {
-            "title": "Performance Indicator",
-            "values": ["pi"],
-        },
-        "exit_codes": {
-            "title": "Exit Code",
-            "values": ["exit_code"],
-        },
+        "hardware": {"title": "Hardware", "values": ["platform", "processor", "flags", "ncpus", "info"]},
+        "base_image": {"title": "Operating System", "values": ["base_image", "number_cpus_run"]},
+        "software_stack": {"title": "Software Stack", "values": ["requirements_locked"]},
+        "pi": {"title": "Performance Indicator", "values": ["pi"]},
+        "exit_codes": {"title": "Exit Code", "values": ["exit_code"]},
     }
 
     _INSPECTION_JSON_DF_KEYS_FEATURES_MAPPING = {
@@ -1155,18 +1144,12 @@ class AmunInspectionsSummary:
             "description": "Base Image",
             "values": ["os_release__name", "os_release__version", "specification_base"],
         },
-        "number_cpus_run": {
-            "description": "CPUs during run",
-            "values": ["run__requests__cpu"],
-        },
+        "number_cpus_run": {"description": "CPUs during run", "values": ["run__requests__cpu"]},
         "pi": {
             "description": "",
             "values": ["script_sha256", "@parameters", "stdout__name", "stdout__component", "batch_size"],
         },
-        "exit_code": {
-            "description": "",
-            "values": ["exit_code"],
-        },
+        "exit_code": {"description": "", "values": ["exit_code"]},
     }
 
     @classmethod
@@ -1180,20 +1163,12 @@ class AmunInspectionsSummary:
 
         for number in range(1, objects.shape[0]):
             new = objects.iloc[number].to_dict()
-            ddiff = DeepDiff(
-                first,
-                new,
-                ignore_order=True,
-            )
+            ddiff = DeepDiff(first, new, ignore_order=True)
 
             if ddiff:
                 unique = True
                 for obj in unique_objects:
-                    sddiff = DeepDiff(
-                        obj,
-                        new,
-                        ignore_order=True,
-                    )
+                    sddiff = DeepDiff(obj, new, ignore_order=True)
                     if not sddiff:
                         unique = False
 
@@ -1204,7 +1179,7 @@ class AmunInspectionsSummary:
 
     @classmethod
     def produce_summary_report(
-        cls, inspections_df: pd.DataFrame, is_markdown: Optional[bool] = False
+        cls, inspections_df: pd.DataFrame, is_markdown: Optional[bool] = False,
     ) -> Tuple[Dict[str, Any], Optional[str]]:
         """Create summary report of the difference in the layers identified.
 
