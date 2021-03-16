@@ -30,4 +30,3 @@ presubmits:
             requests:
               memory: "2Gi"
               cpu: "2"
-
