@@ -138,3 +138,12 @@ all the things that you see...
 ### Features
 * :arrow_up: Automatic update of dependencies by kebechet. (#98)
 * Continue if report is missing (#96)
+
+## Release 0.5.0 (2021-03-16T08:46:12)
+### Features
+* Allow list of inspection ids retrieval from Ceph
+* :arrow_up: Automatic update of dependencies by Kebechet
+* Add aicoe.yaml
+* update pre-commit
+### Improvements
+* make pre-commit happy
