@@ -44,7 +44,7 @@ class Solver:
 
     @classmethod
     def aggregate_solver_results(
-        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = False, repo_path: Optional[Path] = None
+        cls, limit_results: bool = False, max_ids: int = 5, is_local: bool = False, repo_path: Optional[Path] = None,
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
@@ -60,14 +60,14 @@ class Solver:
 
         if not is_local:
             files, counter = cls._aggregate_thoth_results_from_ceph(
-                files=files, limit_results=limit_results, max_ids=max_ids
+                files=files, limit_results=limit_results, max_ids=max_ids,
             )
             _LOGGER.info("Number of files retrieved is: %r" % counter)
 
             return files
 
         files, counter = cls._aggregate_thoth_results_from_local(
-            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids
+            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids,
         )
         _LOGGER.info("Number of files retrieved is: %r" % counter)
 
@@ -113,7 +113,7 @@ class Solver:
 
     @staticmethod
     def _aggregate_thoth_results_from_ceph(
-        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5
+        files: Dict[str, Any], store_files: Optional[List[str]] = None, limit_results: bool = False, max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         solver_store = SolverResultsStore()
@@ -221,6 +221,6 @@ class Solver:
                     "stderr": error["details"]["stderr"] if "stderr" in error["details"] else None,
                     "stdout": error["details"]["stdout"] if "stdout" in error["details"] else None,
                     "timeout": error["details"]["timeout"] if "timeout" in error["details"] else None,
-                }
+                },
             )
         return errors

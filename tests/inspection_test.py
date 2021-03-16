@@ -30,23 +30,23 @@ class TestAdviser(ReportProcessingTestCase):
     def test_get_inspection_runs(self) -> None:
         """Test retrieving adviser results from local path."""
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
-            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True,
         )
         assert inspection_runs
 
     def test_create_inspection_summary(self) -> None:
         """Test retrieving adviser results from local path."""
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
-            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True,
         )
 
         processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
         inspections_df = AmunInspections.create_inspections_dataframe(
-            processed_inspection_runs=processed_inspection_runs
+            processed_inspection_runs=processed_inspection_runs,
         )
 
         results, md_report_complete = AmunInspectionsSummary.produce_summary_report(
-            inspections_df=inspections_df, is_markdown=True
+            inspections_df=inspections_df, is_markdown=True,
         )
 
         assert md_report_complete
@@ -54,12 +54,12 @@ class TestAdviser(ReportProcessingTestCase):
     def test_final_dataframe(self) -> None:
         """Test retrieving adviser results from local path."""
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
-            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True,
         )
         processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
 
         inspections_df = AmunInspections.create_inspections_dataframe(
-            processed_inspection_runs=processed_inspection_runs
+            processed_inspection_runs=processed_inspection_runs,
         )
 
         final_dataframe = AmunInspections.create_final_dataframe(inspections_df=inspections_df)
@@ -68,12 +68,12 @@ class TestAdviser(ReportProcessingTestCase):
     def test_filter_final_dataframe(self) -> None:
         """Test retrieving adviser results from local path."""
         inspection_runs = AmunInspections.aggregate_thoth_inspections_results(
-            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True
+            repo_path=self._INSPECTIONS_FOLDER_PATH, is_local=True,
         )
         processed_inspection_runs, _ = AmunInspections.process_inspection_runs(inspection_runs)
 
         inspections_df = AmunInspections.create_inspections_dataframe(
-            processed_inspection_runs=processed_inspection_runs
+            processed_inspection_runs=processed_inspection_runs,
         )
 
         final_dataframe = AmunInspections.create_final_dataframe(inspections_df=inspections_df)
