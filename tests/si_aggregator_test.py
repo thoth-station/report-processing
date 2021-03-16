@@ -41,19 +41,22 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH, is_local=True,
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH,
+            is_local=True,
         )
         si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH, is_local=True,
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH,
+            is_local=True,
         )
         si_cloc_report = si_cloc_reports[0]
 
         si_cloc_report["metadata"]["arguments"]["si-cloc"]["package_name"] = "thoth-test-2"
         with pytest.raises(ThothSIPackageNotMatchingException):
             assert security_aggregator.create_si_aggregated_results(
-                si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report,
+                si_bandit_report=si_bandit_report,
+                si_cloc_report=si_cloc_report,
             )
 
     def test_create_si_aggregated_json(self) -> None:
@@ -61,17 +64,21 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         security_aggregator = SecurityIndicatorsAggregator()
 
         si_bandit_reports = SecurityIndicatorsBandit.aggregate_security_indicator_bandit_results(
-            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH, is_local=True,
+            security_indicator_bandit_repo_path=self._SI_FOLDER_PATH,
+            is_local=True,
         )
         si_bandit_report = si_bandit_reports[0]
 
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH, is_local=True,
+            security_indicator_cloc_repo_path=self._SI_FOLDER_PATH,
+            is_local=True,
         )
         si_cloc_report = si_cloc_reports[0]
 
         aggregated_json = security_aggregator.create_si_aggregated_results(
-            si_bandit_report=si_bandit_report, si_cloc_report=si_cloc_report, output_json=True,
+            si_bandit_report=si_bandit_report,
+            si_cloc_report=si_cloc_report,
+            output_json=True,
         )
 
         keys = sorted([k for k in aggregated_json.keys()])

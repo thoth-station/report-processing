@@ -70,14 +70,20 @@ class Adviser:
 
         if not is_local:
             files, counter = cls._aggregate_thoth_results_from_ceph(
-                files=files, initial_date=initial_date, limit_results=limit_results, max_ids=max_ids,
+                files=files,
+                initial_date=initial_date,
+                limit_results=limit_results,
+                max_ids=max_ids,
             )
             _LOGGER.info("Number of files retrieved is: %r" % counter)
 
             return files
 
         files, counter = cls._aggregate_thoth_results_from_local(
-            repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids,
+            repo_path=repo_path,
+            files=files,
+            limit_results=limit_results,
+            max_ids=max_ids,
         )
         _LOGGER.info("Number of files retrieved is: %r" % counter)
 
@@ -122,7 +128,10 @@ class Adviser:
 
     @staticmethod
     def _aggregate_thoth_results_from_ceph(
-        files: Dict[str, Any], initial_date: datetime, limit_results: bool = False, max_ids: int = 5,
+        files: Dict[str, Any],
+        initial_date: datetime,
+        limit_results: bool = False,
+        max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         adviser_store = AdvisersResultsStore()
@@ -169,7 +178,10 @@ class Adviser:
 
     @classmethod
     def create_adviser_dataframe(
-        cls, adviser_version: str, adviser_files: Dict[str, Any], justifications_collected: List[Dict[str, Any]],
+        cls,
+        adviser_version: str,
+        adviser_files: Dict[str, Any],
+        justifications_collected: List[Dict[str, Any]],
     ) -> List[Dict[str, Any]]:
         """Create adviser dataframe.
 
@@ -413,7 +425,9 @@ class Adviser:
 
     @classmethod
     def create_adviser_results_dataframe_heatmap(
-        cls, adviser_type_dataframe: pd.DataFrame, number_days: int = 7,
+        cls,
+        adviser_type_dataframe: pd.DataFrame,
+        number_days: int = 7,
     ) -> pd.DataFrame:
         """Create adviser justifications heatmap.
 
@@ -422,7 +436,8 @@ class Adviser:
         """
         data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe, number_days=number_days)
         heatmaps_values = cls._create_heatmaps_values(
-            input_data=data, advise_encoded_type=adviser_type_dataframe["message"].values,
+            input_data=data,
+            advise_encoded_type=adviser_type_dataframe["message"].values,
         )
         df_heatmap = pd.DataFrame(heatmaps_values)
         df_heatmap["interval"] = data.keys()
@@ -448,11 +463,17 @@ class Adviser:
 
     @classmethod
     def connect_to_ceph(
-        cls, ceph_bucket_prefix: str, processed_data_name: str, environment: str, bucket: Optional[str] = None,
+        cls,
+        ceph_bucket_prefix: str,
+        processed_data_name: str,
+        environment: str,
+        bucket: Optional[str] = None,
     ) -> CephStore:
         """Connect to Ceph to store processed data."""
         prefix = cls._get_processed_data_prefix(
-            ceph_bucket_prefix=ceph_bucket_prefix, processed_data_name=processed_data_name, environment=environment,
+            ceph_bucket_prefix=ceph_bucket_prefix,
+            processed_data_name=processed_data_name,
+            environment=environment,
         )
         ceph = CephStore(prefix=prefix, bucket=bucket)
         ceph.connect()
@@ -460,7 +481,11 @@ class Adviser:
 
     @staticmethod
     def store_csv_from_dataframe(
-        csv_from_df: str, ceph_sli: CephStore, file_name: str, ceph_path: str, is_public: bool = False,
+        csv_from_df: str,
+        ceph_sli: CephStore,
+        file_name: str,
+        ceph_path: str,
+        is_public: bool = False,
     ) -> None:
         """Store CSV obtained from pd.DataFrame on Ceph.
 

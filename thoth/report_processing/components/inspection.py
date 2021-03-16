@@ -413,7 +413,9 @@ class AmunInspections:
 
     @classmethod
     def process_inspection_runs(
-        cls, inspection_runs: Dict[str, Any], filter_by_batch_size: int = 1,
+        cls,
+        inspection_runs: Dict[str, Any],
+        filter_by_batch_size: int = 1,
     ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
         """Process inspection runs into pd.DataFrame for each inspection ID.
 
@@ -475,7 +477,9 @@ class AmunInspections:
 
     @staticmethod
     def evaluate_statistics_on_inspection_df(
-        inspection_df: pd.DataFrame, column_names: List[str], extra_columns: List[str],
+        inspection_df: pd.DataFrame,
+        column_names: List[str],
+        extra_columns: List[str],
     ) -> pd.DataFrame:
         """Evaluate statistics on performance values selected from Dataframe columns."""
         unashable_columns = inspection_df.applymap(lambda x: isinstance(x, dict) or isinstance(x, list)).all()[
@@ -596,7 +600,9 @@ class AmunInspections:
         for dataframe in processed_inspection_runs.values():
 
             new_df = cls.evaluate_statistics_on_inspection_df(
-                inspection_df=dataframe, column_names=column_names, extra_columns=extra_columns,
+                inspection_df=dataframe,
+                column_names=column_names,
+                extra_columns=extra_columns,
             )
 
             for flags_ in dataframe["hwinfo__cpu_features__flags"].values:
@@ -608,7 +614,8 @@ class AmunInspections:
 
         if include_statistics:
             inspections_statistics_dataframe = AmunInspectionsStatistics.create_inspections_statistics_dataframe(
-                processed_inspection_runs=processed_inspection_runs, parameters=[parameter_for_statistics],
+                processed_inspection_runs=processed_inspection_runs,
+                parameters=[parameter_for_statistics],
             )
             return pd.merge(main_inspection_df, inspections_statistics_dataframe, on="inspection_document_id")
 
@@ -973,7 +980,9 @@ class AmunInspectionsStatistics:
 
     @classmethod
     def _create_inspection_parameters_dataframe(
-        cls, inspections_df: pd.DataFrame, parameters: List[str],
+        cls,
+        inspections_df: pd.DataFrame,
+        parameters: List[str],
     ) -> pd.DataFrame:
         """Create pd.DataFrame of selected parameters from inspections_df.
 
@@ -994,7 +1003,9 @@ class AmunInspectionsStatistics:
 
     @classmethod
     def create_inspections_statistics_dataframe(
-        cls, processed_inspection_runs: Dict[str, Any], parameters: List[str],
+        cls,
+        processed_inspection_runs: Dict[str, Any],
+        parameters: List[str],
     ) -> pd.DataFrame:
         """Evaluate statistical quantities of each parameter selected for inspection results.
 
@@ -1008,7 +1019,8 @@ class AmunInspectionsStatistics:
             inspection_id_results_df = processed_inspection_runs[inspection_document_id]
 
             inspection_parameters_df = cls._create_inspection_parameters_dataframe(
-                inspections_df=inspection_id_results_df, parameters=parameters,
+                inspections_df=inspection_id_results_df,
+                parameters=parameters,
             )
 
             for inspection_parameter in parameters:
@@ -1057,7 +1069,8 @@ class AmunInspectionsFailedSummary:
 
     @staticmethod
     def show_software_stack_differences(
-        inspections_df: pd.DataFrame, failed_inspections_df: pd.DataFrame,
+        inspections_df: pd.DataFrame,
+        failed_inspections_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Create summary report of the difference in the layers identified.
 
@@ -1179,7 +1192,9 @@ class AmunInspectionsSummary:
 
     @classmethod
     def produce_summary_report(
-        cls, inspections_df: pd.DataFrame, is_markdown: Optional[bool] = False,
+        cls,
+        inspections_df: pd.DataFrame,
+        is_markdown: Optional[bool] = False,
     ) -> Tuple[Dict[str, Any], Optional[str]]:
         """Create summary report of the difference in the layers identified.
 

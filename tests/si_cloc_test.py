@@ -31,14 +31,16 @@ class TestSecurityReportsCloc(ReportProcessingTestCase):
     def test_get_security_indicator_cloc_report(self) -> None:
         """Test retrieving report from local path."""
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH, is_local=True,
+            security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH,
+            is_local=True,
         )
         assert si_cloc_reports[0]
 
     def test_get_metadata_df_from_cloc_report(self) -> None:
         """Test obtaining metadata from si cloc report."""
         si_cloc_reports = SecurityIndicatorsCloc.aggregate_security_indicator_cloc_results(
-            security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH, is_local=True,
+            security_indicator_cloc_repo_path=self._SI_CLOC_FOLDER_PATH,
+            is_local=True,
         )
         si_cloc_report = si_cloc_reports[0]
         metadata_retrieved = SecurityIndicatorsCloc()._extract_data_from_si_cloc_metadata(si_cloc_report=si_cloc_report)

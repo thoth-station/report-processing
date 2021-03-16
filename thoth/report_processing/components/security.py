@@ -80,12 +80,19 @@ class _SecurityIndicators:
 
         if is_local:
             files, counter = self._aggregate_thoth_results_from_local(
-                repo_path=repo_path, files=files, limit_results=limit_results, max_ids=max_ids, store_files=store_files,
+                repo_path=repo_path,
+                files=files,
+                limit_results=limit_results,
+                max_ids=max_ids,
+                store_files=store_files,
             )
 
         else:
             files, counter = self._aggregate_thoth_results_from_ceph(
-                store_files=store_files, files=files, limit_results=limit_results, max_ids=max_ids,
+                store_files=store_files,
+                files=files,
+                limit_results=limit_results,
+                max_ids=max_ids,
             )
 
         _LOGGER.info("Number of files retrieved is: %r" % counter)
@@ -275,7 +282,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         return extracted_metadata
 
     def create_si_bandit_metadata_dataframe(
-        self, si_bandit_report: Dict[str, Any], analyzer_version: Optional[str] = None,
+        self,
+        si_bandit_report: Dict[str, Any],
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Create si-bandit report metadata dataframe.
 
@@ -299,7 +308,8 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
     @staticmethod
     def extract_severity_confidence_info(
-        si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None,
+        si_bandit_report: Dict[str, Any],
+        filters_files: Optional[List[str]] = None,
     ) -> Tuple[List[Dict[str, Any]], Dict[str, int]]:
         """Extract severity and confidence from result metrics.
 
@@ -376,7 +386,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         return extracted_info, summary_files
 
     def create_security_confidence_dataframe(
-        self, si_bandit_report: Dict[str, Any], filters_files: Optional[List[str]] = None,
+        self,
+        si_bandit_report: Dict[str, Any],
+        filters_files: Optional[List[str]] = None,
     ) -> Tuple[pd.DataFrame, Dict[str, int]]:
         """Create Security/Confidence dataframe for si-bandit report.
 
@@ -388,7 +400,8 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         :output summary_files: dictionary with statistics about analyzed, filtered total files.
         """
         results_sec_conf, summary_files = self.extract_severity_confidence_info(
-            si_bandit_report=si_bandit_report, filters_files=filters_files,
+            si_bandit_report=si_bandit_report,
+            filters_files=filters_files,
         )
 
         summary_df = pd.DataFrame()
@@ -406,7 +419,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
     @staticmethod
     def produce_si_bandit_report_summary_dataframe(
-        metadata_df: pd.DataFrame, si_bandit_sec_conf_df: pd.DataFrame, summary_files: Dict[str, int],
+        metadata_df: pd.DataFrame,
+        si_bandit_sec_conf_df: pd.DataFrame,
+        summary_files: Dict[str, int],
     ) -> pd.DataFrame:
         """Create si-bandit report summary dataframe.
 
@@ -423,9 +438,12 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         )
         report_summary_df["number_of_analyzed_files"] = pd.to_numeric(summary_files["number_of_analyzed_files"])
         report_summary_df["number_of_filtered_files"] = pd.to_numeric(summary_files["number_of_filtered_files"])
-        report_summary_df["number_of_files_total"] = pd.to_numeric(
-            summary_files["number_of_filtered_files"],
-        ) + pd.to_numeric(summary_files["number_of_analyzed_files"])
+        report_summary_df["number_of_files_total"] = (
+            pd.to_numeric(
+                summary_files["number_of_filtered_files"],
+            )
+            + pd.to_numeric(summary_files["number_of_analyzed_files"])
+        )
         report_summary_df["_total_severity"] = pd.to_numeric(report_summary_df["_total_severity"])
 
         return report_summary_df
@@ -455,7 +473,8 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         # Create metadata dataframe
         metadata_df = self.create_si_bandit_metadata_dataframe(
-            si_bandit_report=si_bandit_report, analyzer_version=analyzer_version,
+            si_bandit_report=si_bandit_report,
+            analyzer_version=analyzer_version,
         )
 
         if analyzer_version and metadata_df.empty:
@@ -473,12 +492,15 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         # Create Security/Confidence dataframe
         security_confidence_df, summary_files = self.create_security_confidence_dataframe(
-            si_bandit_report=si_bandit_report, filters_files=filters_files,
+            si_bandit_report=si_bandit_report,
+            filters_files=filters_files,
         )
 
         # Create Summary dataframe
         si_bandit_report_summary_df = self.produce_si_bandit_report_summary_dataframe(
-            metadata_df=metadata_df, si_bandit_sec_conf_df=security_confidence_df, summary_files=summary_files,
+            metadata_df=metadata_df,
+            si_bandit_sec_conf_df=security_confidence_df,
+            summary_files=summary_files,
         )
 
         return si_bandit_report_summary_df
@@ -508,7 +530,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
             _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
 
             si_bandit_report_summary_df = self.create_si_bandit_final_dataframe(
-                si_bandit_report=si_bandit_report, filters_files=filters_files, analyzer_version=analyzer_version,
+                si_bandit_report=si_bandit_report,
+                filters_files=filters_files,
+                analyzer_version=analyzer_version,
             )
             if not si_bandit_report_summary_df.empty:
                 final_df = pd.concat([final_df, si_bandit_report_summary_df], axis=0)
@@ -634,7 +658,9 @@ class SecurityIndicatorsCloc:
         return extracted_metadata
 
     def create_si_cloc_metadata_dataframe(
-        self, si_cloc_report: Dict[str, Any], analyzer_version: Optional[str] = None,
+        self,
+        si_cloc_report: Dict[str, Any],
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Create si-cloc report metadata dataframe.
 
@@ -666,7 +692,8 @@ class SecurityIndicatorsCloc:
 
     @staticmethod
     def produce_si_cloc_report_summary_dataframe(
-        metadata_df: pd.DataFrame, cloc_results_df: pd.DataFrame,
+        metadata_df: pd.DataFrame,
+        cloc_results_df: pd.DataFrame,
     ) -> pd.DataFrame:
         """Create si-cloc report summary dataframe.
 
@@ -680,7 +707,9 @@ class SecurityIndicatorsCloc:
         return report_summary_df
 
     def create_si_cloc_final_dataframe(
-        self, si_cloc_report: Dict[str, Any], analyzer_version: Optional[str] = None,
+        self,
+        si_cloc_report: Dict[str, Any],
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Create final si-cloc final dataframe.
 
@@ -716,13 +745,16 @@ class SecurityIndicatorsCloc:
         cloc_results_df = self.create_si_cloc_results_dataframe(si_cloc_report=si_cloc_report)
 
         report_summary_df = self.produce_si_cloc_report_summary_dataframe(
-            metadata_df=metadata_df, cloc_results_df=cloc_results_df,
+            metadata_df=metadata_df,
+            cloc_results_df=cloc_results_df,
         )
 
         return report_summary_df
 
     def aggregate_si_cloc_final_dataframes(
-        self, si_cloc_reports: List[Dict[str, Any]], analyzer_version: Optional[str] = None,
+        self,
+        si_cloc_reports: List[Dict[str, Any]],
+        analyzer_version: Optional[str] = None,
     ) -> pd.DataFrame:
         """Aggregate si-cloc dataframes into final dataframe.
 
@@ -742,7 +774,8 @@ class SecurityIndicatorsCloc:
             _LOGGER.info(f"Analyzing SI-cloc report: {counter}/{total_reports}")
 
             si_cloc_report_summary_df = self.create_si_cloc_final_dataframe(
-                si_cloc_report=si_cloc_report, analyzer_version=analyzer_version,
+                si_cloc_report=si_cloc_report,
+                analyzer_version=analyzer_version,
             )
 
             if not si_cloc_report_summary_df.empty:
@@ -820,10 +853,13 @@ class SecurityIndicatorsAggregator:
         """
         aggregated_df = pd.DataFrame()
         si_bandit_df = self.si_bandit.create_si_bandit_final_dataframe(
-            si_bandit_report=si_bandit_report, filters_files=filters_files, analyzer_version=si_bandit_version,
+            si_bandit_report=si_bandit_report,
+            filters_files=filters_files,
+            analyzer_version=si_bandit_version,
         )
         si_cloc_df = self.si_cloc.create_si_cloc_final_dataframe(
-            si_cloc_report=si_cloc_report, analyzer_version=si_cloc_version,
+            si_cloc_report=si_cloc_report,
+            analyzer_version=si_cloc_version,
         )
         if si_bandit_df.empty or si_cloc_df.empty:
             _LOGGER.exception("One of the analyzer results is empty!")
