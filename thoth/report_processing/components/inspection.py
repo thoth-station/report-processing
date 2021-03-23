@@ -75,7 +75,7 @@ class AmunInspections:
         max_ids: int = 5,
         is_local: bool = False,
         repo_path: Optional[Path] = None,
-        store_locally: Optional[Path] = None,
+        store_locally: bool = False,
         store_locally_repo_name: str = "./inspections",
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
@@ -88,7 +88,8 @@ class AmunInspections:
         :param is_local: flag to retrieve the dataset locally (if not uses Ceph S3 (credentials are required)).
         :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True.
         :param store_locally: required if you want to store the dataset retrieved from Ceph.
-        :param store_locally_repo_name: repo name where to store the dataset retrieved from Ceph, './inspections' by default.
+        :param store_locally_repo_name: repo name where to store the dataset retrieved from Ceph,
+                './inspections' by default.
         """
         if store_files:
             if any(store_file not in ThothAmunInspectionFileStoreEnum.__members__ for store_file in store_files):
@@ -124,7 +125,7 @@ class AmunInspections:
                 limit_results=limit_results,
                 max_ids=max_ids,
                 store_locally=store_locally,
-                store_locally_repo_name=store_locally_repo_name
+                store_locally_repo_name=store_locally_repo_name,
             )
 
         _LOGGER.info("Number of files retrieved is: %r" % counter)
@@ -162,7 +163,7 @@ class AmunInspections:
 
                 identifier_check = cls._has_inspection_identifier(
                     inspection_document_id,
-                    inspections_identifiers
+                    inspections_identifiers,
                 )
 
             if inspections_identifiers and not identifier_check:
@@ -177,8 +178,7 @@ class AmunInspections:
                 # Iterate through inspection results number
                 for inspection_number_path in Path(f"{result_path}/results").iterdir():
                     _LOGGER.info(
-                        f"Considering inspection ID {inspection_document_id}."
-                        f"Number {inspection_number_path.name}",
+                        f"Considering inspection ID {inspection_document_id}." f"Number {inspection_number_path.name}",
                     )
 
                     file_info: Dict[str, Any] = {}
@@ -277,15 +277,14 @@ class AmunInspections:
             else:
                 files.pop(inspection_document_id)
 
-
         return files, counter
 
     @staticmethod
     def _has_inspection_identifier(
         inspection_id: str,
-        inspections_identifiers: List[str]
-    ):
-        """Check if inspection id has identifier"""
+        inspections_identifiers: List[str],
+    ) -> bool:
+        """Check if inspection id has identifier."""
         inspection_id_pieces = inspection_id.split("-")
 
         for identifier in inspections_identifiers:
@@ -303,9 +302,9 @@ class AmunInspections:
         inspection_store: InspectionStore,
         store_locally_repo_name: str,
         store_files: Optional[List[str]] = None,
-        store_locally: Optional[List[str]] = None,
-    ):
-        """"Retrieve inspection results for inspection ID."""
+        store_locally: bool = False,
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Retrieve inspection results for inspection ID."""
         _LOGGER.info(f"Document id: {inspection_document_id}")
         number_results = inspection_store.results.get_results_count()
 
@@ -326,18 +325,23 @@ class AmunInspections:
 
                 if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
                     inspection_result_document = inspection_store.results.retrieve_result(
-                        item=inspection_result_number
+                        item=inspection_result_number,
                     )
 
                     file_info["result"] = inspection_result_document
                     file_info["result"]["inspection_document_id"] = inspection_document_id
 
                     if store_locally:
-                        result_path = f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}"
+                        result_path = (
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}"
+                        )
                         if not os.path.exists(result_path):
                             os.makedirs(result_path)
 
-                    with open(f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/result", "w") as result_file:
+                    with open(
+                        f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/result",
+                        "w",
+                    ) as result_file:
                         result_file.write(json.dumps(inspection_result_document))
 
                 if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
@@ -348,9 +352,11 @@ class AmunInspections:
                     file_info["hwinfo"] = inspection_hw_info
 
                     if store_locally:
-                        with open(f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/hwinfo", "w") as hw_file:
+                        with open(
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/hwinfo",
+                            "w",
+                        ) as hw_file:
                             hw_file.write(json.dumps(inspection_hw_info))
-
 
                 if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
                     inspection_job_logs = inspection_store.results.retrieve_log(item=inspection_result_number)
@@ -358,7 +364,10 @@ class AmunInspections:
                     file_info["job_logs"] = inspection_job_logs
 
                     if store_locally:
-                        with open(f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/log", "w") as log_file:
+                        with open(
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/log",
+                            "w",
+                        ) as log_file:
                             log_file.write(inspection_job_logs)
 
                 inspection_result_counter += 1
@@ -381,16 +390,15 @@ class AmunInspections:
 
         return retrieved_files, inspection_result_number
 
-
     @staticmethod
     def _retrieve_build_specification_from_ceph(
         inspection_document_id: str,
         inspection_store: InspectionStore,
         store_locally_repo_name: str,
         store_files: Optional[List[str]] = None,
-        store_locally: Optional[List[str]] = None,
-    ):
-        """"Retrieve inspection build specification for inspection ID."""
+        store_locally: bool = False,
+    ) -> Any:
+        """Retrieve inspection build specification for inspection ID."""
         if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
 
             try:
@@ -404,7 +412,10 @@ class AmunInspections:
                 return None
 
             if store_locally:
-                with open(f"{store_locally_repo_name}/{inspection_document_id}/build/specification", "w") as specification_file:
+                with open(
+                    f"{store_locally_repo_name}/{inspection_document_id}/build/specification",
+                    "w",
+                ) as specification_file:
                     specification_file.write(json.dumps(inspection_specification_document))
 
             return inspection_specification_document
@@ -412,16 +423,15 @@ class AmunInspections:
         else:
             return None
 
-
     @staticmethod
     def _retrieve_build_logs_from_ceph(
         inspection_document_id: str,
         inspection_store: InspectionStore,
         store_locally_repo_name: str,
         store_files: Optional[List[str]] = None,
-        store_locally: Optional[List[str]] = None,
-    ):
-        """"Retrieve inspection build logs for inspection ID."""
+        store_locally: bool = False,
+    ) -> Any:
+        """Retrieve inspection build logs for inspection ID."""
         if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
 
             try:
@@ -437,7 +447,7 @@ class AmunInspections:
             if store_locally:
                 with open(f"{store_locally_repo_name}/{inspection_document_id}/build/log", "w") as build_log_file:
                     build_log_file.write(inspection_build_logs)
-            
+
             return inspection_build_logs
 
         else:
@@ -453,7 +463,7 @@ class AmunInspections:
         inspection_ids_list: Optional[List[str]] = None,
         limit_results: bool = False,
         max_ids: int = 5,
-        store_locally: Optional[List[str]] = None,
+        store_locally: bool = False,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from Ceph."""
         store_class_type = InspectionStore
@@ -473,13 +483,13 @@ class AmunInspections:
 
                 identifier_check = cls._has_inspection_identifier(
                     inspection_document_id,
-                    inspections_identifiers
+                    inspections_identifiers,
                 )
 
             if inspections_identifiers and not identifier_check:
                 # If identifiers are requested and inspection id does not contain any of them, skip it
                 continue
-    
+
             inspection_store = InspectionStore(inspection_id=inspection_document_id)
             inspection_store.connect()
 
@@ -488,7 +498,7 @@ class AmunInspections:
                 inspection_store=inspection_store,
                 store_files=store_files,
                 store_locally=store_locally,
-                store_locally_repo_name=store_locally_repo_name
+                store_locally_repo_name=store_locally_repo_name,
             )
 
             if store_locally:
@@ -501,7 +511,7 @@ class AmunInspections:
                 inspection_store=inspection_store,
                 store_files=store_files,
                 store_locally=store_locally,
-                store_locally_repo_name=store_locally_repo_name
+                store_locally_repo_name=store_locally_repo_name,
             )
 
             if retrieved_files and build_specification_file:
@@ -514,9 +524,7 @@ class AmunInspections:
                     result["requirements"] = build_specification_file["python"]["requirements"]
 
                     requirements_locked = cls._parse_requirements_locked(
-                        requirements_locked=build_specification_file["python"][
-                            "requirements_locked"
-                        ],
+                        requirements_locked=build_specification_file["python"]["requirements_locked"],
                     )
                     result["result"]["requirements_locked"] = requirements_locked
 
@@ -528,7 +536,7 @@ class AmunInspections:
             else:
                 files[inspection_document_id] = {}
 
-            if build_specification_file:    
+            if build_specification_file:
                 files[inspection_document_id]["specification"] = build_specification_file
 
             build_info_file = cls._retrieve_build_logs_from_ceph(
@@ -536,7 +544,7 @@ class AmunInspections:
                 inspection_store=inspection_store,
                 store_files=store_files,
                 store_locally=store_locally,
-                store_locally_repo_name=store_locally_repo_name
+                store_locally_repo_name=store_locally_repo_name,
             )
 
             if build_info_file:
@@ -587,7 +595,7 @@ class AmunInspections:
             return processed_inspection_runs, failed_inspection_runs
 
         for inspection_id, inspection_run in inspection_runs.items():
-            
+
             if "results" not in inspection_run.keys():
                 _LOGGER.warning(
                     f"Inspection ID {inspection_id} has not results, discarding...",
@@ -785,12 +793,15 @@ class AmunInspections:
         return main_inspection_df
 
     @staticmethod
-    def create_python_package_df(inspections_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def create_python_package_df(
+        inspections_df: pd.DataFrame,
+    ) -> Tuple[pd.DataFrame, Dict[str, Any], pd.DataFrame]:
         """Create DataFrame with only python packages present in software stacks.
 
         :param inspection_df: df of inspections results provided by `create_inspections_dataframe`.
         """
         python_packages_versions: Dict[str, Any] = {}
+        python_packages_versions_plot: Dict[str, Any] = {}
         python_packages_names = []
 
         sws_df = inspections_df[[col for col in inspections_df.columns.values if "__index" in col]]
@@ -813,16 +824,24 @@ class AmunInspections:
                 if pd.isnull(version):
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
+                        python_packages_versions_plot[package] = []
 
                     python_packages_versions[package].append("")
+                    python_packages_versions_plot[package].append("")
 
                 else:
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
+                        python_packages_versions_plot[package] = []
 
                     python_packages_versions[package].append(f"{package}-{version.replace('==', '')}-{index}")
+                    python_packages_versions_plot[package].append(version.replace("==", ""))
 
-        return pd.DataFrame(python_packages_versions), python_packages_versions
+        return (
+            pd.DataFrame(python_packages_versions),
+            python_packages_versions,
+            pd.DataFrame(python_packages_versions_plot),
+        )
 
     @classmethod
     def create_final_dataframe(
@@ -830,6 +849,7 @@ class AmunInspections:
         inspections_df: pd.DataFrame,
         filters_for_identifiers: Optional[List[str]] = None,
         include_statistics: bool = False,
+        use_only_versions: bool = False,
     ) -> pd.DataFrame:
         """Create final dataframe with all information required for plots.
 
@@ -840,11 +860,16 @@ class AmunInspections:
             _LOGGER.exception("Inspections dataframe is empty!")
             return pd.DataFrame()
 
-        python_packages_dataframe, packages_versions = cls.create_python_package_df(inspections_df=inspections_df)
+        python_packages_dataframe, packages_versions_indexes, versions = cls.create_python_package_df(
+            inspections_df=inspections_df,
+        )
 
         label_encoder = LabelEncoder()
 
-        processed_string_result = copy.deepcopy(packages_versions)
+        if not use_only_versions:
+            processed_string_result = copy.deepcopy(packages_versions_indexes)
+        else:
+            processed_string_result = copy.deepcopy(versions)
 
         sws_encoded = []
         for index, row in python_packages_dataframe.iterrows():
@@ -1246,10 +1271,10 @@ class AmunInspectionsFailedSummary:
             _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
             return pd.DataFrame(results)
 
-        python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
+        python_packages_dataframe, _, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
         packages = set(python_packages_dataframe.columns.values)
 
-        python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
+        python_packages_dataframe_failed, _, _ = AmunInspections.create_python_package_df(
             inspections_df=failed_inspections_df,
         )
         packages_from_failed = set(python_packages_dataframe_failed.columns.values)
