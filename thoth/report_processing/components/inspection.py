@@ -75,6 +75,8 @@ class AmunInspections:
         max_ids: int = 5,
         is_local: bool = False,
         repo_path: Optional[Path] = None,
+        store_locally: bool = False,
+        store_locally_repo_name: str = "./inspections",
     ) -> Dict[str, Any]:
         """Aggregate results stored on Ceph or locally from repo for Thoth components reports.
 
@@ -85,6 +87,9 @@ class AmunInspections:
         :param max_ids: maximum number of reports ids considered.
         :param is_local: flag to retrieve the dataset locally (if not uses Ceph S3 (credentials are required)).
         :param repo_path: required if you want to retrieve the dataset locally and `is_local` is set to True.
+        :param store_locally: required if you want to store the dataset retrieved from Ceph.
+        :param store_locally_repo_name: repo name where to store the dataset retrieved from Ceph,
+                './inspections' by default.
         """
         if store_files:
             if any(store_file not in ThothAmunInspectionFileStoreEnum.__members__ for store_file in store_files):
@@ -99,10 +104,10 @@ class AmunInspections:
         files: Dict[str, Any] = {}
 
         if not store_files:
-            store_files = ["results", "specification", "hardware_info"]
+            store_files = ["results", "specification", "hardware_info", "build_logs"]
 
         if is_local:
-            files, counter = cls._aggregate_thoth_results_from_local(
+            files, counter = cls._aggregate_inspections_from_local(
                 repo_path=repo_path,
                 inspections_identifiers=inspections_identifiers,
                 files=files,
@@ -112,13 +117,15 @@ class AmunInspections:
             )
 
         else:
-            files, counter = cls._aggregate_thoth_results_from_ceph(
+            files, counter = cls._aggregate_inspections_from_ceph(
                 store_files=store_files,
                 inspections_identifiers=inspections_identifiers,
                 inspection_ids_list=inspection_ids_list,
                 files=files,
                 limit_results=limit_results,
                 max_ids=max_ids,
+                store_locally=store_locally,
+                store_locally_repo_name=store_locally_repo_name,
             )
 
         _LOGGER.info("Number of files retrieved is: %r" % counter)
@@ -126,7 +133,7 @@ class AmunInspections:
         return files
 
     @classmethod
-    def _aggregate_thoth_results_from_local(
+    def _aggregate_inspections_from_local(
         cls,
         files: Dict[str, Any],
         store_files: Optional[List[str]] = None,
@@ -134,7 +141,6 @@ class AmunInspections:
         repo_path: Optional[Path] = None,
         limit_results: bool = False,
         max_ids: int = 5,
-        is_multiple: Optional[bool] = None,
     ) -> Tuple[Dict[str, Any], int]:
         """Aggregate Thoth results from local repo."""
         _LOGGER.info(f"Retrieving dataset at path... {repo_path}")
@@ -151,208 +157,77 @@ class AmunInspections:
         for result_path in repo_path.iterdir():
             inspection_document_id = result_path.name
 
-            inspection_id_pieces = inspection_document_id.split("-")
-
             identifier_check = False
 
             if inspections_identifiers:
 
-                for identifier in inspections_identifiers:
-                    identifier_pieces = identifier.split("-")
-                    if not set(identifier_pieces) - set(inspection_id_pieces):
-                        # The inspection id has the correct identifier requested
-                        identifier_check = True
-                        break
+                identifier_check = cls._has_inspection_identifier(
+                    inspection_document_id,
+                    inspections_identifiers,
+                )
 
-            if not inspections_identifiers or identifier_check:
-                _LOGGER.info(f"Considering inspection ID... {inspection_document_id}")
+            if inspections_identifiers and not identifier_check:
+                _LOGGER.info(f"Skipping inspection ID... {inspection_document_id}")
+                # If identifiers are requested and inspection id does not contain any of them, skip it
+                continue
 
-                retrieved_files: List[Dict[str, Any]] = []
-                try:
-                    # Iterate through inspection results number
-                    for inspection_number_path in Path(f"{result_path}/results").iterdir():
-                        _LOGGER.info(
-                            f"Considering inspection ID {inspection_document_id}."
-                            f"Number {inspection_number_path.name}",
-                        )
+            _LOGGER.info(f"Considering inspection ID... {inspection_document_id}")
 
-                        file_info: Dict[str, Any] = {}
-
-                        if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
-
-                            with open(f"{inspection_number_path}/result", "r") as result_file:
-                                inspection_result_document = json.load(result_file)
-
-                                file_info["result"] = inspection_result_document
-                                file_info["result"]["inspection_document_id"] = inspection_document_id
-
-                            if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
-
-                                with open(f"{inspection_number_path}/hwinfo", "r") as hwinfo_file:
-                                    inspection_hw_info = json.load(hwinfo_file)
-
-                                    file_info["hwinfo"] = inspection_hw_info
-
-                            if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
-
-                                with open(f"{inspection_number_path}/log", "r") as job_log_file:
-                                    inspection_job_logs = job_log_file.read()
-
-                                    file_info["job_logs"] = inspection_job_logs
-
-                        retrieved_files.append(file_info)
-
-                    files[inspection_document_id] = {"results": retrieved_files}
-
-                    if retrieved_files:
-                        if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
-
-                            with open(f"{result_path}/build/specification", "r") as specification_file:
-                                inspection_specification_document = json.load(specification_file)
-
-                                modified_results = []
-                                for result in files[inspection_document_id]["results"]:
-                                    result["result"]["identifier"] = inspection_specification_document["identifier"]
-                                    result["result"]["specification_base"] = inspection_specification_document["base"]
-                                    result["result"]["batch_size"] = inspection_specification_document["batch_size"]
-                                    result["requirements"] = inspection_specification_document["python"]["requirements"]
-
-                                    requirements_locked = cls._parse_requirements_locked(
-                                        requirements_locked=inspection_specification_document["python"][
-                                            "requirements_locked"
-                                        ],
-                                    )
-                                    result["result"]["requirements_locked"] = requirements_locked
-
-                                    result["result"]["run"] = inspection_specification_document["run"]
-
-                                    modified_results.append(result)
-
-                                files[inspection_document_id] = {"results": modified_results}
-                                files[inspection_document_id]["specification"] = inspection_specification_document
-
-                        if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
-
-                            with open(f"{result_path}/build/log", "r") as build_logs_type:
-                                inspection_build_logs = build_logs_type.read()
-
-                                files[inspection_document_id]["build_logs"] = inspection_build_logs
-
-                        counter += 1
-                except Exception as retrieval_error:
+            retrieved_files: List[Dict[str, Any]] = []
+            try:
+                # Iterate through inspection results number
+                for inspection_number_path in Path(f"{result_path}/results").iterdir():
                     _LOGGER.info(
-                        f"Considering inspection ID {inspection_document_id}."
-                        f"No files retrieved due to the following error: {retrieval_error}",
+                        f"Considering inspection ID {inspection_document_id}." f"Number {inspection_number_path.name}",
                     )
 
-                if limit_results:
-                    if counter == max_ids:
-                        return files, counter
+                    file_info: Dict[str, Any] = {}
 
-            else:
-                _LOGGER.info(f"Skipping inspection ID... {inspection_document_id}")
+                    if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
 
-        return files, counter
+                        with open(f"{inspection_number_path}/result", "r") as result_file:
+                            inspection_result_document = json.load(result_file)
 
-    @classmethod
-    def _aggregate_thoth_results_from_ceph(
-        cls,
-        files: Dict[str, Any],
-        store_files: Optional[List[str]] = None,
-        inspections_identifiers: Optional[List[str]] = None,
-        inspection_ids_list: Optional[List[str]] = None,
-        limit_results: bool = False,
-        max_ids: int = 5,
-    ) -> Tuple[Dict[str, Any], int]:
-        """Aggregate Thoth results from Ceph."""
-        store_class_type = InspectionStore
+                            file_info["result"] = inspection_result_document
+                            file_info["result"]["inspection_document_id"] = inspection_document_id
 
-        # Inspection ID counter
-        inspection_counter = 0
+                        if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
 
-        for inspection_document_id in inspection_ids_list or store_class_type.iter_inspections():
-
-            inspection_id_pieces = inspection_document_id.split("-")
-
-            identifier_check = False
-
-            if inspections_identifiers:
-
-                for identifier in inspections_identifiers:
-                    identifier_pieces = identifier.split("-")
-                    if not set(identifier_pieces) - set(inspection_id_pieces):
-                        # The inspection id has the correct identifier requested
-                        identifier_check = True
-                        break
-
-            if not inspections_identifiers or identifier_check:
-                inspection_store = InspectionStore(inspection_id=inspection_document_id)
-                inspection_store.connect()
-
-                _LOGGER.info(f"Document id: {inspection_document_id}")
-                number_results = inspection_store.results.get_results_count()
-
-                # Inspection ID result counter
-                inspection_result_counter = 0
-
-                if number_results > 0:
-
-                    retrieved_files: List[Dict[str, Any]] = []
-
-                    for inspection_result_number in range(number_results):
-
-                        file_info: Dict[str, Any] = {}
-
-                        try:
-
-                            if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
-                                inspection_result_document = inspection_store.results.retrieve_result(
-                                    inspection_result_number,
-                                )
-
-                                file_info["result"] = inspection_result_document
-                                file_info["result"]["inspection_document_id"] = inspection_document_id
-
-                            if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
-                                inspection_hw_info = inspection_store.results.retrieve_hwinfo(
-                                    item=inspection_result_number,
-                                )
+                            with open(f"{inspection_number_path}/hwinfo", "r") as hwinfo_file:
+                                inspection_hw_info = json.load(hwinfo_file)
 
                                 file_info["hwinfo"] = inspection_hw_info
 
-                            if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
-                                inspection_job_logs = inspection_store.results.retrieve_log()
+                        if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
+
+                            with open(f"{inspection_number_path}/log", "r") as job_log_file:
+                                inspection_job_logs = job_log_file.read()
 
                                 file_info["job_logs"] = inspection_job_logs
 
-                            inspection_result_counter += 1
-
-                            _LOGGER.info(
-                                "Documents id %r results number retrieved: %r",
-                                inspection_document_id,
-                                inspection_result_number,
-                            )
-
-                        except Exception as inspection_exception:
-                            _LOGGER.exception(
-                                f"Exception during retrieval of inspection id {inspection_document_id} results"
-                                f"n.{inspection_result_number}: {inspection_exception}",
-                            )
-                            pass
-
+                    if file_info:
                         retrieved_files.append(file_info)
 
-                if inspection_result_counter > 0:
+            except Exception as retrieval_error:
+                _LOGGER.info(
+                    f"Considering inspection ID {inspection_document_id}."
+                    f"No files retrieved due to the following error: {retrieval_error}",
+                )
 
-                    files[inspection_document_id] = {"results": retrieved_files}
+            if retrieved_files:
+                files[inspection_document_id] = {"results": retrieved_files}
+            else:
+                files[inspection_document_id] = {}
 
-                    try:
-                        if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
-                            inspection_specification_document = inspection_store.retrieve_specification()
+            try:
+                if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
 
+                    with open(f"{result_path}/build/specification", "r") as specification_file:
+                        inspection_specification_document = json.load(specification_file)
+
+                        if retrieved_files:
                             modified_results = []
                             for result in files[inspection_document_id]["results"]:
-
                                 result["result"]["identifier"] = inspection_specification_document["identifier"]
                                 result["result"]["specification_base"] = inspection_specification_document["base"]
                                 result["result"]["batch_size"] = inspection_specification_document["batch_size"]
@@ -370,32 +245,322 @@ class AmunInspections:
                                 modified_results.append(result)
 
                             files[inspection_document_id] = {"results": modified_results}
-                            files[inspection_document_id]["specification"] = inspection_specification_document
 
-                        if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
-                            inspection_build_logs = inspection_store.build.retrieve_log()
+                        files[inspection_document_id]["specification"] = inspection_specification_document
 
-                            files[inspection_document_id]["build_logs"] = inspection_build_logs
+            except Exception as retrieval_error:
+                _LOGGER.info(
+                    f"Considering inspection ID {inspection_document_id}."
+                    f"No build specification retrieved due to the following error: {retrieval_error}",
+                )
 
-                        inspection_counter += 1
+            try:
+                if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
 
-                        _LOGGER.info("Documents id retrieved: %r", inspection_counter)
+                    with open(f"{result_path}/build/log", "r") as build_logs_type:
+                        inspection_build_logs = build_logs_type.read()
 
-                        if limit_results:
-                            if inspection_counter == max_ids:
-                                return files, inspection_counter
+                        files[inspection_document_id]["build_logs"] = inspection_build_logs
 
-                    except Exception as inspection_exception:
-                        _LOGGER.exception(
-                            f"Exception during retrieval of inspection info for"
-                            f"inspection id {inspection_document_id}: {inspection_exception}",
+            except Exception as retrieval_error:
+                _LOGGER.info(
+                    f"Considering inspection ID {inspection_document_id}."
+                    f"No build log retrieved due to the following error: {retrieval_error}",
+                )
+
+            if files[inspection_document_id]:
+                counter += 1
+
+                if limit_results:
+                    if counter == max_ids:
+                        return files, counter
+            else:
+                files.pop(inspection_document_id)
+
+        return files, counter
+
+    @staticmethod
+    def _has_inspection_identifier(
+        inspection_id: str,
+        inspections_identifiers: List[str],
+    ) -> bool:
+        """Check if inspection id has identifier."""
+        inspection_id_pieces = inspection_id.split("-")
+
+        for identifier in inspections_identifiers:
+            identifier_pieces = identifier.split("-")
+            if not set(identifier_pieces) - set(inspection_id_pieces):
+                # The inspection id has the correct identifier requested
+                return True
+
+        # The inspection id does not has the identifier requested
+        return False
+
+    @staticmethod
+    def _retrieve_inspection_results_from_ceph(
+        inspection_document_id: str,
+        inspection_store: InspectionStore,
+        store_locally_repo_name: str,
+        store_files: Optional[List[str]] = None,
+        store_locally: bool = False,
+    ) -> Tuple[List[Dict[str, Any]], int]:
+        """Retrieve inspection results for inspection ID."""
+        _LOGGER.info(f"Document id: {inspection_document_id}")
+        number_results = inspection_store.results.get_results_count()
+
+        if number_results == 0:
+            _LOGGER.warning(f"No inspection results identified for inspection ID: {inspection_document_id}")
+            return [], 0
+
+        # Inspection ID result counter
+        inspection_result_counter = 0
+
+        retrieved_files: List[Dict[str, Any]] = []
+
+        for inspection_result_number in range(number_results):
+
+            file_info: Dict[str, Any] = {}
+
+            try:
+
+                if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
+                    inspection_result_document = inspection_store.results.retrieve_result(
+                        item=inspection_result_number,
+                    )
+
+                    file_info["result"] = inspection_result_document
+                    file_info["result"]["inspection_document_id"] = inspection_document_id
+
+                    if store_locally:
+                        result_path = (
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}"
                         )
-                        pass
+                        if not os.path.exists(result_path):
+                            os.makedirs(result_path)
 
-                else:
-                    _LOGGER.warning(f"No inspection results identified for inspection ID: {inspection_document_id}")
+                    with open(
+                        f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/result",
+                        "w",
+                    ) as result_file:
+                        result_file.write(json.dumps(inspection_result_document))
 
-        return files, inspection_counter
+                if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
+                    inspection_hw_info = inspection_store.results.retrieve_hwinfo(
+                        item=inspection_result_number,
+                    )
+
+                    file_info["hwinfo"] = inspection_hw_info
+
+                    if store_locally:
+                        with open(
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/hwinfo",
+                            "w",
+                        ) as hw_file:
+                            hw_file.write(json.dumps(inspection_hw_info))
+
+                if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
+                    inspection_job_logs = inspection_store.results.retrieve_log(item=inspection_result_number)
+
+                    file_info["job_logs"] = inspection_job_logs
+
+                    if store_locally:
+                        with open(
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/log",
+                            "w",
+                        ) as log_file:
+                            log_file.write(inspection_job_logs)
+
+                inspection_result_counter += 1
+
+                _LOGGER.info(
+                    "From inspection id %r results number identifier retrieved: %r",
+                    inspection_document_id,
+                    inspection_result_number,
+                )
+
+                if file_info:
+                    retrieved_files.append(file_info)
+
+            except Exception as inspection_exception:
+                _LOGGER.exception(
+                    f"Exception during retrieval of inspection id {inspection_document_id} results"
+                    f"n.{inspection_result_number}: {inspection_exception}",
+                )
+                pass
+
+        return retrieved_files, inspection_result_number
+
+    @staticmethod
+    def _retrieve_build_specification_from_ceph(
+        inspection_document_id: str,
+        inspection_store: InspectionStore,
+        store_locally_repo_name: str,
+        store_files: Optional[List[str]] = None,
+        store_locally: bool = False,
+    ) -> Any:
+        """Retrieve inspection build specification for inspection ID."""
+        if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
+
+            try:
+                inspection_specification_document = inspection_store.retrieve_specification()
+
+            except Exception as inspection_exception:
+                _LOGGER.exception(
+                    f"Exception during retrieval of inspection build specification for"
+                    f"inspection id {inspection_document_id}: {inspection_exception}",
+                )
+                return None
+
+            if store_locally:
+                with open(
+                    f"{store_locally_repo_name}/{inspection_document_id}/build/specification",
+                    "w",
+                ) as specification_file:
+                    specification_file.write(json.dumps(inspection_specification_document))
+
+            return inspection_specification_document
+
+        else:
+            return None
+
+    @staticmethod
+    def _retrieve_build_logs_from_ceph(
+        inspection_document_id: str,
+        inspection_store: InspectionStore,
+        store_locally_repo_name: str,
+        store_files: Optional[List[str]] = None,
+        store_locally: bool = False,
+    ) -> Any:
+        """Retrieve inspection build logs for inspection ID."""
+        if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
+
+            try:
+                inspection_build_logs = inspection_store.build.retrieve_log()
+
+            except Exception as inspection_exception:
+                _LOGGER.exception(
+                    f"Exception during retrieval of inspection build logs for"
+                    f"inspection id {inspection_document_id}: {inspection_exception}",
+                )
+                return None
+
+            if store_locally:
+                with open(f"{store_locally_repo_name}/{inspection_document_id}/build/log", "w") as build_log_file:
+                    build_log_file.write(inspection_build_logs)
+
+            return inspection_build_logs
+
+        else:
+            return None
+
+    @classmethod
+    def _aggregate_inspections_from_ceph(
+        cls,
+        files: Dict[str, Any],
+        store_locally_repo_name: str,
+        store_files: Optional[List[str]] = None,
+        inspections_identifiers: Optional[List[str]] = None,
+        inspection_ids_list: Optional[List[str]] = None,
+        limit_results: bool = False,
+        max_ids: int = 5,
+        store_locally: bool = False,
+    ) -> Tuple[Dict[str, Any], int]:
+        """Aggregate Thoth results from Ceph."""
+        store_class_type = InspectionStore
+
+        # Inspection ID counter
+        files_retrieved_counter = 0
+
+        if store_locally:
+            if not os.path.exists(store_locally_repo_name):
+                os.mkdir(store_locally_repo_name)
+
+        for inspection_document_id in inspection_ids_list or store_class_type.iter_inspections():
+
+            identifier_check = False
+
+            if inspections_identifiers:
+
+                identifier_check = cls._has_inspection_identifier(
+                    inspection_document_id,
+                    inspections_identifiers,
+                )
+
+            if inspections_identifiers and not identifier_check:
+                # If identifiers are requested and inspection id does not contain any of them, skip it
+                continue
+
+            inspection_store = InspectionStore(inspection_id=inspection_document_id)
+            inspection_store.connect()
+
+            retrieved_files, _ = cls._retrieve_inspection_results_from_ceph(
+                inspection_document_id=inspection_document_id,
+                inspection_store=inspection_store,
+                store_files=store_files,
+                store_locally=store_locally,
+                store_locally_repo_name=store_locally_repo_name,
+            )
+
+            if store_locally:
+                build_path = f"{store_locally_repo_name}/{inspection_document_id}/build/"
+                if not os.path.exists(build_path):
+                    os.makedirs(build_path)
+
+            build_specification_file = cls._retrieve_build_specification_from_ceph(
+                inspection_document_id=inspection_document_id,
+                inspection_store=inspection_store,
+                store_files=store_files,
+                store_locally=store_locally,
+                store_locally_repo_name=store_locally_repo_name,
+            )
+
+            if retrieved_files and build_specification_file:
+                modified_results = []
+
+                for result in retrieved_files:
+                    result["result"]["identifier"] = build_specification_file["identifier"]
+                    result["result"]["specification_base"] = build_specification_file["base"]
+                    result["result"]["batch_size"] = build_specification_file["batch_size"]
+                    result["requirements"] = build_specification_file["python"]["requirements"]
+
+                    requirements_locked = cls._parse_requirements_locked(
+                        requirements_locked=build_specification_file["python"]["requirements_locked"],
+                    )
+                    result["result"]["requirements_locked"] = requirements_locked
+
+                    result["result"]["run"] = build_specification_file["run"]
+
+                    modified_results.append(result)
+
+                files[inspection_document_id] = {"results": modified_results}
+            else:
+                files[inspection_document_id] = {}
+
+            if build_specification_file:
+                files[inspection_document_id]["specification"] = build_specification_file
+
+            build_info_file = cls._retrieve_build_logs_from_ceph(
+                inspection_document_id=inspection_document_id,
+                inspection_store=inspection_store,
+                store_files=store_files,
+                store_locally=store_locally,
+                store_locally_repo_name=store_locally_repo_name,
+            )
+
+            if build_info_file:
+                files[inspection_document_id]["build_logs"] = build_info_file
+
+            if files[inspection_document_id]:
+                _LOGGER.info(f"Retrieved file n. {files_retrieved_counter}")
+                files_retrieved_counter += 1
+
+                if limit_results:
+                    if files_retrieved_counter == max_ids:
+                        return files, files_retrieved_counter
+            else:
+                files.pop(inspection_document_id)
+
+        return files, files_retrieved_counter
 
     @staticmethod
     def _parse_requirements_locked(requirements_locked: Dict[str, Any]) -> Dict[str, Any]:
@@ -430,6 +595,12 @@ class AmunInspections:
             return processed_inspection_runs, failed_inspection_runs
 
         for inspection_id, inspection_run in inspection_runs.items():
+
+            if "results" not in inspection_run.keys():
+                _LOGGER.warning(
+                    f"Inspection ID {inspection_id} has not results, discarding...",
+                )
+                continue
 
             inspection_run_df = cls.process_inspection_run(inspection_run=inspection_run)
 
@@ -622,12 +793,15 @@ class AmunInspections:
         return main_inspection_df
 
     @staticmethod
-    def create_python_package_df(inspections_df: pd.DataFrame) -> Tuple[pd.DataFrame, Dict[str, Any]]:
+    def create_python_package_df(
+        inspections_df: pd.DataFrame,
+    ) -> Tuple[pd.DataFrame, Dict[str, Any], pd.DataFrame]:
         """Create DataFrame with only python packages present in software stacks.
 
         :param inspection_df: df of inspections results provided by `create_inspections_dataframe`.
         """
         python_packages_versions: Dict[str, Any] = {}
+        python_packages_versions_plot: Dict[str, Any] = {}
         python_packages_names = []
 
         sws_df = inspections_df[[col for col in inspections_df.columns.values if "__index" in col]]
@@ -650,16 +824,24 @@ class AmunInspections:
                 if pd.isnull(version):
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
+                        python_packages_versions_plot[package] = []
 
                     python_packages_versions[package].append("")
+                    python_packages_versions_plot[package].append("")
 
                 else:
                     if package not in python_packages_versions.keys():
                         python_packages_versions[package] = []
+                        python_packages_versions_plot[package] = []
 
                     python_packages_versions[package].append(f"{package}-{version.replace('==', '')}-{index}")
+                    python_packages_versions_plot[package].append(version.replace("==", ""))
 
-        return pd.DataFrame(python_packages_versions), python_packages_versions
+        return (
+            pd.DataFrame(python_packages_versions),
+            python_packages_versions,
+            pd.DataFrame(python_packages_versions_plot),
+        )
 
     @classmethod
     def create_final_dataframe(
@@ -667,6 +849,7 @@ class AmunInspections:
         inspections_df: pd.DataFrame,
         filters_for_identifiers: Optional[List[str]] = None,
         include_statistics: bool = False,
+        use_only_versions: bool = False,
     ) -> pd.DataFrame:
         """Create final dataframe with all information required for plots.
 
@@ -677,11 +860,16 @@ class AmunInspections:
             _LOGGER.exception("Inspections dataframe is empty!")
             return pd.DataFrame()
 
-        python_packages_dataframe, packages_versions = cls.create_python_package_df(inspections_df=inspections_df)
+        python_packages_dataframe, packages_versions_indexes, versions = cls.create_python_package_df(
+            inspections_df=inspections_df,
+        )
 
         label_encoder = LabelEncoder()
 
-        processed_string_result = copy.deepcopy(packages_versions)
+        if not use_only_versions:
+            processed_string_result = copy.deepcopy(packages_versions_indexes)
+        else:
+            processed_string_result = copy.deepcopy(versions)
 
         sws_encoded = []
         for index, row in python_packages_dataframe.iterrows():
@@ -1083,10 +1271,10 @@ class AmunInspectionsFailedSummary:
             _LOGGER.warning("No inspections runs have been received, no failures summary can be produced.")
             return pd.DataFrame(results)
 
-        python_packages_dataframe, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
+        python_packages_dataframe, _, _ = AmunInspections.create_python_package_df(inspections_df=inspections_df)
         packages = set(python_packages_dataframe.columns.values)
 
-        python_packages_dataframe_failed, _ = AmunInspections.create_python_package_df(
+        python_packages_dataframe_failed, _, _ = AmunInspections.create_python_package_df(
             inspections_df=failed_inspections_df,
         )
         packages_from_failed = set(python_packages_dataframe_failed.columns.values)
