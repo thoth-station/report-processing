@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-thoth-storages = ">=0.24.1"
+thoth-storages = ">=0.40.0"
 pandas = "*"
 scikit-learn = "*"
 numpy = "*"
@@ -19,7 +19,7 @@ hypothesis-auto = "*"
 hypothesis = "*"
 pytest-mypy = "*"
 mypy = "*"
-pre-commit = "==2.0.1"
+pre-commit = "*"
 
 [requires]
 python_version = "3.8"
