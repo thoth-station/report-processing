@@ -30,7 +30,7 @@ import numpy as np
 
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
 
-from thoth.storages import CephStore, GraphDatabase
+from thoth.storages import CephStore
 from thoth.storages.advisers import AdvisersResultsStore
 
 # set up logging
@@ -50,8 +50,8 @@ class Adviser:
     @classmethod
     def aggregate_adviser_results(
         cls,
-        start_date: Optional[datetime.date] = None,
-        end_date: Optional[datetime.date] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
         limit_results: bool = False,
         max_ids: int = 5,
         is_local: bool = False,
@@ -133,8 +133,8 @@ class Adviser:
     @staticmethod
     def _aggregate_thoth_results_from_ceph(
         files: Dict[str, Any],
-        start_date: Optional[datetime.date] = None,
-        end_date: Optional[datetime.date] = None,
+        start_date: Optional[date] = None,
+        end_date: Optional[date] = None,
         limit_results: bool = False,
         max_ids: int = 5,
     ) -> Tuple[Dict[str, Any], int]:
@@ -181,7 +181,7 @@ class Adviser:
     @classmethod
     def _retrieve_adviser_justifications(
         cls,
-        adviser_files: Dict[str, Any]
+        adviser_files: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """Retrieve adviser justifications.
 
@@ -251,16 +251,19 @@ class Adviser:
     @classmethod
     def create_adviser_justifications_dataframe(cls, adviser_files: Dict[str, Any]) -> pd.DataFrame:
         """Create dataframe of adviser justifications from results."""
-        adviser_justifications_dataframe = pd.DataFrame(cls._retrieve_adviser_justifications(adviser_files=adviser_files))
+        adviser_justifications_dataframe = pd.DataFrame(
+            cls._retrieve_adviser_justifications(adviser_files=adviser_files),
+        )
         if not adviser_justifications_dataframe.empty:
             adviser_justifications_dataframe["date_"] = [
-                pd.to_datetime(str(v_date)).strftime("%Y-%m-%d") for v_date in adviser_justifications_dataframe["date"].values
+                pd.to_datetime(str(v_date)).strftime("%Y-%m-%d")
+                for v_date in adviser_justifications_dataframe["date"].values
             ]
         return adviser_justifications_dataframe
 
     @staticmethod
     def _retrieve_adviser_integration_info(
-        adviser_files: Dict[str, Any]
+        adviser_files: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
         """Retrieve adviser users info.
 
@@ -290,10 +293,13 @@ class Adviser:
     @classmethod
     def create_adviser_users_dataframe(cls, adviser_files: Dict[str, Any]) -> pd.DataFrame:
         """Create dataframe of adviser user info from results."""
-        adviser_integration_info_dataframe = pd.DataFrame(cls._retrieve_adviser_integration_info(adviser_files=adviser_files))
+        adviser_integration_info_dataframe = pd.DataFrame(
+            cls._retrieve_adviser_integration_info(adviser_files=adviser_files),
+        )
         if not adviser_integration_info_dataframe.empty:
             adviser_integration_info_dataframe["date_"] = [
-                pd.to_datetime(str(v_date)).strftime("%Y-%m-%d") for v_date in adviser_integration_info_dataframe["date"].values
+                pd.to_datetime(str(v_date)).strftime("%Y-%m-%d")
+                for v_date in adviser_integration_info_dataframe["date"].values
             ]
         return adviser_integration_info_dataframe
 
@@ -301,8 +307,8 @@ class Adviser:
     def create_adviser_dataframes(cls, adviser_files: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
         """Create dataframe of adviser justifications from results."""
         dataframes = {}
-        dataframes['justifications'] = cls.create_adviser_justifications_dataframe(adviser_files=adviser_files)
-        dataframes['integration_info'] = cls.create_adviser_users_dataframe(adviser_files=adviser_files)
+        dataframes["justifications"] = cls.create_adviser_justifications_dataframe(adviser_files=adviser_files)
+        dataframes["integration_info"] = cls.create_adviser_users_dataframe(adviser_files=adviser_files)
 
         return dataframes
 
