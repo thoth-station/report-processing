@@ -192,59 +192,46 @@ class Adviser:
         for document_id, document in adviser_files.items():
 
             report = {}
-            general_error = ""
 
             try:
                 datetime_advise_run = document["metadata"].get("datetime")
                 analyzer_version = document["metadata"].get("analyzer_version")
                 datetime_object = datetime.strptime(datetime_advise_run, "%Y-%m-%dT%H:%M:%S.%f")
                 result = document["result"]
-
                 report = result.get("report")
-                general_error = result["error"]
 
-                if not report:
-                    continue
+            except Exception as report_error:
+                _LOGGER.error(f"Error analyzing adviser document {document_id} report stack info: {report_error}")
+                _LOGGER.error("Adviser document %s report is: %s", document_id, report)
 
-                for info in report["stack_info"]:
+            if not report:
+                _LOGGER.warning(f"No report for adviser document: {document_id}")
+                continue
 
-                    justification = {"message": info["message"], "type": info["type"]}
+            try:
+                justifications_collected = cls.extract_adviser_justifications_from_stack_info(
+                    report=report,
+                    justifications_collected=justifications_collected,
+                    document_id=document_id,
+                    datetime_object=datetime_object,
+                    analyzer_version=analyzer_version,
+                )
 
-                    if "link" in info:
-                        message = info["link"]
-                    else:
-                        message = info["message"]
+            except Exception as stack_info_error:
+                _LOGGER.error(f"Error analyzing adviser document {document_id} report stack info: {stack_info_error}")
+                _LOGGER.error("Adviser document %s report stack info: %s", document_id, report.get("stack_info"))
 
-                    error = False
-
-                    if info["type"] == "ERROR":
-                        error = True
-
-                    justifications_collected.append(
-                        {
-                            "document_id": document_id,
-                            "date": datetime_object,
-                            "analyzer_version": analyzer_version,
-                            "justification": justification,
-                            "error": error,
-                            "message": message,
-                            "type": info["type"],
-                        },
-                    )
-
-                    justifications_collected = cls.extract_adviser_justifications(
-                        report=report,
-                        justifications_collected=justifications_collected,
-                        document_id=document_id,
-                        datetime_object=datetime_object,
-                        analyzer_version=analyzer_version,
-                    )
-
-            except Exception as e:
-                _LOGGER.error(f"Error analyzing adviser document {document_id}: {e}")
-                _LOGGER.error("Adviser document %s report: %s", document_id, report)
-                _LOGGER.error("Adviser document %s report: %s", document_id, general_error)
-                pass
+            try:
+                justifications_collected = cls.extract_adviser_justifications_from_products(
+                    report=report,
+                    justifications_collected=justifications_collected,
+                    document_id=document_id,
+                    datetime_object=datetime_object,
+                    analyzer_version=analyzer_version,
+                )
+            except Exception as products_error:
+                _LOGGER.error(f"Error analyzing adviser document {document_id} report stack info: {products_error}")
+                _LOGGER.error("Adviser document %s report products: %s", document_id, report.get("products"))
 
         return justifications_collected
 
@@ -312,20 +299,59 @@ class Adviser:
 
         return dataframes
 
-    @classmethod
-    def extract_adviser_justifications(
-        cls,
-        report: Optional[Dict[str, Any]],
+    @staticmethod
+    def extract_adviser_justifications_from_stack_info(
+        report: Dict[str, Any],
         justifications_collected: List[Dict[str, Any]],
         document_id: str,
         datetime_object: datetime,
         analyzer_version: str,
     ) -> List[Dict[str, Any]]:
-        """Retrieve justifications from adviser document."""
-        if not report:
-            _LOGGER.warning(f"No report identified in adviser document: {document_id}")
+        """Retrieve justifications from stack info from adviser report."""
+        stack_info = report.get("stack_info")
+
+        if not stack_info:
+            _LOGGER.warning("No stack info in report.")
             return justifications_collected
 
+        for info in stack_info:
+
+            justification = {"message": info["message"], "type": info["type"]}
+
+            if "link" in info:
+                message = info["link"]
+            else:
+                message = info["message"]
+
+            error = False
+
+            if info["type"] == "ERROR":
+                error = True
+
+            justifications_collected.append(
+                {
+                    "document_id": document_id,
+                    "date": datetime_object,
+                    "analyzer_version": analyzer_version,
+                    "justification": justification,
+                    "error": error,
+                    "message": message,
+                    "type": info["type"],
+                },
+            )
+
+        return justifications_collected
+
+    @classmethod
+    def extract_adviser_justifications_from_products(
+        cls,
+        report: Dict[str, Any],
+        justifications_collected: List[Dict[str, Any]],
+        document_id: str,
+        datetime_object: datetime,
+        analyzer_version: str,
+    ) -> List[Dict[str, Any]]:
+        """Retrieve justifications from products from adviser report."""
         products = report.get("products")
         justifications_collected = cls.extract_justifications_from_products(
             products=products,
@@ -350,43 +376,44 @@ class Adviser:
             _LOGGER.debug(f"No products identified in adviser document: {document_id}")
             return justifications_collected
 
-        for product in products:
-            justifications = product["justification"]
+        # TODO: Handle all products
+        product = products[0]
+        justifications = product["justification"]
 
-            if justifications:
-                # Collect all justifications
-                for justification in justifications:
+        if justifications:
+            # Collect all justifications
+            for justification in justifications:
 
-                    if "advisory" in justification:
+                if "advisory" in justification:
 
-                        error = True
-                        message = justification["advisory"]
-                        justification_type = justification["type"]
+                    error = True
+                    message = justification["advisory"]
+                    justification_type = justification["type"]
 
-                    elif "link" in justification:
+                elif "link" in justification:
 
-                        error = False
-                        message = justification["link"]
-                        justification_type = justification["type"]
+                    error = False
+                    message = justification["link"]
+                    justification_type = justification["type"]
 
-                    else:
-                        error = False
-                        message = justification["message"]
-                        justification_type = justification["type"]
+                else:
+                    error = False
+                    message = justification["message"]
+                    justification_type = justification["type"]
 
-                    justifications_collected.append(
-                        {
-                            "document_id": document_id,
-                            "date": datetime_object,
-                            "analyzer_version": analyzer_version,
-                            "justification": justification,
-                            "error": error,
-                            "message": message,
-                            "type": justification_type,
-                        },
-                    )
-            else:
-                _LOGGER.warning(f"No justifications identified for adviser report: {document_id}")
+                justifications_collected.append(
+                    {
+                        "document_id": document_id,
+                        "date": datetime_object,
+                        "analyzer_version": analyzer_version,
+                        "justification": justification,
+                        "error": error,
+                        "message": message,
+                        "type": justification_type,
+                    },
+                )
+        else:
+            _LOGGER.warning(f"No justifications identified for adviser report: {document_id}")
 
         return justifications_collected
 
