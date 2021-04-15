@@ -178,19 +178,46 @@ class Adviser:
 
         return files, counter
 
+    @staticmethod
+    def _update_statistics(
+        statistics: Dict[str, Any],
+        analyzer_version: str,
+        error_count: int,
+        no_report: bool = False,
+    ) -> Dict[str, Any]:
+        if analyzer_version not in statistics:
+            statistics[analyzer_version] = {}
+
+        if analyzer_version not in statistics[analyzer_version]:
+            statistics[analyzer_version]["adviser_version"] = analyzer_version
+        key = "success"
+
+        if no_report or error_count:
+            key = "failure"
+
+        if key not in statistics[analyzer_version]:
+            statistics[analyzer_version][key] = 1
+        else:
+            statistics[analyzer_version][key] += 1
+
+        return statistics
+
     @classmethod
     def _retrieve_adviser_justifications(
         cls,
         adviser_files: Dict[str, Any],
-    ) -> List[Dict[str, Any]]:
+    ) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
         """Retrieve adviser justifications.
 
         :param adviser_files: adviser documents
         """
+        statistics: Dict[str, Any] = {}
+
         justifications_collected: List[Dict[str, Any]] = []
 
         for document_id, document in adviser_files.items():
 
+            error_count = 0
             report = {}
 
             try:
@@ -206,20 +233,46 @@ class Adviser:
 
             if not report:
                 _LOGGER.warning(f"No report for adviser document: {document_id}")
+                justifications_collected.append(
+                    {
+                        "document_id": document_id,
+                        "date": datetime_object,
+                        "analyzer_version": analyzer_version,
+                        "justification": "no report provided",
+                        "error": True,
+                        "message": "no report provided",
+                        "type": "ERROR",
+                    },
+                )
+
+                cls._update_statistics(
+                    statistics=statistics,
+                    analyzer_version=analyzer_version,
+                    error_count=error_count,
+                    no_report=True,
+                )
+
                 continue
 
             try:
-                justifications_collected = cls.extract_adviser_justifications_from_stack_info(
+                justifications_collected, error_count = cls.extract_adviser_justifications_from_stack_info(
                     report=report,
                     justifications_collected=justifications_collected,
                     document_id=document_id,
                     datetime_object=datetime_object,
                     analyzer_version=analyzer_version,
+                    error_count=error_count,
                 )
 
             except Exception as stack_info_error:
                 _LOGGER.error(f"Error analyzing adviser document {document_id} report stack info: {stack_info_error}")
                 _LOGGER.error("Adviser document %s report stack info: %s", document_id, report.get("stack_info"))
+
+            cls._update_statistics(
+                statistics=statistics,
+                analyzer_version=analyzer_version,
+                error_count=error_count,
+            )
 
             try:
                 justifications_collected = cls.extract_adviser_justifications_from_products(
@@ -230,23 +283,40 @@ class Adviser:
                     analyzer_version=analyzer_version,
                 )
             except Exception as products_error:
-                _LOGGER.error(f"Error analyzing adviser document {document_id} report stack info: {products_error}")
+                _LOGGER.error(f"Error analyzing adviser document {document_id} report products: {products_error}")
                 _LOGGER.error("Adviser document %s report products: %s", document_id, report.get("products"))
 
-        return justifications_collected
+        if statistics:
+            if "success" not in statistics[analyzer_version]:
+                statistics[analyzer_version]["success"] = 0
+
+            if "failure" not in statistics[analyzer_version]:
+                statistics[analyzer_version]["failure"] = 0
+
+        return justifications_collected, statistics
 
     @classmethod
-    def create_adviser_justifications_dataframe(cls, adviser_files: Dict[str, Any]) -> pd.DataFrame:
+    def create_adviser_justifications_and_statistics_dataframe(
+        cls,
+        adviser_files: Dict[str, Any],
+    ) -> Tuple[pd.DataFrame, pd.DataFrame]:
         """Create dataframe of adviser justifications from results."""
-        adviser_justifications_dataframe = pd.DataFrame(
-            cls._retrieve_adviser_justifications(adviser_files=adviser_files),
-        )
+        justifications_collected, statistics = cls._retrieve_adviser_justifications(adviser_files=adviser_files)
+        adviser_justifications_dataframe = pd.DataFrame(justifications_collected)
         if not adviser_justifications_dataframe.empty:
             adviser_justifications_dataframe["date_"] = [
                 pd.to_datetime(str(v_date)).strftime("%Y-%m-%d")
                 for v_date in adviser_justifications_dataframe["date"].values
             ]
-        return adviser_justifications_dataframe
+
+        adviser_statistics_dataframe = pd.DataFrame(statistics)
+
+        if not adviser_statistics_dataframe.empty:
+            # Maintain order not to lose track when storing on csv without headers
+            adviser_statistics_dataframe = adviser_statistics_dataframe.transpose()[
+                ["adviser_version", "success", "failure"]
+            ]
+        return adviser_justifications_dataframe, adviser_statistics_dataframe
 
     @staticmethod
     def _retrieve_adviser_integration_info(
@@ -294,7 +364,10 @@ class Adviser:
     def create_adviser_dataframes(cls, adviser_files: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
         """Create dataframe of adviser justifications from results."""
         dataframes = {}
-        dataframes["justifications"] = cls.create_adviser_justifications_dataframe(adviser_files=adviser_files)
+        (
+            dataframes["justifications"],
+            dataframes["statistics"],
+        ) = cls.create_adviser_justifications_and_statistics_dataframe(adviser_files=adviser_files)
         dataframes["integration_info"] = cls.create_adviser_users_dataframe(adviser_files=adviser_files)
 
         return dataframes
@@ -306,13 +379,14 @@ class Adviser:
         document_id: str,
         datetime_object: datetime,
         analyzer_version: str,
-    ) -> List[Dict[str, Any]]:
+        error_count: int,
+    ) -> Tuple[List[Dict[str, Any]], int]:
         """Retrieve justifications from stack info from adviser report."""
         stack_info = report.get("stack_info")
 
         if not stack_info:
             _LOGGER.warning("No stack info in report.")
-            return justifications_collected
+            return justifications_collected, error_count
 
         for info in stack_info:
 
@@ -327,6 +401,7 @@ class Adviser:
 
             if info["type"] == "ERROR":
                 error = True
+                error_count += 1
 
             justifications_collected.append(
                 {
@@ -340,7 +415,7 @@ class Adviser:
                 },
             )
 
-        return justifications_collected
+        return justifications_collected, error_count
 
     @classmethod
     def extract_adviser_justifications_from_products(
@@ -412,6 +487,7 @@ class Adviser:
                         "type": justification_type,
                     },
                 )
+
         else:
             _LOGGER.warning(f"No justifications identified for adviser report: {document_id}")
 
