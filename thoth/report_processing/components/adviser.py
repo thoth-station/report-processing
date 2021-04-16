@@ -346,9 +346,9 @@ class Adviser:
                 os_name = runtime_environment["operating_system"].get("name")
                 if os_name:
                     runtime_environment["operating_system"]["name"] = map_os_name(
-                        os_name=runtime_environment["operating_system"]["name"]
+                        os_name=runtime_environment["operating_system"]["name"],
                     )
-            
+
             # Recommendation type
             recommendation_type = parameters["recommendation_type"].upper()
 
@@ -371,7 +371,7 @@ class Adviser:
                     "base_image": base_image,
                     "solver": f'{os_name}-{os_version}-py{python_interpreter.replace(".", "")}',
                     "cpu_model": hardware.get("cpu_model", None),
-                    "cpu_family": hardware.get("cpu_family", None)
+                    "cpu_family": hardware.get("cpu_family", None),
                 },
             )
 

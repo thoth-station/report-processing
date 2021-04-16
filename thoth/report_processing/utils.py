@@ -48,7 +48,8 @@ def map_os_name(os_name: Optional[str]) -> Optional[str]:
 
 
 def normalize_os_version(
-    os_name: Optional[str], os_version: Optional[str]
+    os_name: Optional[str],
+    os_version: Optional[str],
 ) -> Optional[str]:
     """Normalize operating system version based on operating system used."""
     if os_name is None or os_version is None or os_name.lower() != "rhel":
