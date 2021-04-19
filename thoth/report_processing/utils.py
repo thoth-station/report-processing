@@ -19,7 +19,6 @@
 
 import logging
 
-from typing import Optional
 from pathlib import Path
 from zipfile import ZipFile
 
