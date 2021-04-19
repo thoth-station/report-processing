@@ -29,7 +29,7 @@ import pandas as pd
 import numpy as np
 
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
-
+from thoth.report_processing.utils import map_os_name, normalize_os_version
 from thoth.storages import CephStore
 from thoth.storages.advisers import AdvisersResultsStore
 
@@ -303,6 +303,7 @@ class Adviser:
         """Create dataframe of adviser justifications from results."""
         justifications_collected, statistics = cls._retrieve_adviser_justifications(adviser_files=adviser_files)
         adviser_justifications_dataframe = pd.DataFrame(justifications_collected)
+
         if not adviser_justifications_dataframe.empty:
             adviser_justifications_dataframe["date_"] = [
                 pd.to_datetime(str(v_date)).strftime("%Y-%m-%d")
@@ -319,14 +320,14 @@ class Adviser:
         return adviser_justifications_dataframe, adviser_statistics_dataframe
 
     @staticmethod
-    def _retrieve_adviser_integration_info(
+    def _retrieve_adviser_inputs_statistics(
         adviser_files: Dict[str, Any],
     ) -> List[Dict[str, Any]]:
-        """Retrieve adviser users info.
+        """Retrieve adviser inputs statistics.
 
         :param adviser_files: adviser documents
         """
-        integration_info_collected: List[Dict[str, Any]] = []
+        adviser_inputs_collected: List[Dict[str, Any]] = []
 
         for document_id, document in adviser_files.items():
 
@@ -337,28 +338,57 @@ class Adviser:
             source_type = (cli_arguments.get("metadata") or {}).get("source_type")
             source_type = source_type.upper() if source_type else None
 
-            integration_info_collected.append(
+            parameters = document["result"]["parameters"]
+
+            runtime_environment = parameters["project"].get("runtime_environment")
+            os = runtime_environment.get("operating_system", {})
+            if os:
+                os_name = runtime_environment["operating_system"].get("name")
+                if os_name:
+                    runtime_environment["operating_system"]["name"] = map_os_name(
+                        os_name=runtime_environment["operating_system"]["name"],
+                    )
+
+            # Recommendation type
+            recommendation_type = parameters["recommendation_type"].upper()
+
+            # Solver
+            os = runtime_environment.get("operating_system", {})
+            os_name = os.get("name")
+            os_version = normalize_os_version(os.get("name"), os.get("version"))
+            python_interpreter = runtime_environment.get("python_version")
+
+            # Base image
+            base_image = runtime_environment.get("base_image", None)
+            # Hardware
+            hardware = runtime_environment.get("hardware", {})
+            adviser_inputs_collected.append(
                 {
                     "document_id": document_id,
                     "date": datetime_object,
                     "source_type": source_type,
+                    "recommendation_type": recommendation_type,
+                    "base_image": base_image,
+                    "solver": f'{os_name}-{os_version}-py{python_interpreter.replace(".", "")}',
+                    "cpu_model": hardware.get("cpu_model", None),
+                    "cpu_family": hardware.get("cpu_family", None),
                 },
             )
 
-        return integration_info_collected
+        return adviser_inputs_collected
 
     @classmethod
-    def create_adviser_users_dataframe(cls, adviser_files: Dict[str, Any]) -> pd.DataFrame:
-        """Create dataframe of adviser user info from results."""
-        adviser_integration_info_dataframe = pd.DataFrame(
-            cls._retrieve_adviser_integration_info(adviser_files=adviser_files),
+    def create_adviser_inputs_info_dataframe(cls, adviser_files: Dict[str, Any]) -> pd.DataFrame:
+        """Create dataframe of adviser inputs info from results."""
+        adviser_inputs_info_dataframe = pd.DataFrame(
+            cls._retrieve_adviser_inputs_statistics(adviser_files=adviser_files),
         )
-        if not adviser_integration_info_dataframe.empty:
-            adviser_integration_info_dataframe["date_"] = [
+        if not adviser_inputs_info_dataframe.empty:
+            adviser_inputs_info_dataframe["date_"] = [
                 pd.to_datetime(str(v_date)).strftime("%Y-%m-%d")
-                for v_date in adviser_integration_info_dataframe["date"].values
+                for v_date in adviser_inputs_info_dataframe["date"].values
             ]
-        return adviser_integration_info_dataframe
+        return adviser_inputs_info_dataframe
 
     @classmethod
     def create_adviser_dataframes(cls, adviser_files: Dict[str, Any]) -> Dict[str, pd.DataFrame]:
@@ -368,7 +398,7 @@ class Adviser:
             dataframes["justifications"],
             dataframes["statistics"],
         ) = cls.create_adviser_justifications_and_statistics_dataframe(adviser_files=adviser_files)
-        dataframes["integration_info"] = cls.create_adviser_users_dataframe(adviser_files=adviser_files)
+        dataframes["inputs_info"] = cls.create_adviser_inputs_info_dataframe(adviser_files=adviser_files)
 
         return dataframes
 

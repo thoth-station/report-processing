@@ -19,6 +19,7 @@
 
 import logging
 
+from typing import Optional
 from pathlib import Path
 from zipfile import ZipFile
 
@@ -36,3 +37,23 @@ def extract_zip_file(file_path: Path) -> None:
 
         _LOGGER.debug("Extracting all files...")
         zip_file.extractall()
+
+
+def map_os_name(os_name: Optional[str]) -> Optional[str]:
+    """Map operating system name."""
+    if os_name == "ubi":
+        return "rhel"
+
+    return os_name
+
+
+def normalize_os_version(
+    os_name: Optional[str],
+    os_version: Optional[str],
+) -> Optional[str]:
+    """Normalize operating system version based on operating system used."""
+    if os_name is None or os_version is None or os_name.lower() != "rhel":
+        return os_version
+
+    # Discard any minor release, if present.
+    return os_version.split(".", maxsplit=1)[0]
