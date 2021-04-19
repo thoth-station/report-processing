@@ -158,3 +158,15 @@ all the things that you see...
 * make pre-commit happy
 ### Other
 * remove zuul
+
+## Release 0.6.0 (2021-04-19T09:00:43)
+### Features
+* Add methods to provide adviser inputs stats (#119)
+* :arrow_up: Automatic update of dependencies by Kebechet (#118)
+* Include daily statistics on adviser success and failures (#117)
+* :arrow_up: Automatic update of dependencies by Kebechet (#116)
+* :arrow_up: Automatic update of dependencies by Kebechet
+* Do not run checks
+### Improvements
+* reuse common library methods (#120)
+* introduce methods for adviser data analysis for integrations info (#113)
