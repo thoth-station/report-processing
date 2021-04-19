@@ -29,7 +29,8 @@ import pandas as pd
 import numpy as np
 
 from thoth.report_processing.exceptions import ThothMissingDatasetAtPath
-from thoth.report_processing.utils import map_os_name, normalize_os_version
+from thoth.common import normalize_os_version
+from thoth.common import map_os_name
 from thoth.storages import CephStore
 from thoth.storages.advisers import AdvisersResultsStore
 
