@@ -234,7 +234,7 @@ class Adviser:
 
             if not report:
                 _LOGGER.warning(f"No report for adviser document: {document_id}, checking error msg from document.")
-                error_msg = result["error_msg"]
+                error_msg = result.get("error_msg", "no report provided")
 
                 justifications_collected.append(
                     {
