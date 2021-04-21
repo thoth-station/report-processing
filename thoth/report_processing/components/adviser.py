@@ -233,15 +233,17 @@ class Adviser:
                 _LOGGER.error("Adviser document %s report is: %s", document_id, report)
 
             if not report:
-                _LOGGER.warning(f"No report for adviser document: {document_id}")
+                _LOGGER.warning(f"No report for adviser document: {document_id}, checking error msg from document.")
+                error_msg = result["error_msg"]
+
                 justifications_collected.append(
                     {
                         "document_id": document_id,
                         "date": datetime_object,
                         "analyzer_version": analyzer_version,
-                        "justification": "no report provided",
+                        "justification": error_msg,
                         "error": True,
-                        "message": "no report provided",
+                        "message": error_msg,
                         "type": "ERROR",
                     },
                 )
