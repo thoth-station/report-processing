@@ -170,3 +170,7 @@ all the things that you see...
 ### Improvements
 * reuse common library methods (#120)
 * introduce methods for adviser data analysis for integrations info (#113)
+
+## Release 0.7.0 (2021-04-21T15:35:49)
+### Bug Fixes
+* Use error msg in result when report is missing (#123)
