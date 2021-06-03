@@ -492,10 +492,10 @@ class Adviser:
             # Collect all justifications
             for justification in justifications:
 
-                if "advisory" in justification:
+                if "description" in justification:
 
                     error = True
-                    message = justification["advisory"]
+                    message = justification["description"]
                     justification_type = justification["type"]
 
                 elif "link" in justification:
