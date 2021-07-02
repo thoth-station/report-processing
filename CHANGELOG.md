@@ -174,3 +174,9 @@ all the things that you see...
 ## Release 0.7.0 (2021-04-21T15:35:49)
 ### Bug Fixes
 * Use error msg in result when report is missing (#123)
+
+## Release 0.7.1 (2021-07-02T10:52:02)
+### Features
+* :arrow_up: Automatic update of dependencies by Kebechet
+* :hatched_chick: update the prow resource limits (#126)
+* :arrow_up: Automatic update of dependencies by Kebechet
