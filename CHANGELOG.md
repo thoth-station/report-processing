@@ -1,5 +1,10 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.7.2 (2021-09-14T21:17:26)
+### Features
+* Update of the dependencies
+* change metadata key to reflect new location of cli
+
 ## [0.1.0] - 2019-Sep-11 - goern
 
 ### Added
