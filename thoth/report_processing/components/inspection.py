@@ -338,11 +338,11 @@ class AmunInspections:
                         if not os.path.exists(result_path):
                             os.makedirs(result_path)
 
-                    with open(
-                        f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/result",
-                        "w",
-                    ) as result_file:
-                        result_file.write(json.dumps(inspection_result_document))
+                        with open(
+                            f"{store_locally_repo_name}/{inspection_document_id}/results/{inspection_result_number}/result",
+                            "w",
+                        ) as result_file:
+                            result_file.write(json.dumps(inspection_result_document))
 
                 if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
                     inspection_hw_info = inspection_store.results.retrieve_hwinfo(
