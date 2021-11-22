@@ -19,5 +19,5 @@
 """This is a report-processing for Thoth components outputs."""
 
 
-__version__ = "0.7.2"
+__version__ = "0.7.3"
 __service_version__ = f"{__version__}"

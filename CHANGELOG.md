@@ -1,5 +1,9 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.7.3 (2021-11-22T11:51:21)
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* Fix missing tab in inspection.py
+
 ## Release 0.7.2 (2021-09-14T21:17:26)
 ### Features
 * Update of the dependencies
