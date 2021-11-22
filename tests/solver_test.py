@@ -17,7 +17,7 @@
 
 """Solver test suite."""
 
-from tests.base_test import ReportProcessingTestCase
+from base_test import ReportProcessingTestCase
 
 from thoth.report_processing.components.solver import Solver
 

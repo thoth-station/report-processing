@@ -18,7 +18,7 @@
 """Adviser test suite."""
 
 import pandas as pd
-from tests.base_test import ReportProcessingTestCase
+from base_test import ReportProcessingTestCase
 
 from thoth.report_processing.components.adviser import Adviser
 

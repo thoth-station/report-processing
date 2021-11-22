@@ -19,7 +19,7 @@
 
 import pytest
 import json
-from tests.base_test import ReportProcessingTestCase
+from base_test import ReportProcessingTestCase
 
 from thoth.report_processing.components.security import SecurityIndicatorsBandit, SecurityIndicatorsCloc
 from thoth.report_processing.components.security import SecurityIndicatorsAggregator

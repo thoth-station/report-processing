@@ -17,7 +17,7 @@
 
 """Security Indicator cloc test suite."""
 
-from .base_test import ReportProcessingTestCase
+from base_test import ReportProcessingTestCase
 from thoth.report_processing.components.security import SecurityIndicatorsCloc
 
 
