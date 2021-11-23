@@ -37,9 +37,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(
-            adviser_files=adviser_files
-        )
+        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
 
@@ -49,9 +47,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe for histogram plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(
-            adviser_files=adviser_files
-        )
+        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
 
@@ -65,9 +61,7 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe for heatmap plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(
-            adviser_files=adviser_files
-        )
+        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
 
         adviser_dataframe = pd.DataFrame(justifications_collected)
 
