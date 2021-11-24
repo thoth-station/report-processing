@@ -28,7 +28,7 @@ presubmits:
       containers:
         - image: quay.io/thoth-station/thoth-pytest-py38:v0.12.8
           command:
-             - pytest
+             - "/bin/run-pytest"
           resources:
             requests:
               memory: "1Gi"
