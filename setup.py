@@ -19,9 +19,11 @@
 
 
 import os
+import sys
 from pathlib import Path
 from setuptools import find_packages
 from setuptools import setup
+from setuptools.command.test import test as TestCommand  # noqa
 
 
 def _get_install_requires():
@@ -41,6 +43,48 @@ def _get_version():
     raise ValueError("No version identifier found")
 
 
+class Test(TestCommand):
+    """Introduce test command to run testsuite using pytest."""
+
+    _IMPLICIT_PYTEST_ARGS = [
+        "--timeout=45",
+        "--cov=thoth",
+        "--cov-report=xml",
+        "--mypy",
+        "--capture=no",
+        "--verbose",
+        "-l",
+        "-s",
+        "-vv",
+        "tests/",
+    ]
+
+    user_options = [("pytest-args=", "a", "Arguments to pass into py.test")]
+
+    def initialize_options(self):
+        """Initialize command options."""
+        super().initialize_options()
+        self.pytest_args = None
+
+    def finalize_options(self):
+        """Finalize command options."""
+        super().finalize_options()
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        """Run pytests."""
+        import pytest
+
+        passed_args = list(self._IMPLICIT_PYTEST_ARGS)
+
+        if self.pytest_args:
+            self.pytest_args = [arg for arg in self.pytest_args.split() if arg]
+            passed_args.extend(self.pytest_args)
+
+        sys.exit(pytest.main(passed_args))
+
+
 VERSION = _get_version()
 setup(
     name="thoth-report-processing",
@@ -54,6 +98,7 @@ setup(
     url="https://github.com/thoth-station/report-processing",
     download_url="https://pypi.org/project/thoth-report-processing",
     packages=["thoth.{subpackage}".format(subpackage=p) for p in find_packages("thoth/")],
+    cmdclass={"test": Test},
     include_package_data=True,
     install_requires=_get_install_requires(),
     zip_safe=False,
