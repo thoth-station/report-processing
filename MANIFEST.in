@@ -7,7 +7,6 @@ include LICENSE
 include OWNERS
 include Pipfile
 include mypy.ini
-include .coafile
 recursive-include docs *.html
 recursive-include docs *.py
 recursive-include docs *.rst
