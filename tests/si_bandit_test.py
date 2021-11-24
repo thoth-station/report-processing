@@ -24,8 +24,8 @@ from thoth.report_processing.components.security import SecurityIndicatorsBandit
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_REPORT_NAME = "security-indicator-54c6daf9"
-    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicator"
+    _SI_REPORT_NAME = "security-indicator-211124154025-de8d82a3227adc99"
+    _SI_BANDIT_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
 
     def test_get_security_indicator_bandit_report(self) -> None:
         """Test retrieving report from local path."""
@@ -67,7 +67,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         severity_confidence_info, summary = si_bandit.extract_severity_confidence_info(
             si_bandit_report=si_bandit_report,
         )
-        assert not severity_confidence_info
+        assert severity_confidence_info
 
     def test_get_severity_confidence_info_df_from_bandit_report(self) -> None:
         """Test obtaining severity confidence info DataFrame from si bandit report."""
@@ -85,6 +85,18 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
 
         severity_confidence_info_keys = [k for k in severity_confidence_info]
         severity_confidence_info_test_keys = [
+            "__SEVERITY.LOW__CONFIDENCE.LOW",
+            "__SEVERITY.LOW__CONFIDENCE.MEDIUM",
+            "__SEVERITY.LOW__CONFIDENCE.HIGH",
+            "__SEVERITY.LOW__CONFIDENCE.UNDEFINED",
+            "__SEVERITY.MEDIUM__CONFIDENCE.LOW",
+            "__SEVERITY.MEDIUM__CONFIDENCE.MEDIUM",
+            "__SEVERITY.MEDIUM__CONFIDENCE.HIGH",
+            "__SEVERITY.MEDIUM__CONFIDENCE.UNDEFINED",
+            "__SEVERITY.HIGH__CONFIDENCE.LOW",
+            "__SEVERITY.HIGH__CONFIDENCE.MEDIUM",
+            "__SEVERITY.HIGH__CONFIDENCE.HIGH",
+            "__SEVERITY.HIGH__CONFIDENCE.UNDEFINED",
             "_total_severity",
         ]
         assert severity_confidence_info_keys == severity_confidence_info_test_keys

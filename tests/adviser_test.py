@@ -17,8 +17,7 @@
 
 """Adviser test suite."""
 
-import pandas as pd
-from .base_test import ReportProcessingTestCase
+from tests.base_test import ReportProcessingTestCase
 
 from thoth.report_processing.components.adviser import Adviser
 
@@ -37,36 +36,36 @@ class TestAdviser(ReportProcessingTestCase):
         """Test create of adviser dataframe from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
+        dataframes = Adviser.create_adviser_dataframes(
+            adviser_files=adviser_files,
+        )
 
-        adviser_dataframe = pd.DataFrame(justifications_collected)
-
-        assert adviser_dataframe.shape[0] == 3
+        assert dataframes["justifications"].shape[0] == 212
 
     def test_create_adviser_dataframe_histogram(self) -> None:
         """Test create of adviser dataframe for histogram plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
-
-        adviser_dataframe = pd.DataFrame(justifications_collected)
-
-        sorted_justifications_df = Adviser.create_adviser_results_dataframe_histogram(
-            adviser_type_dataframe=adviser_dataframe,
+        adviser_justifications_dataframe, _ = Adviser.create_adviser_justifications_and_statistics_dataframe(
+            adviser_files=adviser_files,
         )
 
-        assert sorted_justifications_df.shape[0] == 3
+        sorted_justifications_df = Adviser.create_adviser_results_dataframe_histogram(
+            adviser_type_dataframe=adviser_justifications_dataframe,
+        )
+
+        assert sorted_justifications_df.shape[0] == 51
 
     def test_create_adviser_dataframe_heatmap(self) -> None:
         """Test create of adviser dataframe for heatmap plot from adviser documents."""
         adviser_files = Adviser.aggregate_adviser_results(repo_path=self._ADVISER_FOLDER_PATH, is_local=True)
 
-        justifications_collected = Adviser.create_adviser_dataframes(adviser_files=adviser_files)
-
-        adviser_dataframe = pd.DataFrame(justifications_collected)
+        dataframes = Adviser.create_adviser_dataframes(
+            adviser_files=adviser_files,
+        )
 
         adviser_heatmap_df = Adviser.create_adviser_results_dataframe_heatmap(
-            adviser_type_dataframe=adviser_dataframe,
+            adviser_type_dataframe=dataframes["justifications"],
             number_days=1,
         )
 

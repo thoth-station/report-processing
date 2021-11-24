@@ -26,9 +26,11 @@ presubmits:
     context: aicoe-ci/prow/pytest
     spec:
       containers:
-        - image: quay.io/thoth-station/thoth-pytest-py38:v0.12.8
+        - image: quay.io/thoth-station/thoth-pytest-py38:v0.13.0
           command:
-             - "/bin/run-pytest"
+            - "/usr/local/bin/mypy"
+            - "."
+            - "--ignore-missing-imports"
           resources:
             requests:
               memory: "1Gi"

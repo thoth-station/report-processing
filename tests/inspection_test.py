@@ -22,8 +22,8 @@ from .base_test import ReportProcessingTestCase
 from thoth.report_processing.components.inspection import AmunInspections, AmunInspectionsSummary
 
 
-class TestAdviser(ReportProcessingTestCase):
-    """Test implementation of adviser results."""
+class TestInpsection(ReportProcessingTestCase):
+    """Test implementation of inspection results."""
 
     _INSPECTIONS_FOLDER_PATH = ReportProcessingTestCase.DATA / "inspections"
 

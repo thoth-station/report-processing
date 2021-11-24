@@ -30,9 +30,9 @@ from thoth.report_processing.exceptions import ThothSIPackageNotMatchingExceptio
 class TestSecurityReportsBandit(ReportProcessingTestCase):
     """Test implementation of security indicator bandit."""
 
-    _SI_REPORT_NAME = "security-indicator-54c6daf9"
+    _SI_REPORT_NAME = "security-indicator-211124154025-de8d82a3227adc99"
 
-    _SI_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicator"
+    _SI_FOLDER_PATH = ReportProcessingTestCase.DATA / "security-indicators"
 
     _SI_AGGREGATOR_REPORTS_FILE = ReportProcessingTestCase.DATA / "results" / "security-aggregated.json"
 
@@ -52,7 +52,7 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
         )
         si_cloc_report = si_cloc_reports[0]
 
-        si_cloc_report["metadata"]["arguments"]["si-cloc"]["package_name"] = "thoth-test-2"
+        si_cloc_report["metadata"]["arguments"]["app.py"]["package_name"] = "thoth-test-2"
         with pytest.raises(ThothSIPackageNotMatchingException):
             assert security_aggregator.create_si_aggregated_results(
                 si_bandit_report=si_bandit_report,
