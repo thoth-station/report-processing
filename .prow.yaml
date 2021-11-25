@@ -13,11 +13,12 @@ presubmits:
             - "--all-files"
           resources:
             requests:
-              memory: "500Mi"
-              cpu: "300m"
+              memory: "1Gi"
+              cpu: "500m"
             limits:
-              memory: "500Mi"
-              cpu: "300m"
+              memory: "2Gi"
+              cpu: "1"
+
 
   - name: thoth-pytest-py38
     decorate: true
@@ -28,9 +29,7 @@ presubmits:
       containers:
         - image: quay.io/thoth-station/thoth-pytest-py38:v0.13.0
           command:
-            - "/usr/local/bin/mypy"
-            - "."
-            - "--ignore-missing-imports"
+            - "/bin/run-pytest"
           resources:
             requests:
               memory: "1Gi"
