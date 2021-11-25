@@ -1,0 +1,1618 @@
+{
+  "metadata": {
+    "analyzer": "thoth-adviser",
+    "analyzer_version": "0.47.0",
+    "arguments": {
+      "advise": {
+        "beam_width": 25000,
+        "constraints": "input/constraints.txt",
+        "count": 1,
+        "dev": false,
+        "labels": "input/labels.json",
+        "library_usage": "input/library_usage.json",
+        "limit": 1,
+        "limit_latest_versions": -1,
+        "no_pretty": false,
+        "output": "/mnt/workdir/adviser-211123195453-bb9f6846b33a9810",
+        "pipeline": null,
+        "plot": null,
+        "predictor": "AUTO",
+        "predictor_config": {},
+        "prescription": [
+          "/opt/app-root/src/prescriptions.pickle"
+        ],
+        "recommendation_type": "latest",
+        "requirements": "input/Pipfile",
+        "requirements_format": "pipenv",
+        "requirements_locked": "input/Pipfile.lock",
+        "runtime_environment": "input/runtime_environment.json",
+        "seed": 42,
+        "user_stack_scoring": true
+      },
+      "thoth-adviser": {
+        "metadata": {
+          "kebechet_metadata": null,
+          "origin": "git@github.com:thoth-station/jupyterlab-requirements.git",
+          "re_run_adviser_id": null,
+          "source_type": "JUPYTER_NOTEBOOK",
+          "thoth.adviser": {
+            "justification": null,
+            "stack_info": null
+          }
+        },
+        "verbose": false
+      }
+    },
+    "datetime": "2021-11-23T19:55:34.473867",
+    "distribution": {
+      "codename": "Ootpa",
+      "id": "rhel",
+      "like": "fedora",
+      "version": "8.3",
+      "version_parts": {
+        "build_number": "",
+        "major": "8",
+        "minor": "3"
+      }
+    },
+    "document_id": "adviser-211123195453-bb9f6846b33a9810",
+    "duration": 28,
+    "hostname": "adviser-211123195453-bb9f6846b33a9810-2768147984",
+    "os_release": {
+      "id": "rhel",
+      "name": "Red Hat Enterprise Linux",
+      "platform_id": "platform:el8",
+      "redhat_bugzilla_product": "Red Hat Enterprise Linux 8",
+      "redhat_bugzilla_product_version": "8.3",
+      "redhat_support_product": "Red Hat Enterprise Linux",
+      "redhat_support_product_version": "8.3",
+      "version": "8.3 (Ootpa)",
+      "version_id": "8.3"
+    },
+    "python": {
+      "api_version": 1013,
+      "implementation_name": "cpython",
+      "major": 3,
+      "micro": 3,
+      "minor": 8,
+      "releaselevel": "final",
+      "serial": 0
+    },
+    "thoth_deployment_name": "aws-prod",
+    "timestamp": 1637697334
+  },
+  "result": {
+    "error": false,
+    "error_msg": null,
+    "parameters": {
+      "beam_width": 25000,
+      "constraints": "input/constraints.txt",
+      "count": 1,
+      "dev": false,
+      "labels": {},
+      "library_usage": {
+        "report": {},
+        "version": "0.1.0"
+      },
+      "limit": 1,
+      "limit_latest_versions": -1,
+      "no_pretty": false,
+      "output": "/mnt/workdir/adviser-211123195453-bb9f6846b33a9810",
+      "pipeline": null,
+      "plot": null,
+      "predictor": "AUTO",
+      "predictor_config": "{}",
+      "prescription": [
+        "/opt/app-root/src/prescriptions.pickle"
+      ],
+      "project": {
+        "constraints": [],
+        "requirements": {
+          "dev-packages": {},
+          "packages": {
+            "boto3": "*",
+            "numpy": "*"
+          },
+          "requires": {
+            "python_version": "3.8"
+          },
+          "source": [
+            {
+              "name": "pypi-org-simple",
+              "url": "https://pypi.org/simple",
+              "verify_ssl": true
+            }
+          ]
+        },
+        "requirements_locked": null,
+        "runtime_environment": {
+          "base_image": null,
+          "cuda_version": null,
+          "cudnn_version": null,
+          "hardware": {
+            "cpu_family": 6,
+            "cpu_model": 142,
+            "gpu_model": null
+          },
+          "mkl_version": null,
+          "name": "test",
+          "openblas_version": null,
+          "openmpi_version": null,
+          "operating_system": {
+            "name": "ubi",
+            "version": "8"
+          },
+          "platform": "linux-x86_64",
+          "python_version": "3.8",
+          "recommendation_type": null
+        }
+      },
+      "recommendation_type": "latest",
+      "requirements": "input/Pipfile",
+      "requirements_format": "pipenv",
+      "requirements_locked": "input/Pipfile.lock",
+      "runtime_environment": "input/runtime_environment.json",
+      "seed": 42,
+      "user_stack_scoring": true
+    },
+    "report": {
+      "accepted_final_states_count": 1,
+      "discarded_final_states_count": 0,
+      "pipeline": null,
+      "products": [
+        {
+          "advised_manifest_changes": [],
+          "advised_runtime_environment": null,
+          "dependency_graph": {
+            "edges": [
+              [
+                1,
+                2
+              ],
+              [
+                1,
+                4
+              ],
+              [
+                1,
+                3
+              ],
+              [
+                2,
+                5
+              ],
+              [
+                2,
+                3
+              ],
+              [
+                2,
+                6
+              ],
+              [
+                4,
+                2
+              ],
+              [
+                5,
+                7
+              ]
+            ],
+            "nodes": [
+              "numpy",
+              "boto3",
+              "botocore",
+              "jmespath",
+              "s3transfer",
+              "python-dateutil",
+              "urllib3",
+              "six"
+            ]
+          },
+          "justification": [
+            {
+              "link": "https://github.com/thoth-station/s2i-thoth/",
+              "message": "See S2I Thoth base images and their docs for more info",
+              "type": "INFO"
+            },
+            {
+              "link": "https://stackoverflow.com/questions/tagged/python-3.8",
+              "message": "See StackOverflow tags specific for Python 3.8",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/recommendation-types/",
+              "message": "The recommended software stack was computed based on the 'latest' recommendation type",
+              "type": "INFO"
+            },
+            {
+              "link": "https://libraries.io/pypi/boto3/",
+              "message": "Information about 'boto3' on libraries.io",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'boto3' in version '1.19.11'",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/boto3/1.19.11/",
+              "message": "Package 'boto3' in version '1.19.11' is released on PyPI",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/boto3",
+              "message": "Package 'boto3' is hosted on GitHub",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/boto3",
+              "message": "Project 'boto3' has very high popularity on GitHub",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is actively maintained based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/boto3/releases/tag/1.19.11",
+              "message": "Release notes for package 'boto3'",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://stackoverflow.com/questions/tagged/boto3",
+              "message": "See StackOverflow tags specific for boto3",
+              "package_name": "boto3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "boto3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/botocore/",
+              "message": "Information about 'botocore' on libraries.io",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'botocore' in version '1.22.12'",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/botocore/1.22.12/",
+              "message": "Package 'botocore' in version '1.22.12' is released on PyPI",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/botocore",
+              "message": "Package 'botocore' is hosted on GitHub",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/botocore",
+              "message": "Project 'botocore' has very high popularity on GitHub",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is actively maintained based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/botocore/releases/tag/1.22.12",
+              "message": "Release notes for package 'botocore'",
+              "package_name": "botocore",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "botocore",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/jmespath/",
+              "message": "Information about 'jmespath' on libraries.io",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'jmespath' in version '0.10.0'",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/jmespath/0.10.0/",
+              "message": "Package 'jmespath' in version '0.10.0' is released on PyPI",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/jmespath/jmespath.py",
+              "message": "Package 'jmespath' is hosted on GitHub",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/jmespath/jmespath.py",
+              "message": "Project 'jmespath' has very high popularity on GitHub",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project cryptographically signs tags based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/jmespath/jmespath.py/releases/tag/0.10.0",
+              "message": "Release notes for package 'jmespath'",
+              "package_name": "jmespath",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/trove_py",
+              "message": "No Python specific trove classifier matching Python version used '3.8'",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/jmespath/jmespath.py",
+              "message": "Package 'jmespath' was last updated at 2020-05-12 22:01:13",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT require code review before the code is merged based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is NOT actively maintained based on Security Scorecards",
+              "package_name": "jmespath",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/numpy/",
+              "message": "Information about 'numpy' on libraries.io",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'numpy' in version '1.21.4'",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/numpy/1.21.4/",
+              "message": "Package 'numpy' in version '1.21.4' is released on PyPI",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/numpy/numpy",
+              "message": "Package 'numpy' is hosted on GitHub",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/numpy/numpy",
+              "message": "Project 'numpy' has very high popularity on GitHub",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a security policy published based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is actively maintained based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is published as a package based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project uses tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/numpy/numpy/releases/tag/v1.21.4",
+              "message": "Release notes for package 'numpy'",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://numpy.org/doc/",
+              "message": "See NumPy project documentation",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://stackoverflow.com/questions/tagged/numpy",
+              "message": "See StackOverflow tags specific for NumPy",
+              "package_name": "numpy",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/cve_warning",
+              "message": "Package 'numpy' is known to have at least 3 vulnerabilities reported in releases",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign released artifacts based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "numpy",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/python-dateutil/",
+              "message": "Information about 'python-dateutil' on libraries.io",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'python-dateutil' in version '2.8.2'",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/python-dateutil/2.8.2/",
+              "message": "Package 'python-dateutil' in version '2.8.2' is released on PyPI",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/dateutil/dateutil",
+              "message": "Package 'python-dateutil' is hosted on GitHub",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/dateutil/dateutil",
+              "message": "Project 'python-dateutil' has very high popularity on GitHub",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project cryptographically signs released artifacts based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is actively maintained based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/dateutil/dateutil/releases/tag/2.8.2",
+              "message": "Release notes for package 'python-dateutil'",
+              "package_name": "python-dateutil",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "python-dateutil",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/s3transfer/",
+              "message": "Information about 's3transfer' on libraries.io",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 's3transfer' in version '0.5.0'",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/s3transfer/0.5.0/",
+              "message": "Package 's3transfer' in version '0.5.0' is released on PyPI",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/s3transfer",
+              "message": "Package 's3transfer' is hosted on GitHub",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/s3transfer",
+              "message": "Project 's3transfer' has high popularity on GitHub",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/boto/s3transfer/releases/tag/0.5.0",
+              "message": "Release notes for package 's3transfer'",
+              "package_name": "s3transfer",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT run CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is NOT actively maintained based on Security Scorecards",
+              "package_name": "s3transfer",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/six/",
+              "message": "Information about 'six' on libraries.io",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'six' in version '1.16.0'",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/six/1.16.0/",
+              "message": "Package 'six' in version '1.16.0' is released on PyPI",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/benjaminp/six",
+              "message": "Package 'six' is hosted on GitHub",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/benjaminp/six",
+              "message": "Project 'six' has very high popularity on GitHub",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project follows the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project uses pinned dependencies based on Security Scorecards",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/benjaminp/six/releases/tag/1.16.0",
+              "message": "Release notes for package 'six'",
+              "package_name": "six",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not use fuzzing based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is NOT actively maintained based on Security Scorecards",
+              "package_name": "six",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://libraries.io/pypi/urllib3/",
+              "message": "Information about 'urllib3' on libraries.io",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/no_cve",
+              "message": "No known CVE known for 'urllib3' in version '1.26.7'",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://pypi.org/project/urllib3/1.26.7/",
+              "message": "Package 'urllib3' in version '1.26.7' is released on PyPI",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/urllib3/urllib3",
+              "message": "Package 'urllib3' is hosted on GitHub",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/urllib3/urllib3",
+              "message": "Project 'urllib3' has very high popularity on GitHub",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have binary artifacts in the source repository",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have open or unfixed vulnerabilities on the OSV service based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project has a set of contributors from multiple companies based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project is actively maintained based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project requires code review before the code is merged based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project runs CI tests before pull requests are merged based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project uses fuzzing based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://github.com/urllib3/urllib3/releases/tag/1.26.7",
+              "message": "Release notes for package 'urllib3'",
+              "package_name": "urllib3",
+              "type": "INFO"
+            },
+            {
+              "link": "https://thoth-station.ninja/j/cve_warning",
+              "message": "Package 'urllib3' is known to have at least 3 vulnerabilities reported in releases",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign released artifacts based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT cryptographically sign tags based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT follow the principle of least privileged in GitHub workflows based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT have branch protection setup based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT honour CII Best Practices based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use pinned dependencies based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use static source code analysis based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does NOT use tools for automatic dependency updates based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            },
+            {
+              "link": "https://github.com/ossf/scorecard/blob/main/docs/checks.md",
+              "message": "Project does not have any security policy published based on Security Scorecards",
+              "package_name": "urllib3",
+              "type": "WARNING"
+            }
+          ],
+          "project": {
+            "constraints": [],
+            "requirements": {
+              "dev-packages": {},
+              "packages": {
+                "boto3": "*",
+                "numpy": "*"
+              },
+              "requires": {
+                "python_version": "3.8"
+              },
+              "source": [
+                {
+                  "name": "pypi-org-simple",
+                  "url": "https://pypi.org/simple",
+                  "verify_ssl": true
+                }
+              ],
+              "thoth": {
+                "allow_prereleases": {},
+                "disable_index_adjustment": false
+              }
+            },
+            "requirements_locked": {
+              "_meta": {
+                "hash": {
+                  "sha256": "38000e3c6b19693838adc50e9a93a923343a1dcdd407844799f81f5afd76bb0e"
+                },
+                "pipfile-spec": 6,
+                "requires": {
+                  "python_version": "3.8"
+                },
+                "sources": [
+                  {
+                    "name": "pypi-org-simple",
+                    "url": "https://pypi.org/simple",
+                    "verify_ssl": true
+                  }
+                ]
+              },
+              "default": {
+                "boto3": {
+                  "hashes": [
+                    "sha256:54c8aecabc2d093c84751c874e9514e88454bcf2b9a2426282c889961842ed16",
+                    "sha256:078f3d81b7f5f9bd4184ccc9948911058492992635a94f63adddeacf99a72cd7"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==1.19.11"
+                },
+                "botocore": {
+                  "hashes": [
+                    "sha256:1d1094fb53ebe4535d8840fbd7c14aadb65bde7ff03a65f9a4f1d76bd03e16ff",
+                    "sha256:fc59b55e8c5dde64b017b2f114c25f8cce397b667e812aea7eafb4b59b49d7cb"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==1.22.12"
+                },
+                "jmespath": {
+                  "hashes": [
+                    "sha256:cdf6525904cc597730141d61b36f2e4b8ecc257c420fa2f4549bac2c2d0cb72f",
+                    "sha256:b85d0567b8666149a93172712e68920734333c0ce7e89b78b3e987f71e5ed4f9"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==0.10.0"
+                },
+                "numpy": {
+                  "hashes": [
+                    "sha256:8890b3360f345e8360133bc078d2dacc2843b6ee6059b568781b15b97acbe39f",
+                    "sha256:69077388c5a4b997442b843dbdc3a85b420fb693ec8e33020bb24d647c164fa5",
+                    "sha256:e89717274b41ebd568cd7943fc9418eeb49b1785b66031bc8a7f6300463c5898",
+                    "sha256:0b78ecfa070460104934e2caf51694ccd00f37d5e5dbe76f021b1b0b0d221823",
+                    "sha256:615d4e328af7204c13ae3d4df7615a13ff60a49cb0d9106fde07f541207883ca",
+                    "sha256:1403b4e2181fc72664737d848b60e65150f272fe5a1c1cbc16145ed43884065a",
+                    "sha256:74b85a17528ca60cf98381a5e779fc0264b4a88b46025e6bcbe9621f46bb3e63",
+                    "sha256:92aafa03da8658609f59f18722b88f0a73a249101169e28415b4fa148caf7e41",
+                    "sha256:5d95668e727c75b3f5088ec7700e260f90ec83f488e4c0aaccb941148b2cd377",
+                    "sha256:f5162ec777ba7138906c9c274353ece5603646c6965570d82905546579573f73",
+                    "sha256:81225e58ef5fce7f1d80399575576fc5febec79a8a2742e8ef86d7b03beef49f",
+                    "sha256:32fe5b12061f6446adcbb32cf4060a14741f9c21e15aaee59a207b6ce6423469",
+                    "sha256:c449eb870616a7b62e097982c622d2577b3dbc800aaf8689254ec6e0197cbf1e",
+                    "sha256:2e4ed57f45f0aa38beca2a03b6532e70e548faf2debbeb3291cfc9b315d9be8f",
+                    "sha256:1247ef28387b7bb7f21caf2dbe4767f4f4175df44d30604d42ad9bd701ebb31f",
+                    "sha256:34f3456f530ae8b44231c63082c8899fe9c983fd9b108c997c4b1c8c2d435333",
+                    "sha256:4c9c23158b87ed0e70d9a50c67e5c0b3f75bcf2581a8e34668d4e9d7474d76c6",
+                    "sha256:e4799be6a2d7d3c33699a6f77201836ac975b2e1b98c2a07f66a38f499cb50ce",
+                    "sha256:bc988afcea53e6156546e5b2885b7efab089570783d9d82caf1cfd323b0bb3dd",
+                    "sha256:170b2a0805c6891ca78c1d96ee72e4c3ed1ae0a992c75444b6ab20ff038ba2cd",
+                    "sha256:fde96af889262e85aa033f8ee1d3241e32bf36228318a61f1ace579df4e8170d",
+                    "sha256:c885bfc07f77e8fee3dc879152ba993732601f1f11de248d4f357f0ffea6a6d4",
+                    "sha256:9e6f5f50d1eff2f2f752b3089a118aee1ea0da63d56c44f3865681009b0af162",
+                    "sha256:ad010846cdffe7ec27e3f933397f8a8d6c801a48634f419e3d075db27acf5880",
+                    "sha256:c74c699b122918a6c4611285cc2cad4a3aafdb135c22a16ec483340ef97d573c",
+                    "sha256:9864424631775b0c052f3bd98bc2712d131b3e2cd95d1c0c68b91709170890b0",
+                    "sha256:b1e2312f5b8843a3e4e8224b2b48fe16119617b8fc0a54df8f50098721b5bed2",
+                    "sha256:e3c3e990274444031482a31280bf48674441e0a5b55ddb168f3a6db3e0c38ec8",
+                    "sha256:a3deb31bc84f2b42584b8c4001c85d1934dbfb4030827110bc36bfd11509b7bf",
+                    "sha256:e6c76a87633aa3fa16614b61ccedfae45b91df2767cf097aa9c933932a7ed1e0"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==1.21.4"
+                },
+                "python-dateutil": {
+                  "hashes": [
+                    "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9",
+                    "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==2.8.2"
+                },
+                "s3transfer": {
+                  "hashes": [
+                    "sha256:9c1dc369814391a6bda20ebbf4b70a0f34630592c9aa520856bf384916af2803",
+                    "sha256:50ed823e1dc5868ad40c8dc92072f757aa0e653a192845c94a3b676f4a62da4c"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==0.5.0"
+                },
+                "six": {
+                  "hashes": [
+                    "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254",
+                    "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==1.16.0"
+                },
+                "urllib3": {
+                  "hashes": [
+                    "sha256:c4fdf4019605b6e5423637e01bc9fe4daef873709a7973e195ceba0a62bbc844",
+                    "sha256:4987c65554f7a2dbf30c18fd48778ef124af6fab771a377103da0585e2336ece"
+                  ],
+                  "index": "pypi-org-simple",
+                  "version": "==1.26.7"
+                }
+              },
+              "develop": {}
+            },
+            "runtime_environment": {
+              "base_image": null,
+              "cuda_version": null,
+              "cudnn_version": null,
+              "hardware": {
+                "cpu_family": 6,
+                "cpu_model": 142,
+                "gpu_model": null
+              },
+              "mkl_version": null,
+              "name": "test",
+              "openblas_version": null,
+              "openmpi_version": null,
+              "operating_system": {
+                "name": "rhel",
+                "version": "8"
+              },
+              "platform": "linux-x86_64",
+              "python_version": "3.8",
+              "recommendation_type": null
+            }
+          },
+          "score": 0.0
+        }
+      ],
+      "resolver_iterations": 14,
+      "stack_info": [
+        {
+          "link": "https://thoth-station.ninja/j/cve_timestamp",
+          "message": "CVE database of known vulnerabilities for Python packages was updated at '2021-11-23T00:00:04.004211'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/thoth_s2i",
+          "message": "It is recommended to use Thoth's s2i to have recommendations specific to runtime environment",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/rhel_ubi",
+          "message": "Using observations for RHEL instead of UBI, RHEL is ABI compatible with UBI",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Resolving for runtime environment named 'test'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Resolving for operating system 'rhel' in version '8'"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Resolving for Python version '3.8'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/recommendation-types/",
+          "message": "Using recommendation type 'latest'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Using platform 'linux-x86_64'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No constraints supplied to the resolution process",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Using supplied static source code analysis",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No containerized environment used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "Using CPU family 6 model 142",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No CUDA used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No cuDNN used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No OpenBLAS used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No OpenMPI used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/env",
+          "message": "No MKL used",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/eol_env",
+          "message": "Runtime environment used is no longer supported, it is recommended to switch to another runtime environment",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/prescription",
+          "message": "Using prescriptions 'thoth' release 'v0.11.0'",
+          "type": "INFO"
+        },
+        {
+          "link": "https://github.com/thoth-station/prescriptions",
+          "message": "Using resolver prescriptions from thoth-station/prescriptions",
+          "type": "INFO"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/rules",
+          "message": "Removing package 'boto3' in versions '<=1.4.1' from index 'https://pypi.org/simple' based on rule: Package released before December 2016",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/rules",
+          "message": "Removing package 'jmespath' in versions '<=0.9.0' from index 'https://pypi.org/simple' based on rule: Package released before December 2016",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/rules",
+          "message": "Removing package 'python-dateutil' in versions '<=2.6.0' from index 'https://pypi.org/simple' based on rule: Package released before December 2016",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/rules",
+          "message": "Removing package 'six' in versions '<=1.10.0' from index 'https://pypi.org/simple' based on rule: Package released before December 2016",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'boto3' from 'https://pypi.org/simple' were removed due to installation issues in the target environment: 1.18.41, 1.2.0",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'boto3' from 'https://tensorflow.pypi.thoth-station.ninja/index/manylinux2010/AVX2/simple' were removed due to installation issues in the target environment: 1.18.48, 1.18.47, 1.18.35, 1.18.19, 1.18.12, 1.18.10, 1.18.8, 1.18.1, 1.17.111, 1.17.107, 1.17.79, 1.17.52, 1.17.45, 1.16.38, 1.12.3, 1.10.9, 1.9.248, 1.9.184, 1.9.90, 1.9.85, 1.9.64, 1.9.2, 1.7.79, 1.7.39, 1.7.20, 1.7.16, 1.7.2",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'numpy' from 'https://pypi.org/simple' were removed due to installation issues in the target environment: 1.17.2, 1.17.1, 1.17.0, 1.16.6, 1.16.5, 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.16.0, 1.15.4, 1.15.3, 1.14.6, 1.14.2, 1.14.1, 1.14.0, 1.13.3, 1.13.1, 1.13.0, 1.12.1, 1.12.0, 1.11.3, 1.11.2, 1.11.1, 1.11.0, 1.10.4, 1.10.3, 1.10.2, 1.10.1, 1.10.0, 1.9.3, 1.9.2, 1.9.1, 1.9.0, 1.8.2, 1.8.1, 1.8.0, 1.7.2, 1.7.1, 1.7.0, 1.6.2, 1.6.1, 1.6.0, 1.5.1, 1.5.0, 1.4.1, 1.4.0, 1.3.0, 1.2.1, 1.2.0, 1.1.1, 1.0.4, 1.0.3, 1.0, 0.9.8, 0.9.6",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'numpy' from 'https://tensorflow.pypi.thoth-station.ninja/index/manylinux2010/AVX2/simple' were removed due to installation issues in the target environment: 1.17.5, 1.13.3",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'python-dateutil' from 'https://tensorflow.pypi.thoth-station.ninja/index/manylinux2010/AVX2/simple' were removed due to installation issues in the target environment: 2.8.1",
+          "type": "WARNING"
+        },
+        {
+          "link": "https://thoth-station.ninja/j/install_error",
+          "message": "The following versions of 'urllib3' from 'https://tensorflow.pypi.thoth-station.ninja/index/manylinux2010/AVX2/simple' were removed due to installation issues in the target environment: 1.25.6",
+          "type": "WARNING"
+        }
+      ]
+    }
+  }
+}

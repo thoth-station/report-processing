@@ -423,16 +423,18 @@ class Adviser:
 
         for info in stack_info:
 
-            justification = {"message": info["message"], "type": info["type"]}
-
-            if "link" in info:
-                message = info["link"]
+            if "type" not in info:
+                type_info = "INFO"
             else:
-                message = info["message"]
+                type_info = info["type"]
+
+            justification = {"message": info["message"], "type": type_info}
+
+            message = info["link"]
 
             error = False
 
-            if info["type"] == "ERROR":
+            if type_info == "ERROR":
                 error = True
                 error_count += 1
 
@@ -444,7 +446,7 @@ class Adviser:
                     "justification": justification,
                     "error": error,
                     "message": message,
-                    "type": info["type"],
+                    "type": type_info,
                 },
             )
 
@@ -530,7 +532,7 @@ class Adviser:
     def create_adviser_results_dataframe_histogram(adviser_type_dataframe: pd.DataFrame) -> pd.DataFrame:
         """Create adviser results dataframe sorted for histogram plot.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_adviser_dataframe`
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_adviser_dataframes`
         """
         histogram_data: Dict[str, Any] = {}
 
@@ -554,7 +556,7 @@ class Adviser:
     def _aggregate_data_per_interval(adviser_type_dataframe: pd.DataFrame, number_days: int = 7) -> pd.DataFrame:
         """Aggregate advise justifications per days intervals.
 
-        :param adviser_type_dataframe dataframe produced by `create_adviser_dataframe`
+        :param adviser_type_dataframe dataframe produced by `create_adviser_dataframes`
         """
         begin = min(adviser_type_dataframe["date"].values)
         end = max(adviser_type_dataframe["date"].values)
@@ -621,7 +623,7 @@ class Adviser:
     ) -> pd.DataFrame:
         """Create adviser justifications heatmap.
 
-        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_adviser_dataframe`
+        :param adviser_type_dataframe dataframe as given by any of df outputs in `create_adviser_dataframes`
         :param number_days: number of days to split data.
         """
         data = cls._aggregate_data_per_interval(adviser_type_dataframe=adviser_type_dataframe, number_days=number_days)
