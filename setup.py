@@ -56,6 +56,7 @@ class Test(TestCommand):
         "-l",
         "-s",
         "-vv",
+        "--cache-clear",
         "tests/",
     ]
 

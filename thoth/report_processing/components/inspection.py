@@ -743,17 +743,28 @@ class AmunInspections:
         row_number = 0
         extracted_columns = []
         flags_columns = []
+        flags_dfs = {}
 
+        # Identify subset of columns to be considered for final results
         for dataframe in processed_inspection_runs.values():
 
             for column in dataframe.columns.values:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
 
+            flags_dict = {}
             for flags in dataframe["__hwinfo__cpu_features__flags"].values:
                 for flag in flags:
                     if f"flag__{flag}" not in flags_columns:
                         flags_columns.append(f"flag__{flag}")
+
+                    if f"flag__{flag}" not in flags_dict:
+                        flags_dict[f"flag__{flag}"] = True
+
+            flags_df = pd.DataFrame.from_dict(flags_dict, orient="index")
+            flags_dfs[str(row_number)] = flags_df
+
+            row_number += 1
 
         for flag_column in flags_columns:
             extracted_columns.append(flag_column)
@@ -762,26 +773,31 @@ class AmunInspections:
         for extra_column in extra_columns:
             extracted_columns.append(extra_column)
 
-        main_inspection_df = pd.DataFrame(columns=extracted_columns)
-
+        # Select columns where statistics can be performed
         column_names = [
             cls._INSPECTION_PERFORMANCE_VALUES[p_value] for p_value in performance_values
         ] + cls._INSPECTION_USAGE_VALUES
 
+        # Create final dataframe with all inspection results
+        row_number = 0
+        data = []
+
         for dataframe in processed_inspection_runs.values():
 
+            # Create dataframe with statistics
             new_df = cls.evaluate_statistics_on_inspection_df(
                 inspection_df=dataframe,
                 column_names=column_names,
                 extra_columns=extra_columns,
             )
 
-            for flags_ in dataframe["__hwinfo__cpu_features__flags"].values:
-                for flag_ in flags_:
-                    new_df[f"flag__{flag_}"] = True
+            # concatenate with dataframe with flagsz
+            new_df = pd.concat([new_df, flags_dfs[str(row_number)].T], axis=1)
 
-            main_inspection_df.loc[row_number] = new_df.iloc[0]
+            data.append(new_df)
             row_number += 1
+
+            main_inspection_df = pd.concat(data, axis=0)
 
         if include_statistics:
             inspections_statistics_dataframe = AmunInspectionsStatistics.create_inspections_statistics_dataframe(
@@ -970,14 +986,14 @@ class AmunInspections:
 
             standardized_identifiers.append(identifier_filter)
 
-        final_df["identifier"] = inspections_df["identifier"]
+        final_df["identifier"] = inspections_df["identifier"].values
         final_df["standardized_identifier"] = standardized_identifiers
 
-        final_df["start_datetime"] = inspections_df["inspection_start"]
-        final_df["end_datetime"] = inspections_df["inspection_end"]
+        final_df["start_datetime"] = inspections_df["inspection_start"].values
+        final_df["end_datetime"] = inspections_df["inspection_end"].values
 
-        final_df["total_duration"] = inspections_df["inspection_duration"]
-        final_df["inspection_batch"] = inspections_df["inspection_batch"]
+        final_df["total_duration"] = inspections_df["inspection_duration"].values
+        final_df["inspection_batch"] = inspections_df["inspection_batch"].values
 
         if include_statistics:
             final_df["statistical_parameter"] = inspections_df["statistical_parameter"]
