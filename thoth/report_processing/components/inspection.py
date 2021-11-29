@@ -565,7 +565,11 @@ class AmunInspections:
     @staticmethod
     def _parse_requirements_locked(requirements_locked: Dict[str, Any]) -> Dict[str, Any]:
         """Parse requirements_locked to make sure name, version, index is present."""
-        default = requirements_locked["default"]
+        try:
+            default = requirements_locked["default"]
+        except KeyError:
+            raise KeyError
+
         for package_name, data in default.items():
 
             # Use PyPI index as default if index is missing
