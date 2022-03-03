@@ -753,7 +753,7 @@ class AmunInspections:
                     extracted_columns.append(column)
 
             flags_dict = {}
-            for flags in dataframe["__hwinfo__cpu_features__flags"].values:
+            for flags in dataframe["hwinfo__cpu_features__flags"].values:
                 for flag in flags:
                     if f"flag__{flag}" not in flags_columns:
                         flags_columns.append(f"flag__{flag}")
