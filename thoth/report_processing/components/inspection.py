@@ -680,7 +680,7 @@ class AmunInspections:
                     inspection_duration = inspection_end - inspection_start
 
             elif c_name in unashable_columns.index.values:
-                if c_name == "__hwinfo__cpu_features__flags":
+                if c_name == "hwinfo__cpu_features__flags":
                     initial_set = set(inspection_df[c_name][0])
                     difference = False
                     for flags_counter in range(1, len(inspection_df[c_name])):
