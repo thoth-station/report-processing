@@ -1,5 +1,14 @@
 # Changelog for Thoth's Template GitHub Project
 
+## Release 0.8.1 (2022-03-11T14:47:10)
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* Fix tests and creating python package Dataframes
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* Fix key error for create_inspections_dataframe
+* :arrow_up: Automatic update of dependencies by Kebechet for the ubi8 environment
+* Update pyproject.toml to use Python 3.8
+* Add github template for missing module
+
 ## Release 0.8.0 (2021-11-25T12:22:46)
 * add missing data
 * Optimize for performance
