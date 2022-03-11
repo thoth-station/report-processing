@@ -680,7 +680,7 @@ class AmunInspections:
                     inspection_duration = inspection_end - inspection_start
 
             elif c_name in unashable_columns.index.values:
-                if c_name == "__hwinfo__cpu_features__flags":
+                if c_name == "hwinfo__cpu_features__flags":
                     initial_set = set(inspection_df[c_name][0])
                     difference = False
                     for flags_counter in range(1, len(inspection_df[c_name])):
@@ -824,18 +824,18 @@ class AmunInspections:
 
         for c_name in sws_df.columns.values:
             if "__index" in c_name:
-                python_packages_names.append(c_name.split("__")[3])
+                python_packages_names.append(c_name.split("__")[2])
 
         columns_packages = []
         for package in python_packages_names:
-            columns_packages.append("".join(["__requirements_locked__default__", package, "__index"]))
-            columns_packages.append("".join(["__requirements_locked__default__", package, "__version"]))
+            columns_packages.append("".join(["requirements_locked__default__", package, "__index"]))
+            columns_packages.append("".join(["requirements_locked__default__", package, "__version"]))
 
         for index, row in inspections_df[columns_packages].iterrows():
 
             for package in python_packages_names:
-                version = row["".join(["__requirements_locked__default__", package, "__version"])]
-                index = row["".join(["__requirements_locked__default__", package, "__index"])]
+                version = row["".join(["requirements_locked__default__", package, "__version"])]
+                index = row["".join(["requirements_locked__default__", package, "__index"])]
 
                 if pd.isnull(version):
                     if package not in python_packages_versions.keys():
@@ -897,7 +897,7 @@ class AmunInspections:
         re_encoded = []
 
         for index, row in inspections_df[
-            ["__os_release__id", "__os_release__version_id", "__requirements_locked___meta__requires__python_version"]
+            ["os_release__id", "os_release__version_id", "requirements_locked___meta__requires__python_version"]
         ].iterrows():
             re_values = [re for re in row.values]
             re_values[2] = "".join(["py", "".join(re_values[2].split("."))])
@@ -933,32 +933,32 @@ class AmunInspections:
         # Hardware:
         # CPU
         processed_string_result["cpu_brand"] = [
-            cpu_brand[0] for cpu_brand in inspections_df[["__hwinfo__cpu_info__brand_raw"]].values
+            cpu_brand[0] for cpu_brand in inspections_df[["hwinfo__cpu_info__brand_raw"]].values
         ]
         processed_string_result["cpu_family"] = [
-            cpu_family[0] for cpu_family in inspections_df[["__runtime_environment__hardware__cpu_family"]].values
+            cpu_family[0] for cpu_family in inspections_df[["runtime_environment__hardware__cpu_family"]].values
         ]
         processed_string_result["cpu_model"] = [
-            cpu_model[0] for cpu_model in inspections_df[["__runtime_environment__hardware__cpu_model"]].values
+            cpu_model[0] for cpu_model in inspections_df[["runtime_environment__hardware__cpu_model"]].values
         ]
         processed_string_result["number_cpus"] = [
-            number_cpus[0] for number_cpus in inspections_df[["__run__requests__cpu"]].values
+            number_cpus[0] for number_cpus in inspections_df[["run__requests__cpu"]].values
         ]
         # GPU
         processed_string_result["cuda_version"] = [
-            cuda_version[0] for cuda_version in inspections_df[["__runtime_environment__cuda_version"]].values
+            cuda_version[0] for cuda_version in inspections_df[["runtime_environment__cuda_version"]].values
         ]
 
         # PI
-        processed_string_result["pi_name"] = [pi_n[0] for pi_n in inspections_df[["__stdout__name"]].values]
-        processed_string_result["pi_component"] = [pi_c[0] for pi_c in inspections_df[["__stdout__component"]].values]
+        processed_string_result["pi_name"] = [pi_n[0] for pi_n in inspections_df[["stdout__name"]].values]
+        processed_string_result["pi_component"] = [pi_c[0] for pi_c in inspections_df[["stdout__component"]].values]
         processed_string_result["pi_sha256"] = [pi_c[0] for pi_c in inspections_df[["script_sha256"]].values]
 
         # PI performance results
         processed_string_result["elapsed_time"] = [
-            r_e[0] for r_e in inspections_df[["__stdout__@result__elapsed"]].values
+            r_e[0] for r_e in inspections_df[["stdout__@result__elapsed"]].values
         ]
-        processed_string_result["rate"] = [r_r[0] for r_r in inspections_df[["__stdout__@result__rate"]].values]
+        processed_string_result["rate"] = [r_r[0] for r_r in inspections_df[["stdout__@result__rate"]].values]
 
         processed_string_result["inspection_document_id"] = [
             i[0] for i in inspections_df[["inspection_document_id"]].values

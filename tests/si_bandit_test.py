@@ -85,18 +85,18 @@ class TestSecurityReportsBandit(ReportProcessingTestCase):
 
         severity_confidence_info_keys = [k for k in severity_confidence_info]
         severity_confidence_info_test_keys = [
-            "__SEVERITY.LOW__CONFIDENCE.LOW",
-            "__SEVERITY.LOW__CONFIDENCE.MEDIUM",
-            "__SEVERITY.LOW__CONFIDENCE.HIGH",
-            "__SEVERITY.LOW__CONFIDENCE.UNDEFINED",
-            "__SEVERITY.MEDIUM__CONFIDENCE.LOW",
-            "__SEVERITY.MEDIUM__CONFIDENCE.MEDIUM",
-            "__SEVERITY.MEDIUM__CONFIDENCE.HIGH",
-            "__SEVERITY.MEDIUM__CONFIDENCE.UNDEFINED",
-            "__SEVERITY.HIGH__CONFIDENCE.LOW",
-            "__SEVERITY.HIGH__CONFIDENCE.MEDIUM",
-            "__SEVERITY.HIGH__CONFIDENCE.HIGH",
-            "__SEVERITY.HIGH__CONFIDENCE.UNDEFINED",
+            "SEVERITY.LOW__CONFIDENCE.LOW",
+            "SEVERITY.LOW__CONFIDENCE.MEDIUM",
+            "SEVERITY.LOW__CONFIDENCE.HIGH",
+            "SEVERITY.LOW__CONFIDENCE.UNDEFINED",
+            "SEVERITY.MEDIUM__CONFIDENCE.LOW",
+            "SEVERITY.MEDIUM__CONFIDENCE.MEDIUM",
+            "SEVERITY.MEDIUM__CONFIDENCE.HIGH",
+            "SEVERITY.MEDIUM__CONFIDENCE.UNDEFINED",
+            "SEVERITY.HIGH__CONFIDENCE.LOW",
+            "SEVERITY.HIGH__CONFIDENCE.MEDIUM",
+            "SEVERITY.HIGH__CONFIDENCE.HIGH",
+            "SEVERITY.HIGH__CONFIDENCE.UNDEFINED",
             "_total_severity",
         ]
         assert severity_confidence_info_keys == severity_confidence_info_test_keys
