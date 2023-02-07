@@ -128,7 +128,6 @@ class _SecurityIndicators:
             retrieved_files: Dict[str, Any] = {result_path.name: {}}
 
             for file_path in result_path.iterdir():
-
                 if store_files and file_path.name in store_files:
                     with open(file_path, "r") as json_file_type:
                         json_file = json.load(json_file_type)
@@ -342,7 +341,6 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         for file in si_bandit_report_result_metrics_df.columns.values:
             # Filter tests/ file
             if file != "_totals" and not any(filter_ in file for filter_ in filters_files):
-
                 analysis = {}
                 analysis["name"] = file
 
@@ -438,12 +436,9 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         )
         report_summary_df["number_of_analyzed_files"] = pd.to_numeric(summary_files["number_of_analyzed_files"])
         report_summary_df["number_of_filtered_files"] = pd.to_numeric(summary_files["number_of_filtered_files"])
-        report_summary_df["number_of_files_total"] = (
-            pd.to_numeric(
-                summary_files["number_of_filtered_files"],
-            )
-            + pd.to_numeric(summary_files["number_of_analyzed_files"])
-        )
+        report_summary_df["number_of_files_total"] = pd.to_numeric(
+            summary_files["number_of_filtered_files"],
+        ) + pd.to_numeric(summary_files["number_of_analyzed_files"])
         report_summary_df["_total_severity"] = pd.to_numeric(report_summary_df["_total_severity"])
 
         return report_summary_df
@@ -525,7 +520,6 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
         total_reports = len(si_bandit_reports)
 
         for si_bandit_report in si_bandit_reports:
-
             document_id = si_bandit_report["metadata"]["document_id"]
             _LOGGER.info(f"Analyzing SI-bandit report: {counter}/{total_reports}")
 
@@ -560,7 +554,6 @@ class SecurityIndicatorsBandit(_SecurityIndicators):
 
         for security in ["LOW", "MEDIUM", "HIGH"]:
             for confidence in ["LOW", "MEDIUM", "HIGH"]:
-
                 vulnerability_class = f"SEVERITY.{security}__CONFIDENCE.{confidence}"
 
                 min_max_scaler = (si_bandit_df[vulnerability_class] - si_bandit_df[vulnerability_class].min()) / (
@@ -769,7 +762,6 @@ class SecurityIndicatorsCloc:
         final_df = pd.DataFrame()
 
         for si_cloc_report in si_cloc_reports:
-
             document_id = si_cloc_report["metadata"]["document_id"]
             _LOGGER.info(f"Analyzing SI-cloc report: {counter}/{total_reports}")
 

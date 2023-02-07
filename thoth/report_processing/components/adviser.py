@@ -217,7 +217,6 @@ class Adviser:
         justifications_collected: List[Dict[str, Any]] = []
 
         for document_id, document in adviser_files.items():
-
             error_count = 0
             report = {}
 
@@ -333,7 +332,6 @@ class Adviser:
         adviser_inputs_collected: List[Dict[str, Any]] = []
 
         for document_id, document in adviser_files.items():
-
             datetime_advise_run = document["metadata"].get("datetime")
             datetime_object = datetime.strptime(datetime_advise_run, "%Y-%m-%dT%H:%M:%S.%f")
 
@@ -422,7 +420,6 @@ class Adviser:
             return justifications_collected, error_count
 
         for info in stack_info:
-
             if "type" not in info:
                 type_info = "INFO"
             else:
@@ -493,15 +490,12 @@ class Adviser:
         if justifications:
             # Collect all justifications
             for justification in justifications:
-
                 if "advisory" in justification:
-
                     error = True
                     message = justification["advisory"]
                     justification_type = justification["type"]
 
                 elif "link" in justification:
-
                     error = False
                     message = justification["link"]
                     justification_type = justification["type"]
@@ -715,7 +709,6 @@ class Adviser:
             justifications = product["justification"]
 
             if justifications:
-
                 for justification in justifications:
                     final_df.loc[counter] = pd.DataFrame([justification]).iloc[0]
                     counter += 1

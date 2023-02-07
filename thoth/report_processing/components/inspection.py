@@ -160,7 +160,6 @@ class AmunInspections:
             identifier_check = False
 
             if inspections_identifiers:
-
                 identifier_check = cls._has_inspection_identifier(
                     inspection_document_id,
                     inspections_identifiers,
@@ -184,7 +183,6 @@ class AmunInspections:
                     file_info: Dict[str, Any] = {}
 
                     if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
-
                         with open(f"{inspection_number_path}/result", "r") as result_file:
                             inspection_result_document = json.load(result_file)
 
@@ -192,14 +190,12 @@ class AmunInspections:
                             file_info["result"]["inspection_document_id"] = inspection_document_id
 
                         if store_files and ThothAmunInspectionFileStoreEnum.hardware_info.name in store_files:
-
                             with open(f"{inspection_number_path}/hwinfo", "r") as hwinfo_file:
                                 inspection_hw_info = json.load(hwinfo_file)
 
                                 file_info["hwinfo"] = inspection_hw_info
 
                         if store_files and ThothAmunInspectionFileStoreEnum.job_logs.name in store_files:
-
                             with open(f"{inspection_number_path}/log", "r") as job_log_file:
                                 inspection_job_logs = job_log_file.read()
 
@@ -221,7 +217,6 @@ class AmunInspections:
 
             try:
                 if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
-
                     with open(f"{result_path}/build/specification", "r") as specification_file:
                         inspection_specification_document = json.load(specification_file)
 
@@ -256,7 +251,6 @@ class AmunInspections:
 
             try:
                 if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
-
                     with open(f"{result_path}/build/log", "r") as build_logs_type:
                         inspection_build_logs = build_logs_type.read()
 
@@ -318,11 +312,9 @@ class AmunInspections:
         retrieved_files: List[Dict[str, Any]] = []
 
         for inspection_result_number in range(number_results):
-
             file_info: Dict[str, Any] = {}
 
             try:
-
                 if store_files and ThothAmunInspectionFileStoreEnum.results.name in store_files:
                     inspection_result_document = inspection_store.results.retrieve_result(
                         item=inspection_result_number,
@@ -400,7 +392,6 @@ class AmunInspections:
     ) -> Any:
         """Retrieve inspection build specification for inspection ID."""
         if store_files and ThothAmunInspectionFileStoreEnum.specification.name in store_files:
-
             try:
                 inspection_specification_document = inspection_store.retrieve_specification()
 
@@ -433,7 +424,6 @@ class AmunInspections:
     ) -> Any:
         """Retrieve inspection build logs for inspection ID."""
         if store_files and ThothAmunInspectionFileStoreEnum.build_logs.name in store_files:
-
             try:
                 inspection_build_logs = inspection_store.build.retrieve_log()
 
@@ -476,11 +466,9 @@ class AmunInspections:
                 os.mkdir(store_locally_repo_name)
 
         for inspection_document_id in inspection_ids_list or store_class_type.iter_inspections():
-
             identifier_check = False
 
             if inspections_identifiers:
-
                 identifier_check = cls._has_inspection_identifier(
                     inspection_document_id,
                     inspections_identifiers,
@@ -567,7 +555,6 @@ class AmunInspections:
         """Parse requirements_locked to make sure name, version, index is present."""
         default = requirements_locked["default"]
         for package_name, data in default.items():
-
             # Use PyPI index as default if index is missing
             if "index" not in data.keys():
                 modified_data = data.copy()
@@ -595,7 +582,6 @@ class AmunInspections:
             return processed_inspection_runs, failed_inspection_runs
 
         for inspection_id, inspection_run in inspection_runs.items():
-
             if "results" not in inspection_run.keys():
                 _LOGGER.warning(
                     f"Inspection ID {inspection_id} has not results, discarding...",
@@ -663,13 +649,11 @@ class AmunInspections:
         inspection_duration = None
 
         for c_name in inspection_df.columns.values:
-
             if c_name in column_names:
                 # TODO: Allow user to select another parameter, median used by default
                 new_data[c_name] = [inspection_df[c_name].median()]
 
             elif c_name == "end_datetime":
-
                 if "start_datetime" in inspection_df.columns.values:
                     inspection_start = pd.to_datetime(inspection_df["start_datetime"]).min()
 
@@ -747,7 +731,6 @@ class AmunInspections:
 
         # Identify subset of columns to be considered for final results
         for dataframe in processed_inspection_runs.values():
-
             for column in dataframe.columns.values:
                 if column not in extracted_columns:
                     extracted_columns.append(column)
@@ -783,7 +766,6 @@ class AmunInspections:
         data = []
 
         for dataframe in processed_inspection_runs.values():
-
             # Create dataframe with statistics
             new_df = cls.evaluate_statistics_on_inspection_df(
                 inspection_df=dataframe,
@@ -832,7 +814,6 @@ class AmunInspections:
             columns_packages.append("".join(["requirements_locked__default__", package, "__version"]))
 
         for index, row in inspections_df[columns_packages].iterrows():
-
             for package in python_packages_names:
                 version = row["".join(["requirements_locked__default__", package, "__version"])]
                 index = row["".join(["requirements_locked__default__", package, "__index"])]
@@ -1298,7 +1279,6 @@ class AmunInspectionsFailedSummary:
         total_packages = packages.union(packages_from_failed)
 
         for package in sorted(list(total_packages)):
-
             evaluated = 0
 
             success: Iterable[Any] = set()
